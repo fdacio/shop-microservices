@@ -1,0 +1,167 @@
+[
+    {
+        "id": 18,
+        "nome": "Smart Phone Moto G23",
+        "descricao": "Celular Motorola Moto G23 128GB Octacore",
+        "productIdentifier": "587889977",
+        "preco": 1800.0,
+        "category": {
+            "id": 1,
+            "nome": "Eletrônicos"
+        }
+    },
+    {
+        "id": 19,
+        "nome": "Cama Box Ortobom D23",
+        "descricao": "Cama Box Ortobom D12 2.10x1.70 cm - casal",
+        "productIdentifier": "174589741",
+        "preco": 1699.99,
+        "category": {
+            "id": 2,
+            "nome": "Móveis"
+        }
+    },
+    {
+        "id": 21,
+        "nome": "Colchão Onix D23",
+        "descricao": "Colchão Onix D23 2.10x1.70 cm - casal",
+        "productIdentifier": "1789588996",
+        "preco": 599.9,
+        "category": {
+            "id": 2,
+            "nome": "Móveis"
+        }
+    },
+    {
+        "id": 24,
+        "nome": "Tenis Nike Air Jordan",
+        "descricao": "Tênis Nike Modelo Air Jordan",
+        "productIdentifier": "187998369",
+        "preco": 249.99,
+        "category": {
+            "id": 4,
+            "nome": "Vestuários"
+        }
+    },
+    {
+        "id": 25,
+        "nome": "Lego Robo Explorer",
+        "descricao": "Coleção Lego Robo Explorer - 360 peças",
+        "productIdentifier": "148799369",
+        "preco": 254.99,
+        "category": {
+            "id": 3,
+            "nome": "Brinquedos"
+        }
+    },
+    {
+        "id": 27,
+        "nome": "Mesa com 4 cadeiras c/ tampo de vidro",
+        "descricao": "Mesa com 4 cadeiras c/ tampo de vidro Tubolar",
+        "productIdentifier": "1789877898",
+        "preco": 399.99,
+        "category": {
+            "id": 2,
+            "nome": "Móveis"
+        }
+    },
+    {
+        "id": 29,
+        "nome": "Mesa com 4 cadeiras c/ tampo de vidro",
+        "descricao": "Mesa com 4 cadeiras c/ tampo de vidro Tubolar",
+        "productIdentifier": "14879936954777",
+        "preco": 399.99,
+        "category": {
+            "id": 4,
+            "nome": "Vestuários"
+        }
+    },
+    {
+        "id": 33,
+        "nome": "Produto 001",
+        "descricao": "Produto 001",
+        "productIdentifier": "0000000000",
+        "preco": 100.0,
+        "category": {
+            "id": 3,
+            "nome": "Brinquedos"
+        }
+    },
+    {
+        "id": 34,
+        "nome": "Produto 002",
+        "descricao": "Produto 002",
+        "productIdentifier": "0000000000",
+        "preco": 100.0,
+        "category": {
+            "id": 3,
+            "nome": "Brinquedos"
+        }
+    },
+    {
+        "id": 35,
+        "nome": "Produto 003",
+        "descricao": "Produto 003",
+        "productIdentifier": "0000000000",
+        "preco": 200.0,
+        "category": {
+            "id": 3,
+            "nome": "Brinquedos"
+        }
+    },
+    {
+        "id": 36,
+        "nome": "Produto 004",
+        "descricao": "Produto 004",
+        "productIdentifier": "0000000004",
+        "preco": 200.0,
+        "category": {
+            "id": 3,
+            "nome": "Brinquedos"
+        }
+    },
+    {
+        "id": 38,
+        "nome": "Produto 004",
+        "descricao": "Produto 004",
+        "productIdentifier": "0000000004",
+        "preco": 200.0,
+        "category": {
+            "id": 3,
+            "nome": "Brinquedos"
+        }
+    },
+    {
+        "id": 39,
+        "nome": "Produto 005",
+        "descricao": "Produto 005",
+        "productIdentifier": "0000000005",
+        "preco": 200.0,
+        "category": {
+            "id": 1,
+            "nome": "Eletrônicos"
+        }
+    },
+    {
+        "id": 40,
+        "nome": "Produto 006",
+        "descricao": "Produto 006",
+        "productIdentifier": "0000000006",
+        "preco": 200.0,
+        "category": {
+            "id": 1,
+            "nome": "Eletrônicos"
+        }
+    },
+        {
+        "id": 41,
+        "nome": "Produto 007",
+        "descricao": "Produto 007",
+        "productIdentifier": "0000000007",
+        "preco": 200.0,
+        "category": {
+            "id": 1,
+            "nome": "Eletrônicos"
+        }
+    }
+]

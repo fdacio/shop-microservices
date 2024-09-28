@@ -1,0 +1,178 @@
+[
+    {
+        "id": 108,
+        "data": "2024-01-05T22:29:34.423458",
+        "total": 2399.6,
+        "user": {
+            "id": 10,
+            "nome": "Laura Wulff Valansuela",
+            "cpf": "07185715687",
+            "endereco": "Praça Alzira Alves Perilo, 743",
+            "email": "laura.valansuela@geradornv.com.br",
+            "telefone": "(67) 99382-7802",
+            "dataCadastro": "2024-01-04T10:48:37.728569"
+        },
+        "itens": [
+            {
+                "id": 82,
+                "quantidade": 4,
+                "preco": 599.9,
+                "product": {
+                    "id": 21,
+                    "nome": "Colchão Onix D23",
+                    "descricao": "Colchão Onix D23 2.10x1.70 cm - casal",
+                    "productIdentifier": "1789588996",
+                    "preco": 599.9,
+                    "category": {
+                        "id": 2,
+                        "nome": "Móveis"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "id": 127,
+        "data": "2024-01-05T23:37:13.396101",
+        "total": 5299.99,
+        "user": {
+            "id": 1,
+            "nome": "Lívia Camelo Linhares",
+            "cpf": "97851113857",
+            "endereco": "Rua Petrônio de Moura, 792",
+            "email": "livia.linhares@geradornv.com.br",
+            "telefone": "(12) 96827-2543",
+            "dataCadastro": "2023-12-12T23:58:19.306562"
+        },
+        "itens": [
+            {
+                "id": 112,
+                "quantidade": 2,
+                "preco": 1800.0,
+                "product": {
+                    "id": 18,
+                    "nome": "Smart Phone Moto G23",
+                    "descricao": "Celular Motorola Moto G23 128GB Octacore",
+                    "productIdentifier": "587889977",
+                    "preco": 1800.0,
+                    "category": {
+                        "id": 1,
+                        "nome": "Eletrônicos"
+                    }
+                }
+            },
+            {
+                "id": 113,
+                "quantidade": 1,
+                "preco": 1699.99,
+                "product": {
+                    "id": 19,
+                    "nome": "Cama Box Ortobom D23",
+                    "descricao": "Cama Box Ortobom D12 2.10x1.70 cm - casal",
+                    "productIdentifier": "174589741",
+                    "preco": 1699.99,
+                    "category": {
+                        "id": 2,
+                        "nome": "Móveis"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "id": 128,
+        "data": "2024-01-06T00:02:55.228394",
+        "total": 46154.7,
+        "user": {
+            "id": 5,
+            "nome": "Wanderley Arlia Ferreira",
+            "cpf": "26005600095",
+            "endereco": "Rua José Domingos Varella, 742",
+            "email": "wanderley.ferreira@exemplo.com.br",
+            "telefone": "(54) 98119-9000",
+            "dataCadastro": "2023-12-16T11:47:40.437878"
+        },
+        "itens": [
+            {
+                "id": 115,
+                "quantidade": 27,
+                "preco": 1699.99,
+                "product": {
+                    "id": 19,
+                    "nome": "Cama Box Ortobom D23",
+                    "descricao": "Cama Box Ortobom D12 2.10x1.70 cm - casal",
+                    "productIdentifier": "174589741",
+                    "preco": 1699.99,
+                    "category": {
+                        "id": 2,
+                        "nome": "Móveis"
+                    }
+                }
+            },
+            {
+                "id": 114,
+                "quantidade": 1,
+                "preco": 254.99,
+                "product": {
+                    "id": 25,
+                    "nome": "Lego Robo Explorer",
+                    "descricao": "Coleção Lego Robo Explorer - 360 peças",
+                    "productIdentifier": "148799369",
+                    "preco": 254.99,
+                    "category": {
+                        "id": 3,
+                        "nome": "Brinquedos"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "id": 129,
+        "data": "2024-01-06T02:14:23.477607",
+        "total": 46154.7,
+        "user": {
+            "id": 3,
+            "nome": "Sonia Mozer Paiva",
+            "cpf": "43578605476",
+            "endereco": "Rua Nossa Senhora Imaculada Conceição, 1000",
+            "email": "sonia.paiva@geradornv.com.br",
+            "telefone": "(84) 98696-5945",
+            "dataCadastro": "2023-12-16T11:44:25.304427"
+        },
+        "itens": [
+            {
+                "id": 117,
+                "quantidade": 27,
+                "preco": 1699.99,
+                "product": {
+                    "id": 19,
+                    "nome": "Cama Box Ortobom D23",
+                    "descricao": "Cama Box Ortobom D12 2.10x1.70 cm - casal",
+                    "productIdentifier": "174589741",
+                    "preco": 1699.99,
+                    "category": {
+                        "id": 2,
+                        "nome": "Móveis"
+                    }
+                }
+            },
+            {
+                "id": 116,
+                "quantidade": 1,
+                "preco": 254.99,
+                "product": {
+                    "id": 25,
+                    "nome": "Lego Robo Explorer",
+                    "descricao": "Coleção Lego Robo Explorer - 360 peças",
+                    "productIdentifier": "148799369",
+                    "preco": 254.99,
+                    "category": {
+                        "id": 3,
+                        "nome": "Brinquedos"
+                    }
+                }
+            }
+        ]
+    }
+]

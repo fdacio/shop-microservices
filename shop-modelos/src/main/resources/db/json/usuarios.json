@@ -1,0 +1,65 @@
+[
+    {
+        "id": 1,
+        "nome": "Lívia Camelo Linhares",
+        "cpf": "97851113857",
+        "endereco": "Rua Petrônio de Moura, 792",
+        "email": "livia.linhares@geradornv.com.br",
+        "telefone": "(12) 96827-2543",
+        "dataCadastro": "2023-12-12T23:58:19.306562"
+    },
+    {
+        "id": 2,
+        "nome": "Maycon Mattos Amancio",
+        "cpf": "76467717163",
+        "endereco": "Avenida Guajupiá. 800",
+        "email": "maycon.amancio@geradornv.com.br",
+        "telefone": "(64) 98986-3311",
+        "dataCadastro": "2023-12-16T11:42:57.353292"
+    },
+    {
+        "id": 3,
+        "nome": "Sonia Mozer Paiva",
+        "cpf": "43578605476",
+        "endereco": "Rua Nossa Senhora Imaculada Conceição, 1000",
+        "email": "sonia.paiva@geradornv.com.br",
+        "telefone": "(84) 98696-5945",
+        "dataCadastro": "2023-12-16T11:44:25.304427"
+    },
+    {
+        "id": 4,
+        "nome": "Marcele Correia Auzier",
+        "cpf": "81728330165",
+        "endereco": "Quadra SEPN 511 Bloco D, Casa 850",
+        "email": "marcele.auzier@geradornv.com.br",
+        "telefone": "(61) 99723-9321",
+        "dataCadastro": "2023-12-16T11:45:44.047562"
+    },
+    {
+        "id": 5,
+        "nome": "Wanderley Arlia Ferreira",
+        "cpf": "26005600095",
+        "endereco": "Rua José Domingos Varella, 742",
+        "email": "wanderley.ferreira@exemplo.com.br",
+        "telefone": "(54) 98119-9000",
+        "dataCadastro": "2023-12-16T11:47:40.437878"
+    },
+    {
+        "id": 9,
+        "nome": "Celso Guzzo Leandro",
+        "cpf": "85851979518",
+        "endereco": "Rua L, Casa 50",
+        "email": "celso.leandro@geradornv.com.br",
+        "telefone": "(79) 99597-7766",
+        "dataCadastro": "2023-12-16T12:46:49.420322"
+    },
+    {
+        "id": 10,
+        "nome": "Laura Wulff Valansuela",
+        "cpf": "07185715687",
+        "endereco": "Praça Alzira Alves Perilo, 743",
+        "email": "laura.valansuela@geradornv.com.br",
+        "telefone": "(67) 99382-7802",
+        "dataCadastro": "2024-01-04T10:48:37.728569"
+    }
+]

@@ -1,0 +1,1 @@
+alter table products.product alter column nome type varchar(120);

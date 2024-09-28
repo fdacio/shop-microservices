@@ -1,0 +1,1 @@
+ALTER TABLE products.product RENAME COLUMN product_identifier TO identifier;
