@@ -38,6 +38,7 @@ public class User {
 	//Security
 	private String password;
 
+	@OneToMany
 	@JoinTable(schema="users", name="user_rule",
 			joinColumns = @JoinColumn(name="user_id"),
 			inverseJoinColumns = @JoinColumn(name="rule_id"))
