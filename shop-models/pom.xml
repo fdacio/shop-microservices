@@ -9,7 +9,7 @@
 		<version>3.3.4</version>
 	</parent>
 	<groupId>br.com.daciosoftware</groupId>
-	<artifactId>shop-modelos</artifactId>
+	<artifactId>shop-models</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>shop-modelos</name>
 	<description>Project Shop do Livro Java Back-End</description>

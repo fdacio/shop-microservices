@@ -44,8 +44,6 @@ public class UserDTO {
 
 	private LocalDateTime dataCadastro;
 	private Set<CategoryDTO> interesses;
-	@JsonIgnore
-	private String key;
 
 	public static UserDTO convert(User user) {
 		UserDTO userDTO = new UserDTO();
@@ -55,7 +53,6 @@ public class UserDTO {
 		userDTO.setEndereco(user.getEndereco());
 		userDTO.setEmail(user.getEmail());
 		userDTO.setTelefone(user.getTelefone());
-		userDTO.setKey(user.getKey());
 		userDTO.setDataCadastro(user.getDataCadastro());
 		if (user.getInteresses() != null)
 			userDTO.setInteresses(user.getInteresses().stream().map(CategoryDTO::convert).collect(Collectors.toSet()));

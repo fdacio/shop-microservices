@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.user.controller;
 
 import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
-import br.com.daciosoftware.shop.modelos.dto.user.UserWithKeyDTO;
 import br.com.daciosoftware.shop.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,6 @@ public class UserController {
 	@GetMapping("/{id}")
 	public UserDTO findById(@PathVariable Long id) {
 		return userService.findById(id);
-	}
-	@GetMapping("/{id}/with-key")
-	public UserWithKeyDTO findWithKeyById(@PathVariable Long id) {
-		return userService.findByIdWithKey(id);
 	}
 
 	@PostMapping

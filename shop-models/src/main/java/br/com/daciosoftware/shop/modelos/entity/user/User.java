@@ -1,6 +1,7 @@
-package br.com.daciosoftware.shop.modelos.entity.auth;
+package br.com.daciosoftware.shop.modelos.entity.user;
 
 import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
+import br.com.daciosoftware.shop.modelos.entity.auth.Rule;
 import br.com.daciosoftware.shop.modelos.entity.product.Category;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,16 +34,6 @@ public class User {
 				joinColumns = @JoinColumn(name="user_id"),
 				inverseJoinColumns = @JoinColumn(name="category_id"))
 	private Set<Category> interesses;
-	private String key;
-
-	//Security
-	private String password;
-
-	@OneToMany
-	@JoinTable(schema="users", name="user_rule",
-			joinColumns = @JoinColumn(name="user_id"),
-			inverseJoinColumns = @JoinColumn(name="rule_id"))
-	private Set<Rule> rules;
 
 	public static User convert(UserDTO userDTO) {		
 		User user = new User();
@@ -52,7 +43,6 @@ public class User {
 		user.setEndereco(userDTO.getEndereco());
 		user.setEmail(userDTO.getEmail());
 		user.setTelefone(userDTO.getTelefone());
-		user.setKey(userDTO.getKey());
 		user.setDataCadastro(userDTO.getDataCadastro());
 		if (userDTO.getInteresses() != null) 
 			user.setInteresses(userDTO.getInteresses().stream().map(Category::convert).collect(Collectors.toSet()));

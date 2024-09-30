@@ -6,7 +6,6 @@ import br.com.daciosoftware.shop.exceptions.exceptions.UserEmailExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.UserNotFoundException;
 import br.com.daciosoftware.shop.modelos.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
-import br.com.daciosoftware.shop.modelos.dto.user.UserWithKeyDTO;
 import br.com.daciosoftware.shop.modelos.entity.product.Category;
 import br.com.daciosoftware.shop.modelos.entity.user.User;
 import br.com.daciosoftware.shop.user.repository.UserRepository;
@@ -38,12 +37,6 @@ public class UserService {
 	public UserDTO findById(Long userId) {
 		return userRepository.findById(userId)
 				.map(UserDTO::convert)
-				.orElseThrow(UserNotFoundException::new);
-	}
-
-	public UserWithKeyDTO findByIdWithKey(Long userId) {
-		return userRepository.findById(userId)
-				.map(UserWithKeyDTO::convert)
 				.orElseThrow(UserNotFoundException::new);
 	}
 
@@ -88,7 +81,6 @@ public class UserService {
 		validCpfUnique(userDTO.getCpf());
 		validEmailUnique(userDTO.getEmail(), null);
 		userDTO.setDataCadastro(LocalDateTime.now());
-		userDTO.setKey(UUID.randomUUID().toString());
 		userDTO.setInteresses(categoryService.findCategorysByUser(userDTO));
 		return UserDTO.convert(userRepository.save(User.convert(userDTO)));
 	}

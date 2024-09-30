@@ -22,7 +22,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>br.com.daciosoftware</groupId>
-			<artifactId>shop-modelos</artifactId>
+			<artifactId>shop-models</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
