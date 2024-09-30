@@ -1,17 +1,15 @@
 package br.com.daciosoftware.shop.gateway;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.gateway.filter.factory.TokenRelayGatewayFilterFactory;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "br.com.daciosoftware.shop.security.*" })
+@ComponentScan(basePackages = { "br.com.daciosoftware.shop.security.gateway.*" })
 public class ShopGatewayApiApplication {
 
 	@Value("${product.api.url}")
@@ -20,7 +18,8 @@ public class ShopGatewayApiApplication {
 	private String userApiUrl;
 	@Value("${shopping.api.url}")
 	private String shoppinpApiUrl;
-
+	@Value("${security.api.url}")
+	private String securityApiUrl;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ShopGatewayApiApplication.class, args);
@@ -30,6 +29,7 @@ public class ShopGatewayApiApplication {
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 
 		return builder.routes()
+				.route("security_route", r -> r.path("/security/**").uri(securityApiUrl))
 				.route("product_route", r -> r.path("/product/**").uri(productApiUrl))
 				.route("product_route", r -> r.path("/category/**").uri(productApiUrl))
 				.route("user_route", r -> r.path("/user/**").uri(userApiUrl))
