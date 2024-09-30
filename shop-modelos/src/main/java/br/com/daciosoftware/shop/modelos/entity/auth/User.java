@@ -1,7 +1,6 @@
-package br.com.daciosoftware.shop.modelos.entity.user;
+package br.com.daciosoftware.shop.modelos.entity.auth;
 
 import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
-import br.com.daciosoftware.shop.modelos.entity.auth.Rule;
 import br.com.daciosoftware.shop.modelos.entity.product.Category;
 import jakarta.persistence.*;
 import lombok.*;

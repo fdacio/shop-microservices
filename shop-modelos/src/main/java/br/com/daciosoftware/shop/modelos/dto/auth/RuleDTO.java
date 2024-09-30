@@ -1,8 +1,6 @@
-package br.com.daciosoftware.shop.modelos.dto.user;
+package br.com.daciosoftware.shop.modelos.dto.auth;
 
-import br.com.daciosoftware.shop.modelos.dto.product.CategoryDTO;
-import br.com.daciosoftware.shop.modelos.entity.product.Category;
-import br.com.daciosoftware.shop.modelos.entity.user.Rule;
+import br.com.daciosoftware.shop.modelos.entity.auth.Rule;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;

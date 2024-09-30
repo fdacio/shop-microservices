@@ -17,9 +17,21 @@ services:
     ports:
       - "8884:8084"
     environment:
+      AUTH_API_URL: http://auth:8085
       PRODUCT_API_URL: http://product:8081
       USER_API_URL: http://user:8082
       SHOPPING_API_URL: http://shopping:8083
+    depends_on:
+      - postgres
+
+  auth:
+    image: loja/shop-auth-api
+    ports:
+      - "8885:8085"
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: dacio@04
     depends_on:
       - postgres
 

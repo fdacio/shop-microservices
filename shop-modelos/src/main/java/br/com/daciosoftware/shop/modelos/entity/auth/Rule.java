@@ -1,4 +1,4 @@
-package br.com.daciosoftware.shop.modelos.entity.user;
+package br.com.daciosoftware.shop.modelos.entity.auth;
 
 import jakarta.persistence.*;
 import lombok.*;
