@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.product;
 
-import br.com.daciosoftware.shop.modelos.dto.product.CategoryDTO;
-import br.com.daciosoftware.shop.modelos.dto.product.ProductDTO;
+import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
+import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
 import br.com.daciosoftware.shop.product.controller.ProductController;
 import br.com.daciosoftware.shop.product.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;

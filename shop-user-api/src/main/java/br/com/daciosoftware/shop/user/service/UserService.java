@@ -4,10 +4,10 @@ import br.com.daciosoftware.shop.exceptions.exceptions.InvalidUserKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.UserCpfExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.UserEmailExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.UserNotFoundException;
-import br.com.daciosoftware.shop.modelos.dto.product.CategoryDTO;
-import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
-import br.com.daciosoftware.shop.modelos.entity.product.Category;
-import br.com.daciosoftware.shop.modelos.entity.user.User;
+import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
+import br.com.daciosoftware.shop.models.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.entity.product.Category;
+import br.com.daciosoftware.shop.models.entity.user.User;
 import br.com.daciosoftware.shop.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -137,16 +137,15 @@ public class UserService {
 	public List<UserDTO> updateKeyAll() {
 		List<User> users = userRepository.findAll();
 		return users.stream().map(u -> {
-			u.setKey(UUID.randomUUID().toString());
 			u = userRepository.save(u);
 			return UserDTO.convert(u);
 		}).collect(Collectors.toList());
 	}
 
-	public UserDTO validUserKey(UserDTO userDTO, String key) {
-		return userRepository.findByIdAndKey(userDTO.getId(), key).map(UserDTO::convert)
-				.orElseThrow(InvalidUserKeyException::new);
-	}
+//	public UserDTO validUserKey(UserDTO userDTO, String key) {
+//		return userRepository.findByIdAndKey(userDTO.getId(), key).map(UserDTO::convert)
+//				.orElseThrow(InvalidUserKeyException::new);
+//	}
 
 	public Map<String, List<UserDTO>> getUsersGroupByCategory() {
 		

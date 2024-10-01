@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.product.controller;
 
-import br.com.daciosoftware.shop.modelos.dto.product.ProductDTO;
-import br.com.daciosoftware.shop.modelos.dto.product.ProductReportRequestDTO;
+import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
+import br.com.daciosoftware.shop.models.dto.product.ProductReportRequestDTO;
 import br.com.daciosoftware.shop.product.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.user;
 
-import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
-import br.com.daciosoftware.shop.modelos.entity.user.User;
+import br.com.daciosoftware.shop.models.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.entity.user.User;
 import br.com.daciosoftware.shop.user.controller.UserController;
 import br.com.daciosoftware.shop.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;

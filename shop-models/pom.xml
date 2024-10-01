@@ -11,7 +11,7 @@
 	<groupId>br.com.daciosoftware</groupId>
 	<artifactId>shop-models</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>shop-modelos</name>
+	<name>shop-models</name>
 	<description>Project Shop do Livro Java Back-End</description>
 	<properties>
 		<java.version>17</java.version>

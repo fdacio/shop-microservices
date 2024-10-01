@@ -1,9 +1,9 @@
 package br.com.daciosoftware.shop.shopping.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
-import br.com.daciosoftware.shop.modelos.dto.product.ProductDTO;
-import br.com.daciosoftware.shop.modelos.dto.shopping.ItemDTO;
-import br.com.daciosoftware.shop.modelos.dto.shopping.ShopDTO;
+import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ItemDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;

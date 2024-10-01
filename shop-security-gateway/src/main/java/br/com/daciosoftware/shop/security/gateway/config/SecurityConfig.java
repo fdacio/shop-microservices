@@ -24,8 +24,8 @@ public class SecurityConfig {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-                        .pathMatchers(HttpMethod.GET, "/category").permitAll()
-                        //.pathMatchers(HttpMethod.GET, "/product").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/user").permitAll()
                         //.pathMatchers(HttpMethod.GET, GET_ROLE_NAME).hasRole("Role_Name")
                         .anyExchange().authenticated())
                 .build();

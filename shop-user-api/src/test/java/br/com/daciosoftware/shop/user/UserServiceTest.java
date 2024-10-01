@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.user;
 
-import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
-import br.com.daciosoftware.shop.modelos.entity.user.User;
+import br.com.daciosoftware.shop.models.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.entity.user.User;
 import br.com.daciosoftware.shop.user.repository.UserRepository;
 import br.com.daciosoftware.shop.user.service.CategoryService;
 import br.com.daciosoftware.shop.user.service.UserService;

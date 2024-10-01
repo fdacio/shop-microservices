@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.product.repository;
 
-import br.com.daciosoftware.shop.modelos.entity.product.Product;
+import br.com.daciosoftware.shop.models.entity.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

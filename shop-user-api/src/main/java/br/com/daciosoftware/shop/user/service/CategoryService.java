@@ -1,8 +1,8 @@
 package br.com.daciosoftware.shop.user.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.CategoryNotFoundException;
-import br.com.daciosoftware.shop.modelos.dto.product.CategoryDTO;
-import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
+import br.com.daciosoftware.shop.models.dto.user.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;

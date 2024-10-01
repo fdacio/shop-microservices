@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.shopping.controller;
 
-import br.com.daciosoftware.shop.modelos.dto.shopping.ShopDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
 import br.com.daciosoftware.shop.shopping.service.ShoppingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

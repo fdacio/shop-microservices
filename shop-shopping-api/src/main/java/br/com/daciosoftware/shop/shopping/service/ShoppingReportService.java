@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.shopping.service;
 
-import br.com.daciosoftware.shop.modelos.dto.shopping.ShopDTO;
-import br.com.daciosoftware.shop.modelos.dto.shopping.ShopSummaryReportDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopSummaryReportDTO;
 import br.com.daciosoftware.shop.shopping.repository.ShoppingReportRepositoryImpl;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font.FontFamily;

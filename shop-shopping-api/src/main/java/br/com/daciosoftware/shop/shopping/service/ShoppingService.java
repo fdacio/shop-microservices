@@ -1,10 +1,10 @@
 package br.com.daciosoftware.shop.shopping.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopNotFoundException;
-import br.com.daciosoftware.shop.modelos.dto.shopping.ItemDTO;
-import br.com.daciosoftware.shop.modelos.dto.shopping.ShopDTO;
-import br.com.daciosoftware.shop.modelos.dto.user.UserDTO;
-import br.com.daciosoftware.shop.modelos.entity.shopping.Shop;
+import br.com.daciosoftware.shop.models.dto.shopping.ItemDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
+import br.com.daciosoftware.shop.models.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.entity.shopping.Shop;
 import br.com.daciosoftware.shop.shopping.repository.ShoppingRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

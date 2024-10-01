@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.shopping.repository;
 
-import br.com.daciosoftware.shop.modelos.dto.shopping.ShopSummaryReportDTO;
-import br.com.daciosoftware.shop.modelos.dto.shopping.ShopUserReportDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopSummaryReportDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopUserReportDTO;
 
 import java.time.LocalDate;
 import java.util.List;

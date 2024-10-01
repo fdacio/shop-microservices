@@ -12,14 +12,14 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = { "br.com.daciosoftware.shop.security.gateway.*" })
 public class ShopGatewayApiApplication {
 
+	@Value("${auth.api.url}")
+	private String authApiUrl;
 	@Value("${product.api.url}")
 	private String productApiUrl;
 	@Value("${user.api.url}")
 	private String userApiUrl;
 	@Value("${shopping.api.url}")
 	private String shoppinpApiUrl;
-	@Value("${security.api.url}")
-	private String securityApiUrl;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ShopGatewayApiApplication.class, args);
@@ -29,7 +29,7 @@ public class ShopGatewayApiApplication {
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 
 		return builder.routes()
-				.route("security_route", r -> r.path("/security/**").uri(securityApiUrl))
+				.route("auth_route", r -> r.path("/auth/**").uri(authApiUrl))
 				.route("product_route", r -> r.path("/product/**").uri(productApiUrl))
 				.route("product_route", r -> r.path("/category/**").uri(productApiUrl))
 				.route("user_route", r -> r.path("/user/**").uri(userApiUrl))
