@@ -2,6 +2,7 @@ package br.com.daciosoftware.shop.auth.config;
 
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
+import br.com.daciosoftware.shop.auth.service.AuthService;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +22,15 @@ public class AdminUserConfig implements CommandLineRunner {
     private AuthRepository authRepository;
     @Autowired
     private RuleRepository ruleRepository;
+    @Autowired
+    private AuthService authService;
 
     @Override
     public void run(String... args) throws Exception {
 
         String nome = "Administrador";
         String userName = "admin@daciosoftware.com.br";
-        String password = bCryptPasswordEncoder().encode("123456");
+        String password = authService.bCryptPasswordEncoder().encode("123456");
         String email = "fdacio@gmail.com";
         Set<Rule> rule = Set.of(ruleRepository.findByNome("Admin"));
 
@@ -45,8 +48,4 @@ public class AdminUserConfig implements CommandLineRunner {
         }
     }
 
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

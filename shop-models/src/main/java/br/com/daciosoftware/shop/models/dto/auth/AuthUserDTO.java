@@ -16,9 +16,9 @@ public class AuthUserDTO {
 	private Long id;
 	private String nome;
 	private String username;
-	private String password;
 	private String email;
 	private String token;
+	private Long expireToken;
 	private Set<RuleDTO> rules;
 	
 	public static AuthUserDTO convert(AuthUser user) {
@@ -27,7 +27,6 @@ public class AuthUserDTO {
 		userDTO.setNome(user.getNome());
 		userDTO.setUsername(user.getUsername());
 		userDTO.setEmail(user.getEmail());
-		userDTO.setPassword("***************");
 		if (user.getRules() != null)
 			userDTO.setRules(user.getRules().stream().map(RuleDTO::convert).collect(Collectors.toSet()));
 		return userDTO;
