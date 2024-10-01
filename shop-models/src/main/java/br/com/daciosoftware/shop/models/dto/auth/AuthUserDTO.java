@@ -1,6 +1,8 @@
 package br.com.daciosoftware.shop.models.dto.auth;
 
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Set;
@@ -17,9 +19,8 @@ public class AuthUserDTO {
 	private String nome;
 	private String username;
 	private String email;
-	private String token;
-	private Long expireToken;
 	private Set<RuleDTO> rules;
+	private TokenDTO token;
 	
 	public static AuthUserDTO convert(AuthUser user) {
 		AuthUserDTO userDTO = new AuthUserDTO();

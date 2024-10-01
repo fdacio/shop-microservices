@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.models.entity.auth;
 
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.RuleDTO;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,6 +45,15 @@ public class AuthUser {
 		if (userDTO.getRules() != null) {
 			user.setRules(userDTO.getRules().stream().map(Rule::convert).collect(Collectors.toSet()));
 		}
+		return user;
+	}
+
+	public static AuthUser convert(CreateAuthUserDTO createAuthUserDTO) {
+		AuthUser user = new AuthUser();
+		user.setId(createAuthUserDTO.getId());
+		user.setNome(createAuthUserDTO.getNome());
+		user.setUsername(createAuthUserDTO.getEmail());
+		user.setEmail(createAuthUserDTO.getEmail());
 		return user;
 	}
 

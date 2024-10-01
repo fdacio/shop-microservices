@@ -1,4 +1,4 @@
-package br.com.daciosoftware.shop.security.gateway.config;
+package br.com.daciosoftware.shop.auth.config;
 
 import java.io.File;
 import java.net.URL;

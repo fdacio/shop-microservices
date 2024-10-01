@@ -142,11 +142,6 @@ public class UserService {
 		}).collect(Collectors.toList());
 	}
 
-//	public UserDTO validUserKey(UserDTO userDTO, String key) {
-//		return userRepository.findByIdAndKey(userDTO.getId(), key).map(UserDTO::convert)
-//				.orElseThrow(InvalidUserKeyException::new);
-//	}
-
 	public Map<String, List<UserDTO>> getUsersGroupByCategory() {
 		
 		Map<String, List<UserDTO>> groupByCategory = new LinkedHashMap<>();

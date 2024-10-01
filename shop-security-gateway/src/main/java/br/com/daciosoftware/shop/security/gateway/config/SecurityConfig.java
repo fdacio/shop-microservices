@@ -1,21 +1,20 @@
 package br.com.daciosoftware.shop.security.gateway.config;
 
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.stereotype.Component;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebFluxSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -23,29 +22,21 @@ public class SecurityConfig {
         System.err.println("[* Security Gateway Filter Chain *] ");
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                //.exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/user").permitAll()
+                        //.pathMatchers(HttpMethod.GET, "/user").permitAll()
                         //.pathMatchers(HttpMethod.GET, GET_ROLE_NAME).hasRole("Role_Name")
                         .anyExchange().authenticated())
+                //.httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
                 .build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() throws Exception {
-        System.err.println("[* Security Gateway Jwt Encoder *] ");
-        RsaKey rsaKey = new RsaKey();
-        JWK jwk = new RSAKey.Builder(rsaKey.getPublicKey()).privateKey(rsaKey.getPrivate()).build();
-        var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        return new NimbusJwtEncoder(jwks);
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() throws Exception {
+    public ReactiveJwtDecoder jwtDecoder() throws Exception {
         System.err.println("[* Security Gateway Jwt Decoder *] ");
         RsaKey rsaKey = new RsaKey();
-        return NimbusJwtDecoder.withPublicKey(rsaKey.getPublicKey()).build();
+        return NimbusReactiveJwtDecoder.withPublicKey(rsaKey.getPublicKey()).build();
     }
-
-
 }
