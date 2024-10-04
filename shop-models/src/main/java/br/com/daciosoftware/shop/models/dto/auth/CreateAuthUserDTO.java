@@ -1,11 +1,10 @@
 package br.com.daciosoftware.shop.models.dto.auth;
 
-import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @Setter
@@ -15,13 +14,13 @@ import java.util.stream.Collectors;
 public class CreateAuthUserDTO {
 
 	private Long id;
-	@NotNull(message="Informe o nome do usuário")
+	@NotEmpty(message="Informe o nome do usuário")
 	private String nome;
-	@NotNull(message="Informe o nome o username")
+	@NotEmpty(message="Informe o nome o username")
 	private String username;
-	@NotNull(message="Informe o email")
+	@NotEmpty(message="Informe o email")
 	private String email;
-	@NotNull(message="Informe o password")
+	@NotBlank(message="Informe o password")
 	private String password;
 
 

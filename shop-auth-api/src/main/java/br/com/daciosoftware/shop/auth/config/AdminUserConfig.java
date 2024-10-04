@@ -3,17 +3,21 @@ package br.com.daciosoftware.shop.auth.config;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+
+import static java.util.Optional.of;
+
 
 @Configuration
 public class AdminUserConfig implements CommandLineRunner {
@@ -21,9 +25,9 @@ public class AdminUserConfig implements CommandLineRunner {
     @Autowired
     private AuthRepository authRepository;
     @Autowired
-    private RuleRepository ruleRepository;
-    @Autowired
     private AuthService authService;
+    @Autowired
+    private RuleRepository ruleRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -31,7 +35,7 @@ public class AdminUserConfig implements CommandLineRunner {
         String nome = "Administrador";
         String userName = "admin@daciosoftware.com.br";
         String password = authService.bCryptPasswordEncoder().encode("123456");
-        String email = "fdacio@gmail.com";
+        String email = "admin@daciosoftware.com.br";
         Set<Rule> rule = Set.of(ruleRepository.findByNome("Admin"));
 
         Optional<AuthUser> user = authRepository.findByUsername(userName);
@@ -42,6 +46,7 @@ public class AdminUserConfig implements CommandLineRunner {
             admin.setUsername(userName);
             admin.setEmail(email);
             admin.setPassword(password);
+            admin.setKeyToken(authService.geraKeyTokenForCreateUser(userName));
             admin.setRules(rule);
             admin.setDataCadastro(LocalDateTime.now());
             authRepository.save(admin);

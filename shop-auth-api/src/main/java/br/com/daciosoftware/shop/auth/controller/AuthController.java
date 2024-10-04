@@ -1,11 +1,8 @@
 package br.com.daciosoftware.shop.auth.controller;
 
 import br.com.daciosoftware.shop.auth.service.AuthService;
-import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
-import br.com.daciosoftware.shop.models.dto.auth.LoginDTO;
-import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,22 +17,44 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public AuthUserDTO login(@RequestBody LoginDTO loginDTO) {
+    public TokenDTO login(@RequestBody LoginDTO loginDTO) {
         return authService.login(loginDTO);
     }
-
 
     @PostMapping("/user")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthUserDTO createUser(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
-        return authService.createAutUser(createAuthUserDTO);
+        return authService.createUser(createAuthUserDTO);
     }
-
 
     @GetMapping("/user")
     public List<AuthUserDTO> findAll() {
+        System.err.println("User list all");
         return authService.findAll();
     }
 
+    @GetMapping("/user/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthUserDTO findById(@PathVariable Long id) {
+        return authService.findById(id);
+    }
+
+    @DeleteMapping("/user/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        authService.delete(id);
+    }
+
+    @PutMapping("/update-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public AuthUserDTO updatePassword(@RequestBody UpdatePasswordDTO newPassword, @RequestHeader("Authorization") String token) {
+        return  authService.updatePassword(newPassword, token);
+    }
+
+    @GetMapping("/user/authenticated")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthUserDTO userAuthenticated(@RequestHeader("Authorization") String token) {
+        return  authService.findAuthenticatedUser(token);
+    }
 
 }

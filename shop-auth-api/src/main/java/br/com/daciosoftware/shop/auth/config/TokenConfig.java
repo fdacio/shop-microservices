@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -15,22 +16,21 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import java.time.Instant;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Configuration
 public class TokenConfig {
 
-    @Bean
+    @Autowired
+    RsaKey rsaKey;
+
     public JwtEncoder jwtEncoder() throws Exception {
-        System.err.println("[* Security Gateway Jwt Encoder *] ");
-        RsaKey rsaKey = new RsaKey();
         JWK jwk = new RSAKey.Builder(rsaKey.getPublicKey()).privateKey(rsaKey.getPrivate()).build();
         var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
 
-    public TokenDTO getToken(AuthUserDTO authUserDTO)  {
+    public TokenDTO getToken(AuthUserDTO authUserDTO) {
 
         var now = Instant.now();
         long expire = 300L;
@@ -38,28 +38,26 @@ public class TokenConfig {
         String scopes = authUserDTO.getRules()
                 .stream()
                 .map(RuleDTO::getNome)
-                .collect(Collectors.joining( " "));
+                .collect(Collectors.joining(" "));
 
         var claims = JwtClaimsSet.builder()
                 .issuer("shop-api")
-                .subject(UUID.nameUUIDFromBytes(authUserDTO.getId().toString().getBytes()).toString())
+                .subject(authUserDTO.getKeyToken())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expire))
                 .claim("scope", scopes)
                 .build();
 
-        String tokenValue = null;
         try {
-
-            tokenValue = jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
+            String tokenValue = jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.setToken(tokenValue);
+            tokenDTO.setExpireToken(expire);
+            return tokenDTO;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        TokenDTO tokenDTO = new TokenDTO();
-        tokenDTO.setToken(tokenValue);
-        tokenDTO.setExpireToken(expire);
-        return tokenDTO;
     }
 
 }

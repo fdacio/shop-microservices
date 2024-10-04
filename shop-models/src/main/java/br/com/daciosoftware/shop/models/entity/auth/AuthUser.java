@@ -2,12 +2,12 @@ package br.com.daciosoftware.shop.models.entity.auth;
 
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
-import br.com.daciosoftware.shop.models.dto.auth.RuleDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Entity(name="authuser")
+@Entity(name="authUser")
 @Table(name="user", schema="auth")
 public class AuthUser {
 	
@@ -27,6 +27,7 @@ public class AuthUser {
 	private String username;
 	private String password;
 	private String email;
+	private String keyToken;
 	private String hashRecoveryPassword;
 	private LocalDateTime dataCadastro;
 
@@ -42,6 +43,7 @@ public class AuthUser {
 		user.setNome(userDTO.getNome());
 		user.setUsername(userDTO.getEmail());
 		user.setEmail(user.getEmail());
+		user.setKeyToken(user.getKeyToken());
 		if (userDTO.getRules() != null) {
 			user.setRules(userDTO.getRules().stream().map(Rule::convert).collect(Collectors.toSet()));
 		}
@@ -52,7 +54,7 @@ public class AuthUser {
 		AuthUser user = new AuthUser();
 		user.setId(createAuthUserDTO.getId());
 		user.setNome(createAuthUserDTO.getNome());
-		user.setUsername(createAuthUserDTO.getEmail());
+		user.setUsername(createAuthUserDTO.getUsername());
 		user.setEmail(createAuthUserDTO.getEmail());
 		return user;
 	}

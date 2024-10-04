@@ -14,6 +14,7 @@ import java.util.Objects;
 @ToString
 public class RuleDTO {
 
+
     private Long id;
     @NotBlank(message="Informe o nome")
     @Size(message="Campo nome muito longo. O máximo são de 30 caracteres", max = 30)

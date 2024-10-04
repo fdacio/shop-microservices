@@ -29,17 +29,11 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        //.requestMatchers(HttpMethod.POST, "/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/category").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/category").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/category/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/product").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
-
-        //http.authorizeHttpRequests(a -> a.requestMatchers("*").permitAll().anyRequest().permitAll());
 
         return http.build();
     }

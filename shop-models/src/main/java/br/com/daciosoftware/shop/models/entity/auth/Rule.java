@@ -12,6 +12,7 @@ import lombok.*;
 @Entity(name="rule")
 @Table(name="rule", schema="auth")
 public class Rule {
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id")
@@ -24,4 +25,5 @@ public class Rule {
         rule.setNome(ruleDTO.getNome());
         return rule;
     }
+
 }

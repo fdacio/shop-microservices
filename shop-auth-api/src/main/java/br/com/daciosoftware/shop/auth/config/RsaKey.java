@@ -1,5 +1,8 @@
 package br.com.daciosoftware.shop.auth.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -11,9 +14,10 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-
+@Component
 public class RsaKey {
 
+    @Bean
     public RSAPublicKey getPublicKey() throws Exception {
 
         URL urlFilePublicKei = this.getClass().getClassLoader().getResource("keys/app.public.key");
@@ -37,6 +41,7 @@ public class RsaKey {
         return (RSAPublicKey) keyFactory.generatePublic(keySpec);
     }
 
+    @Bean
     public RSAPrivateKey getPrivate() throws Exception {
 
         URL urlFilePublicKei = this.getClass().getClassLoader().getResource("keys/app.private.key");

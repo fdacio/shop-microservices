@@ -18,7 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ControllerAdvice(basePackages = {"br.com.daciosoftware.shop.user.controller", "br.com.daciosoftware.shop.product.controller", "br.com.daciosoftware.shop.shopping.controller", "br.com.daciosoftware.shop.modelo*" })
+@ControllerAdvice(basePackages = {
+		"br.com.daciosoftware.shop.user.controller",
+		"br.com.daciosoftware.shop.product.controller",
+		"br.com.daciosoftware.shop.shopping.controller",
+		"br.com.daciosoftware.shop.auth.controller",
+		"br.com.daciosoftware.shop.models.*" })
 public class ApplicationControllerAdvice {
 	
 	@ResponseBody
