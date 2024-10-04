@@ -3,7 +3,6 @@ package br.com.daciosoftware.shop.exceptions.advice;
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthLoginErrorException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
-import br.com.daciosoftware.shop.exceptions.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

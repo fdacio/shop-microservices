@@ -3,8 +3,6 @@ package br.com.daciosoftware.shop.auth.config;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
-import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
-import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
-
-import static java.util.Optional.of;
 
 
 @Configuration
