@@ -20,10 +20,8 @@ import java.util.stream.Collectors;
 @Configuration
 public class TokenConfig {
 
-    @Autowired
-    RsaKey rsaKey;
-
     public JwtEncoder jwtEncoder() throws Exception {
+        RsaKey rsaKey = new RsaKey();
         JWK jwk = new RSAKey.Builder(rsaKey.getPublicKey()).privateKey(rsaKey.getPrivate()).build();
         var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
@@ -32,7 +30,7 @@ public class TokenConfig {
     public TokenDTO getToken(AuthUserDTO authUserDTO) {
 
         var now = Instant.now();
-        long expire = 300L;
+        long expire = 10L;
 
         String scopes = authUserDTO.getRules()
                 .stream()

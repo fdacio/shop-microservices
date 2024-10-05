@@ -4,16 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ErrorDTO {
 
-	private int status;
-	private String message;
-	private LocalDateTime date;
+	private final int status;
+	private final String statusName;
+	private final String message;
+	private final LocalDateTime date;
+
+	public ErrorDTO(int status, String message) {
+
+		this.status = status;
+		this.statusName = HttpStatus.valueOf(status).getReasonPhrase();
+		this.message = message;
+		this.date = LocalDateTime.now();
+	}
 }

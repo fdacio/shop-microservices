@@ -20,44 +20,28 @@ public class ProductControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ProductNotFoundException.class)
     public ErrorDTO handleProductNotFound(ProductNotFoundException productNotFoundException) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.setMessage("Produto não encontrado");
-        error.setDate(LocalDateTime.now());
-        return error;
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(),"Produto não encontrado" );
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CategoryNotFoundException.class)
     public ErrorDTO handleCategoryNotFount(CategoryNotFoundException categoryNotFoundException) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.setMessage("Categoria não encontrada");
-        error.setDate(LocalDateTime.now());
-        return error;
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(),"Categoria não encontrada");
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ProductIdentifieViolationException.class)
     public ErrorDTO handleIntegrityViolation(ProductIdentifieViolationException ex) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.CONFLICT.value());
-        error.setMessage("Identificador do produto já existe");
-        error.setDate(LocalDateTime.now());
-        return error;
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Identificador do produto já existe");
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ExceptionHandler(ReportPdfException.class)
     public ErrorDTO handleReportPdf(ReportPdfException ex) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.NO_CONTENT.value());
-        error.setMessage("Erro ao gerar relatório");
-        error.setDate(LocalDateTime.now());
-        return error;
+        return new ErrorDTO(HttpStatus.NO_CONTENT.value(), "Erro ao gerar relatório");
     }
 
 }

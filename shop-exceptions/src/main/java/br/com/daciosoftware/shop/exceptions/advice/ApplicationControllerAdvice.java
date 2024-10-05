@@ -30,10 +30,7 @@ public class ApplicationControllerAdvice {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ErrorDTO handleValidationError(MethodArgumentNotValidException ex) {
-		ValidErrorDTO error = new ValidErrorDTO();
-		error.setStatus(HttpStatus.BAD_REQUEST.value());
-		error.setMessage("Erro de validação de campos");
-		error.setDate(LocalDateTime.now());
+		ValidErrorDTO error = new ValidErrorDTO(HttpStatus.BAD_REQUEST.value(), "Erro de validação de campos");
 		Map<String, String> fieldsValidation = new HashMap<>();
 		BindingResult result = ex.getBindingResult();
 		List<FieldError> fieldsErrors = result.getFieldErrors();
@@ -50,22 +47,14 @@ public class ApplicationControllerAdvice {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ErrorDTO handleValidationError(HttpMessageNotReadableException ex) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.BAD_REQUEST.value());
-		error.setMessage("Erro no corpo da requisição");
-		error.setDate(LocalDateTime.now());
-		return error;
+		return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Erro no corpo da requisição");
 	}
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ErrorDTO handleValidationError(IllegalArgumentException ex) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.BAD_REQUEST.value());
-		error.setMessage("Erro no corpo da requisição");
-		error.setDate(LocalDateTime.now());
-		return error;
+		return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Erro no corpo da requisição");
 	}
 
 	
@@ -74,11 +63,7 @@ public class ApplicationControllerAdvice {
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ErrorDTO handleIntegrityViolation(DataIntegrityViolationException ex) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.CONFLICT.value());
-		error.setMessage("Violação de integridade");
-		error.setDate(LocalDateTime.now());
-		return error;
+		return  new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade");
 	}
 	
 }

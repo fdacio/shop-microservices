@@ -10,4 +10,8 @@ import java.util.Map;
 public class ValidErrorDTO extends ErrorDTO {
 
 	private Map<String, String> fields;
+
+	public ValidErrorDTO(int status, String message) {
+		super(status, message);
+	}
 }

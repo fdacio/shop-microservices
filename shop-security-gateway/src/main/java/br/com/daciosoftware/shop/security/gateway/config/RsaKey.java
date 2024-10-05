@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -11,19 +13,18 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-
 public class RsaKey {
 
     public RSAPublicKey getPublicKey() throws Exception {
 
-        URL urlFilePublicKei = this.getClass().getClassLoader().getResource("keys/app.public.key");
-        if (urlFilePublicKei == null) {
+        URL urlFilePublicKey = this.getClass().getClassLoader().getResource("keys/app.public.key");
+        if (urlFilePublicKey == null) {
             throw new Exception("Não há arquivo de chave publica");
         }
 
-        File file = new File(urlFilePublicKei.getFile());
-
-        String key = Files.readString(file.toPath(), Charset.defaultCharset());
+        File file = new File(urlFilePublicKey.getFile());
+        Path pathToFile = Paths.get(file.toURI());
+        String key = Files.readString(pathToFile, Charset.defaultCharset());
 
         String publicKeyPEM = key
                 .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -39,13 +40,15 @@ public class RsaKey {
 
     public RSAPrivateKey getPrivate() throws Exception {
 
-        URL urlFilePublicKei = this.getClass().getClassLoader().getResource("keys/app.private.key");
-        if (urlFilePublicKei == null) {
+        URL urlFilePublicKeY = this.getClass().getClassLoader().getResource("keys/app.private.key");
+        if (urlFilePublicKeY == null) {
             throw new Exception("Não há arquivo de chave privada");
         }
 
-        File file = new File(urlFilePublicKei.getFile());
-        String key = Files.readString(file.toPath(), Charset.defaultCharset());
+        File file = new File(urlFilePublicKeY.getFile());
+        Path pathToFile = Paths.get(file.toURI());
+        String key = Files.readString(pathToFile, Charset.defaultCharset());
+
         String privateKeyPEM = key
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replaceAll(System.lineSeparator(), "")

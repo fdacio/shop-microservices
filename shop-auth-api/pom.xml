@@ -12,6 +12,7 @@
 	<artifactId>shop-auth-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>shop-auth-api</name>
+	<packaging>jar</packaging>
 	<description>Api de autenticação do shop microservice</description>
 	<properties>
 		<java.version>17</java.version>
@@ -72,6 +73,11 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

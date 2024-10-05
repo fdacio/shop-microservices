@@ -22,66 +22,44 @@ public class ShoppingControllerAdvice {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler(ShopNotFoundException.class)
 	public ErrorDTO handleUserNotFound(ShopNotFoundException shopNotFoundException) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.NOT_FOUND.value());
-		error.setMessage("SHOP - Venda não encontrado");
-		error.setDate(LocalDateTime.now());
-		return error;
+		return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "SHOP - Venda não encontrado");
+
 	}
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler(UserNotFoundException.class)
 	public ErrorDTO handleUserNotFound(UserNotFoundException userNotFoundException) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.NOT_FOUND.value());
-		error.setMessage("SHOP - Usuário não encontrado");
-		error.setDate(LocalDateTime.now());
-		return error;
+		return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "SHOP - Usuário não encontrado");
 	}
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler(ProductNotFoundException.class)
 	public ErrorDTO handleProductNotFound(ProductNotFoundException productNotFoundException) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.NOT_FOUND.value());
-		error.setMessage("SHOP - Produto não encontrado");
-		error.setDate(LocalDateTime.now());
-		return error;
+		return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "SHOP - Produto não encontrado");
 	}
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler(InvalidUserKeyException.class)
-	public ErrorDTO handleProductNotFound(InvalidUserKeyException invalidUserKeyException) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.UNAUTHORIZED.value());
-		error.setMessage("SHOP - Chave do usuário inválida");
-		error.setDate(LocalDateTime.now());
-		return error;
+	public ErrorDTO handleInvalidKeyCustomer(InvalidUserKeyException invalidUserKeyException) {
+		return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "SHOP - Chave do usuário inválida");
+
 	}
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-	public ErrorDTO invalidaRequest(MethodArgumentTypeMismatchException ex) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.BAD_REQUEST.value());
-		error.setMessage("SHOP - Requisição inválida");
-		error.setDate(LocalDateTime.now());
-		return error;
+	public ErrorDTO handleInvalidRequest(MethodArgumentTypeMismatchException ex) {
+		return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "SHOP - Requisição inválida");
 	}
 
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ErrorDTO invalidaRequest(HttpMessageNotReadableException ex) {
-		ErrorDTO error = new ErrorDTO();
-		error.setStatus(HttpStatus.BAD_REQUEST.value());
-		error.setMessage("SHOP - Requisição inválida");
-		error.setDate(LocalDateTime.now());
-		return error;
+	public ErrorDTO handleInvalidMessageRequest(HttpMessageNotReadableException ex) {
+		return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "SHOP - Requisição inválida");
 	}
 	
 }

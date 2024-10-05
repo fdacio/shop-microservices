@@ -1,4 +1,4 @@
-package br.com.daciosoftware.shop.security.gateway.config;
+package br.com.daciosoftware.shop.security.config;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;

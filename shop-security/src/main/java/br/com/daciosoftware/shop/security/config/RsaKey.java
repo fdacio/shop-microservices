@@ -1,4 +1,4 @@
-package br.com.daciosoftware.shop.security.gateway.config;
+package br.com.daciosoftware.shop.security.config;
 
 import java.io.File;
 import java.net.URL;
@@ -16,7 +16,7 @@ public class RsaKey {
 
     public RSAPublicKey getPublicKey() throws Exception {
 
-        URL urlFilePublicKei = this.getClass().getClassLoader().getResource("app.public.key");
+        URL urlFilePublicKei = this.getClass().getClassLoader().getResource("keys/app.public.key");
         if (urlFilePublicKei == null) {
             throw new RuntimeException("Não há arquivo de chave publica");
         }
@@ -39,7 +39,7 @@ public class RsaKey {
 
     public RSAPrivateKey getPrivate() throws Exception {
 
-        URL urlFilePublicKei = this.getClass().getClassLoader().getResource("app.private.key");
+        URL urlFilePublicKei = this.getClass().getClassLoader().getResource("keys/app.private.key");
         if (urlFilePublicKei == null) {
             throw new RuntimeException("Não há arquivo de chave privada");
         }

@@ -17,56 +17,28 @@ public class UserControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotFoundException.class)
     public ErrorDTO handleUserNotFound(UserNotFoundException userNotFoundException) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.setMessage("Usuário não encontrado");
-        error.setDate(LocalDateTime.now());
-        return error;
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Usuário não encontrado");
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CategoryNotFoundException.class)
     public ErrorDTO handleCategoryNotFount(CategoryNotFoundException categoryNotFoundException) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.setMessage("Categoria dos interesses não encontrada");
-        error.setDate(LocalDateTime.now());
-        return error;
-    }
-
-
-    @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(InvalidUserKeyException.class)
-    public ErrorDTO handleProductNotFound(InvalidUserKeyException invalidUserKeyException) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.UNAUTHORIZED.value());
-        error.setMessage("Token Inválido");
-        error.setDate(LocalDateTime.now());
-        return error;
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Categoria dos interesses não encontrada");
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserCpfExistsException.class)
-    public ErrorDTO handleUserCpfExistesException(UserCpfExistsException ex) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setMessage("CPF já existe");
-        error.setDate(LocalDateTime.now());
-        return error;
+    public ErrorDTO handleUserCpfExistsException(UserCpfExistsException ex) {
+        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "CPF já existe");
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserEmailExistsException.class)
-    public ErrorDTO handleUserEmailExistesException(UserEmailExistsException ex) {
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setMessage("Email já existe");
-        error.setDate(LocalDateTime.now());
-        return error;
+    public ErrorDTO handleUserEmailExistsException(UserEmailExistsException ex) {
+        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Email já existe");
     }
 
 }

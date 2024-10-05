@@ -4,7 +4,8 @@ import br.com.daciosoftware.shop.auth.config.RsaKey;
 import br.com.daciosoftware.shop.auth.config.TokenConfig;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthLoginErrorException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthExpiredTokenException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthInvalidLoginException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
@@ -41,9 +42,8 @@ public class AuthService {
                     .getSubject();
             return authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new AuthExpiredTokenException();
         }
-
     }
 
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -59,7 +59,7 @@ public class AuthService {
                 .orElseThrow(AuthUserNotFoundException::new);
 
         boolean loginValid = bCryptPasswordEncoder().matches(loginDTO.getPassword(), user.getPassword());
-        if (!loginValid) throw new AuthLoginErrorException();
+        if (!loginValid) throw new AuthInvalidLoginException();
 
         AuthUserDTO authUserDTO = AuthUserDTO.convert(user);
         return tokenConfig.getToken(authUserDTO);
