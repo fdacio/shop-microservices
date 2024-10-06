@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 public class CustomerService {
 
 	@Autowired
-	private CustomerRepository userRepository;
+	private CustomerRepository customerRepository;
 	@Autowired
 	private CategoryService categoryService;
 
     public List<CustomerDTO> findAll() {
-		return userRepository.findAll()
+		return customerRepository.findAll()
 				.stream()
 				.sorted(Comparator.comparing(Customer::getId))
 				.map(CustomerDTO::convert)
@@ -34,39 +34,39 @@ public class CustomerService {
 	}
 
 	public CustomerDTO findById(Long userId) {
-		return userRepository.findById(userId)
+		return customerRepository.findById(userId)
 				.map(CustomerDTO::convert)
 				.orElseThrow(UserNotFoundException::new);
 	}
 
 	public List<CustomerDTO> findByNome(String nome) {
-		return userRepository.findByNomeContainingIgnoreCase(nome)
+		return customerRepository.findByNomeContainingIgnoreCase(nome)
 				.stream()
 				.map(CustomerDTO::convert)
 				.collect(Collectors.toList());
 	}
 
 	public CustomerDTO findByCpf(String cpf) {
-		return userRepository.findByCpf(cpf)
+		return customerRepository.findByCpf(cpf)
 				.map(CustomerDTO::convert)
 				.orElseThrow(UserNotFoundException::new);
 	}
 	
 	public CustomerDTO findByEmail(String email) {
-		return userRepository.findByEmail(email)
+		return customerRepository.findByEmail(email)
 				.map(CustomerDTO::convert)
 				.orElseThrow(UserNotFoundException::new);
 	}
 	
 	private void validCpfUnique(String cpf) {
-		Optional<CustomerDTO> userDTO = userRepository.findByCpf(cpf).map(CustomerDTO::convert);
+		Optional<CustomerDTO> userDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);
 		if (userDTO.isPresent()) {
 			throw new UserCpfExistsException();
 		}
 	}
 	
 	private void validEmailUnique(String email, Long id) {
-		Optional<CustomerDTO> userDTO = userRepository.findByEmail(email).map(CustomerDTO::convert);
+		Optional<CustomerDTO> userDTO = customerRepository.findByEmail(email).map(CustomerDTO::convert);
 		if (userDTO.isPresent()) {
 			if (id == null) {
 				throw new UserEmailExistsException();
@@ -76,16 +76,16 @@ public class CustomerService {
 		}
 	}
 
-	public CustomerDTO save(CustomerDTO userDTO) {
-		validCpfUnique(userDTO.getCpf());
-		validEmailUnique(userDTO.getEmail(), null);
-		userDTO.setDataCadastro(LocalDateTime.now());
-		userDTO.setInteresses(categoryService.findCategorysByUser(userDTO));
-		return CustomerDTO.convert(userRepository.save(Customer.convert(userDTO)));
+	public CustomerDTO save(CustomerDTO customerDTO) {
+		validCpfUnique(customerDTO.getCpf());
+		validEmailUnique(customerDTO.getEmail(), null);
+		customerDTO.setDataCadastro(LocalDateTime.now());
+		customerDTO.setInteresses(categoryService.findCategorysByUser(customerDTO));
+		return CustomerDTO.convert(customerRepository.save(Customer.convert(customerDTO)));
 	}
 
 	public void delete(Long userId) {
-		userRepository.delete(Customer.convert(findById(userId)));
+		customerRepository.delete(Customer.convert(findById(userId)));
 	}
 
 	public CustomerDTO update(Long userId, CustomerDTO userDTO) {
@@ -126,17 +126,17 @@ public class CustomerService {
 			user.setInteresses(interesses);
 		}
 		
-		return CustomerDTO.convert(userRepository.save(user));
+		return CustomerDTO.convert(customerRepository.save(user));
 	}
 
 	public Page<CustomerDTO> getAllPage(Pageable page) {
-		return userRepository.findAll(page).map(CustomerDTO::convert);
+		return customerRepository.findAll(page).map(CustomerDTO::convert);
 	}
 
 	public List<CustomerDTO> updateKeyAll() {
-		List<Customer> users = userRepository.findAll();
+		List<Customer> users = customerRepository.findAll();
 		return users.stream().map(u -> {
-			u = userRepository.save(u);
+			u = customerRepository.save(u);
 			return CustomerDTO.convert(u);
 		}).collect(Collectors.toList());
 	}

@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/auth/token/public-key").permitAll()
+                        //.pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
                         .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Admin")
                         .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Basic")
                         .pathMatchers(HttpMethod.GET, "/auth/user").hasAuthority("SCOPE_Admin")
@@ -46,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         try {
-            String publicKey = authService.getPublicKey();
+            String publicKey = authService.getContentPublicKey();
             byte[] encoded = Base64.getDecoder().decode(publicKey);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);

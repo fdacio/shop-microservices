@@ -27,6 +27,7 @@ public class Customer {
 	private String endereco;
 	private String email;
 	private String telefone;
+	private String keyAuth;
 	private LocalDateTime dataCadastro;
 	@OneToMany
 	@JoinTable(schema="customers", name="interests",
@@ -34,17 +35,18 @@ public class Customer {
 				inverseJoinColumns = @JoinColumn(name="category_id"))
 	private Set<Category> interesses;
 
-	public static Customer convert(CustomerDTO userDTO) {
+	public static Customer convert(CustomerDTO customerDTO) {
 		Customer customer = new Customer();
-		customer.setId(userDTO.getId());
-		customer.setNome(userDTO.getNome());
-		customer.setCpf(userDTO.getCpf());
-		customer.setEndereco(userDTO.getEndereco());
-		customer.setEmail(userDTO.getEmail());
-		customer.setTelefone(userDTO.getTelefone());
-		customer.setDataCadastro(userDTO.getDataCadastro());
-		if (userDTO.getInteresses() != null) 
-			customer.setInteresses(userDTO.getInteresses().stream().map(Category::convert).collect(Collectors.toSet()));
+		customer.setId(customerDTO.getId());
+		customer.setNome(customerDTO.getNome());
+		customer.setCpf(customerDTO.getCpf());
+		customer.setEndereco(customerDTO.getEndereco());
+		customer.setEmail(customerDTO.getEmail());
+		customer.setTelefone(customerDTO.getTelefone());
+		customer.setKeyAuth(customer.getKeyAuth());
+		customer.setDataCadastro(customerDTO.getDataCadastro());
+		if (customerDTO.getInteresses() != null)
+			customer.setInteresses(customerDTO.getInteresses().stream().map(Category::convert).collect(Collectors.toSet()));
 		return customer;
 	}
 

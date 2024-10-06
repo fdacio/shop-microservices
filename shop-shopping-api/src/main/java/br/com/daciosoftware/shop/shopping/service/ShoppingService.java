@@ -27,7 +27,7 @@ public class ShoppingService {
 	@Autowired
 	private ShoppingRepository shopRepository;
 	@Autowired
-	private UserService userService;
+	private CustomerService customerService;
 	@Autowired
 	private ProductService productService;
 	@PersistenceContext
@@ -56,14 +56,14 @@ public class ShoppingService {
 	}
 
 	@Transactional
-	public ShopDTO save(ShopDTO shopDTO, String key) {
-		CustomerDTO userDTO = userService.validUserKey(shopDTO.getCustomer(), key);
+	public ShopDTO save(ShopDTO shopDTO, String customerKeyAuth) {
+		CustomerDTO customerDTO = customerService.validCustomerKeyAuth(shopDTO.getCustomer(), customerKeyAuth);
 		List<ItemDTO> itensDTO = productService.findItens(shopDTO);
 		Float total = itensDTO.stream().map(i -> (i.getPreco()*i.getQuantidade()) ).reduce((float)0, Float::sum);
 		
 		shopDTO.setData(LocalDateTime.now());
 		shopDTO.setTotal(total);
-		shopDTO.setCustomer(userDTO);
+		shopDTO.setCustomer(customerDTO);
 		shopDTO.setItens(itensDTO);
 		
 		Shop shop = Shop.convert(shopDTO);

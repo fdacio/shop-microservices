@@ -11,7 +11,7 @@ public class AuthService {
     @Value("${auth.api.url}")
     private String authApiURL;
 
-    public String getPublicKey() {
+    public String getContentPublicKey() {
 
         WebClient webClient = WebClient.builder().baseUrl(authApiURL).build();
 

@@ -43,18 +43,20 @@ public class CustomerDTO {
 
 	private LocalDateTime dataCadastro;
 	private Set<CategoryDTO> interesses;
+	private String keyAuth;
 
-	public static CustomerDTO convert(Customer user) {
+	public static CustomerDTO convert(Customer customer) {
 		CustomerDTO customerDTO = new CustomerDTO();
-		customerDTO.setId(user.getId());
-		customerDTO.setNome(user.getNome());
-		customerDTO.setCpf(user.getCpf());
-		customerDTO.setEndereco(user.getEndereco());
-		customerDTO.setEmail(user.getEmail());
-		customerDTO.setTelefone(user.getTelefone());
-		customerDTO.setDataCadastro(user.getDataCadastro());
-		if (user.getInteresses() != null)
-			customerDTO.setInteresses(user.getInteresses().stream().map(CategoryDTO::convert).collect(Collectors.toSet()));
+		customerDTO.setId(customer.getId());
+		customerDTO.setNome(customer.getNome());
+		customerDTO.setCpf(customer.getCpf());
+		customerDTO.setEndereco(customer.getEndereco());
+		customerDTO.setEmail(customer.getEmail());
+		customerDTO.setTelefone(customer.getTelefone());
+		customerDTO.setKeyAuth(customer.getKeyAuth());
+		customerDTO.setDataCadastro(customer.getDataCadastro());
+		if (customer.getInteresses() != null)
+			customerDTO.setInteresses(customer.getInteresses().stream().map(CategoryDTO::convert).collect(Collectors.toSet()));
 		return customerDTO;
 	}
 

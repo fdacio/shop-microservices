@@ -10,22 +10,22 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class UserService {
+public class CustomerService {
 	
-	@Value("${user.api.url}")
-	private String userApiURL;
+	@Value("${customer.api.url}")
+	private String customerApiURL;
 	
 	public CustomerDTO findUser(ShopDTO shopDTO) {
 		
-		Long id = shopDTO.getCustomer().getId();
+		String key = shopDTO.getCustomer().getKeyAuth();
 		
 		try {
 			WebClient webClient = WebClient.builder()
-					.baseUrl(userApiURL)
+					.baseUrl(customerApiURL)
 					.build();
 			Mono<CustomerDTO> user = webClient
 					.get()
-					.uri("/user/"+id)
+					.uri("/customer/"+key+"/key")
 					.retrieve()
 					.bodyToMono(CustomerDTO.class);
 			return user.block();
@@ -36,16 +36,16 @@ public class UserService {
 	}
 	
 	
-	public CustomerDTO validUserKey(CustomerDTO userDTO, String key) {
+	public CustomerDTO validCustomerKeyAuth(CustomerDTO customerDTO, String customerKeyAuth) {
 		try {
 			WebClient webClient = WebClient.builder()
-					.baseUrl(userApiURL)
+					.baseUrl(customerApiURL)
 					.build();
 			Mono<CustomerDTO> user = webClient
 					.post()
-					.uri("/user/valid")
-					.bodyValue(userDTO)
-					.header("key", key)
+					.uri("/customer/valid")
+					.bodyValue(customerDTO)
+					.header("customerKeyAuth", customerKeyAuth)
 					.retrieve()
 					.bodyToMono(CustomerDTO.class);
 			return user.block();
