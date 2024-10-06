@@ -65,4 +65,9 @@ public class ShoppingController {
 	{
 		return shoppingService.getShopByFilters(dataInicio, dataFim, valorMinimo);
 	}
+
+	@GetMapping("/healthcheck")
+	public String healthcheck () {
+		return "ok";
+	}
 }

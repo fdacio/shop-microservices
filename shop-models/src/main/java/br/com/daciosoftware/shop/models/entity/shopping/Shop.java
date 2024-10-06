@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.models.entity.shopping;
 
 import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
-import br.com.daciosoftware.shop.models.entity.user.User;
+import br.com.daciosoftware.shop.models.entity.customer.Customer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class Shop {
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
-	private User user;
+	private Customer user;
 	
 	//@ElementCollection(fetch = FetchType.EAGER)
 	//@CollectionTable(name="itens", joinColumns = @JoinColumn(name="shop_id"))
@@ -45,7 +45,7 @@ public class Shop {
 		shop.setId(shopDTO.getId());
 		shop.setData(shopDTO.getData());
 		shop.setTotal(shopDTO.getTotal());
-		shop.setUser(User.convert(shopDTO.getUser()));		
+		shop.setUser(Customer.convert(shopDTO.getCustomer()));
 		List<Item> itens = shopDTO.getItens().stream().map(Item::convert).collect(Collectors.toList());
 		itens.forEach((i) -> i.setShop(shop));//Anexar o item ao shop
 		shop.setItens(itens);

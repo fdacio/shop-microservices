@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.models.dto.shopping;
 
-import br.com.daciosoftware.shop.models.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.shopping.Shop;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +24,7 @@ public class ShopDTO {
 	private LocalDateTime data;
 	private Float total;
 	@NotNull(message="Informe o usuário")
-	private UserDTO user;
+	private CustomerDTO customer;
 	@NotNull(message="Informe os itens")
 	@NotEmpty(message="Informe pelo menos um item")
 	private List<ItemDTO> itens = new ArrayList<>();
@@ -34,7 +34,7 @@ public class ShopDTO {
 		shopDTO.setId(shop.getId());
 		shopDTO.setData(shop.getData());
 		shopDTO.setTotal(shop.getTotal());
-		shopDTO.setUser(UserDTO.convert(shop.getUser()));
+		shopDTO.setCustomer(CustomerDTO.convert(shop.getUser()));
 		List<ItemDTO> itensDTO = shop.getItens()
 				.stream()
 				.map(ItemDTO::convert)
@@ -45,7 +45,7 @@ public class ShopDTO {
 
 	@Override
 	public String toString() {
-		return "ShopDTO [id=" + id + ", data=" + data + ", total=" + total + ", user=" + user + ", itens=" + itens
+		return "ShopDTO [id=" + id + ", data=" + data + ", total=" + total + ", user=" + customer + ", itens=" + itens
 				+ "]";
 	}
 	

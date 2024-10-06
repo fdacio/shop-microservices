@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.models.dto.shopping;
 
-import br.com.daciosoftware.shop.models.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ShopUserReportDTO {
 
-    UserDTO user;
+    CustomerDTO customer;
     Integer count;
     Float total;
 }

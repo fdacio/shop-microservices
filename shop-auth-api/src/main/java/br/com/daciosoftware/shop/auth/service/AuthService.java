@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
-import br.com.daciosoftware.shop.auth.config.RsaKey;
-import br.com.daciosoftware.shop.auth.config.TokenConfig;
+import br.com.daciosoftware.shop.auth.component.RsaKey;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthExpiredTokenException;
@@ -30,13 +29,13 @@ public class AuthService {
     private RuleRepository ruleRepository;
 
     @Autowired
-    private TokenConfig tokenConfig;
+    private TokenService tokenConfig;
 
 
     private AuthUser getAuthUserFromToken(String token) {
         try {
             String keyToken = Jwts.parser()
-                    .setSigningKey(new RsaKey().getPrivate())
+                    .setSigningKey(new RsaKey().getRsaPrivateKey())
                     .parseClaimsJws(token.replace("Bearer ", ""))
                     .getBody()
                     .getSubject();

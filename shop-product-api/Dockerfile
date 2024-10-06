@@ -1,4 +1,5 @@
 FROM openjdk:17-alpine
+RUN apk add curl
 VOLUME /tmp
 RUN mkdir -p /app/photos
 ENV PRODUCT_API_DIR_PHOTO=/app/photos

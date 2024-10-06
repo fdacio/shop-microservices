@@ -85,4 +85,10 @@ public class ProductController {
         headers.setContentLength(pdfStream.size());
         return new ResponseEntity<>(pdfStream.toByteArray(), headers, HttpStatus.OK);
     }
+
+    @GetMapping("/healthcheck")
+    public String healthcheck () {
+        return "ok";
+    }
+
 }

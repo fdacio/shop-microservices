@@ -1,0 +1,11 @@
+create schema if not exists customers;
+
+create table if not exists customers.customer (
+    id bigserial primary key,
+    nome varchar(80) not null,
+    cpf varchar(11) not null,
+    endereco varchar(100) not null,
+    email varchar(100) not null,
+    telefone varchar(20) not null,
+    data_cadastro timestamp not null
+)

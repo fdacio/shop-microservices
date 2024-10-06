@@ -3,7 +3,7 @@ package br.com.daciosoftware.shop.shopping.service;
 import br.com.daciosoftware.shop.exceptions.exceptions.InvalidUserKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.UserNotFoundException;
 import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
-import br.com.daciosoftware.shop.models.dto.user.UserDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,19 +15,19 @@ public class UserService {
 	@Value("${user.api.url}")
 	private String userApiURL;
 	
-	public UserDTO findUser(ShopDTO shopDTO) {
+	public CustomerDTO findUser(ShopDTO shopDTO) {
 		
-		Long id = shopDTO.getUser().getId();
+		Long id = shopDTO.getCustomer().getId();
 		
 		try {
 			WebClient webClient = WebClient.builder()
 					.baseUrl(userApiURL)
 					.build();
-			Mono<UserDTO> user = webClient
+			Mono<CustomerDTO> user = webClient
 					.get()
 					.uri("/user/"+id)
 					.retrieve()
-					.bodyToMono(UserDTO.class);
+					.bodyToMono(CustomerDTO.class);
 			return user.block();
 			
 		} catch (Exception e) {
@@ -36,18 +36,18 @@ public class UserService {
 	}
 	
 	
-	public UserDTO validUserKey(UserDTO userDTO, String key) {
+	public CustomerDTO validUserKey(CustomerDTO userDTO, String key) {
 		try {
 			WebClient webClient = WebClient.builder()
 					.baseUrl(userApiURL)
 					.build();
-			Mono<UserDTO> user = webClient
+			Mono<CustomerDTO> user = webClient
 					.post()
 					.uri("/user/valid")
 					.bodyValue(userDTO)
 					.header("key", key)
 					.retrieve()
-					.bodyToMono(UserDTO.class);
+					.bodyToMono(CustomerDTO.class);
 			return user.block();
 			
 		} catch (Exception e) {

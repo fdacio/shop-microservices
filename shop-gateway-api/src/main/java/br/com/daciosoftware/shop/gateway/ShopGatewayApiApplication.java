@@ -9,15 +9,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { " br.com.daciosoftware.shop.security.gateway.*" })
+@ComponentScan(basePackages = { "br.com.daciosoftware.shop.gateway.*" })
 public class ShopGatewayApiApplication {
 
 	@Value("${auth.api.url}")
 	private String authApiUrl;
 	@Value("${product.api.url}")
 	private String productApiUrl;
-	@Value("${user.api.url}")
-	private String userApiUrl;
+	@Value("${customer.api.url}")
+	private String customerApiUrl;
 	@Value("${shopping.api.url}")
 	private String shoppinpApiUrl;
 
@@ -32,7 +32,7 @@ public class ShopGatewayApiApplication {
 				.route("auth_route", r -> r.path("/auth/**").uri(authApiUrl))
 				.route("product_route", r -> r.path("/product/**").uri(productApiUrl))
 				.route("product_route", r -> r.path("/category/**").uri(productApiUrl))
-				.route("user_route", r -> r.path("/user/**").uri(userApiUrl))
+				.route("customer_route", r -> r.path("/customer/**").uri(customerApiUrl))
 				.route("shopping_route", r -> r.path("/shopping/**").uri(shoppinpApiUrl))
 				.build();
 	}
