@@ -3,10 +3,7 @@ package br.com.daciosoftware.shop.auth.service;
 import br.com.daciosoftware.shop.auth.component.RsaKey;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthExpiredTokenException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthInvalidLoginException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthPasswordNotMatchException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,18 +26,16 @@ public class AuthService {
     private AuthRepository authRepository;
     @Autowired
     private RuleRepository ruleRepository;
-
     @Autowired
     private TokenService tokenConfig;
 
-    private AuthUser getAuthUserFromToken(String token) {
+    private String getKeyTokenFromToken(String token) {
         try {
-            String keyToken = Jwts.parser()
+            return Jwts.parser()
                     .setSigningKey(new RsaKey().getRsaPrivateKey())
                     .parseClaimsJws(token.replace("Bearer ", ""))
                     .getBody()
                     .getSubject();
-            return authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         } catch (Exception e) {
             throw new AuthExpiredTokenException();
         }
@@ -94,6 +90,13 @@ public class AuthService {
                 .orElseThrow(AuthUserNotFoundException::new);
     }
 
+    public AuthUserDTO update (Long authUserId, UpdateAuthUserDTO updateAuthUserDTO) {
+        AuthUserDTO authUserDTO = findById(authUserId);
+        validUsernameUnique(updateAuthUserDTO.getUsername(), authUserId);
+        validEmailUnique(updateAuthUserDTO.getEmail(), authUserId);
+        return authUserDTO;
+    }
+
     public void delete(Long userId) {
         authRepository.delete(AuthUser.convert(findById(userId)));
     }
@@ -102,16 +105,21 @@ public class AuthService {
         if (!newPassword.getPassword().equals(newPassword.getRePassword())) {
             throw new AuthPasswordNotMatchException();
         }
-        AuthUser authUser = getAuthUserFromToken(token);
+        String keyToken = getKeyTokenFromToken(token);
+        AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         authUser.setPassword(bCryptPasswordEncoder().encode(newPassword.getPassword()));
         return AuthUserDTO.convert(authRepository.save(authUser));
     }
 
     public AuthUserDTO findAuthenticatedUser(String token) {
-        return AuthUserDTO.convert(getAuthUserFromToken(token));
+        String keyToken = getKeyTokenFromToken(token);
+        AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
+        return AuthUserDTO.convert(authUser);
     }
 
     public AuthUserDTO createUserFromCustomer(CreateAuthUserDTO createAuthUserDTO) {
+        validUsernameUnique(createAuthUserDTO.getUsername(), null);
+        validEmailUnique(createAuthUserDTO.getEmail(), null);
         Rule rule = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow();
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
         authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
@@ -119,6 +127,28 @@ public class AuthService {
         authUser.setRules(Set.of(rule));
         authUser.setDataCadastro(LocalDateTime.now());
         return AuthUserDTO.convert(authRepository.save(authUser));
+    }
+
+    private void validUsernameUnique(String username, Long id) {
+        Optional<AuthUserDTO> authUserDTO = authRepository.findByUsername(username).map(AuthUserDTO::convert);
+        if (authUserDTO.isPresent()) {
+            if (id == null) {
+                throw new AuthUsernameExistsException();
+            } else if (!id.equals(authUserDTO.get().getId())) {
+                throw new AuthUsernameExistsException();
+            }
+        }
+    }
+
+    private void validEmailUnique(String email, Long id) {
+        Optional<AuthUserDTO> authUserDTO = authRepository.findByEmail(email).map(AuthUserDTO::convert);
+        if (authUserDTO.isPresent()) {
+            if (id == null) {
+                throw new AuthEmailExistsException();
+            } else if (!id.equals(authUserDTO.get().getId())) {
+                throw new AuthEmailExistsException();
+            }
+        }
     }
 
 }

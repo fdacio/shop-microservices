@@ -32,9 +32,9 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://gateway:8080/gateway/healthcheck" ]
-      interval: 60s
-      timeout: 30s
-      retries: 2
+      interval: 30s
+      timeout: 10s
+      retries: 1
 
   auth:
     image: loja/shop-auth-api
@@ -49,9 +49,9 @@ services:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://auth:8081/auth/healthcheck" ]
-      interval: 60s
+      interval: 120s
       timeout: 30s
-      retries: 2
+      retries: 1
 
   product:
     image: loja/shop-product-api
@@ -68,9 +68,9 @@ services:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://product:8082/product/healthcheck" ]
-      interval: 60s
+      interval: 120s
       timeout: 30s
-      retries: 2
+      retries: 1
 
   customer:
     image: loja/shop-customer-api
@@ -87,9 +87,9 @@ services:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://customer:8083/customer/healthcheck" ]
-      interval: 60s
+      interval: 120s
       timeout: 30s
-      retries: 2
+      retries: 1
 
   shopping:
     image: loja/shop-shopping-api
@@ -100,14 +100,15 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: dacio@04
+      AUTH_API_URL: http://auth:8081
       PRODUCT_API_URL: http://product:8082
       CUSTOMER_API_URL: http://customer:8083
     depends_on:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://shopping:8084/shopping/healthcheck" ]
-      interval: 60s
+      interval: 120s
       timeout: 30s
-      retries: 2
+      retries: 1
 
 

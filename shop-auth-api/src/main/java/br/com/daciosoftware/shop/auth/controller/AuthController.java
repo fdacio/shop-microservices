@@ -50,6 +50,11 @@ public class AuthController {
         return authService.findById(id);
     }
 
+    @GetMapping("/user/{username}")
+    public AuthUserDTO findByUsername(@PathVariable(name = "username") String username) {
+        return authService.findByUsername(username);
+    }
+
     @DeleteMapping("/user/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {

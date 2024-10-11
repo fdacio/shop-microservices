@@ -32,7 +32,7 @@ public class TokenService {
     public TokenDTO getToken(AuthUserDTO authUserDTO) {
 
         var now = Instant.now();
-        long expire = 10L;
+        long expire = 300L;
 
         String scopes = authUserDTO.getRules()
                 .stream()

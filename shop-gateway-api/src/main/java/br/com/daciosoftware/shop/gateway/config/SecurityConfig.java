@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/customer/user").permitAll()
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Admin", "SCOPE_Basic")
+                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Admin", "SCOPE_Basic", "SCOPE_Customer")
                         .pathMatchers(HttpMethod.GET, "/auth/user").hasAuthority("SCOPE_Admin")
                         .pathMatchers(HttpMethod.GET, "/auth/user/*").hasAuthority("SCOPE_Admin")
                         .anyExchange().authenticated())

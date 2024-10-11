@@ -1,11 +1,9 @@
-package br.com.daciosoftware.shop.customer.service;
+package br.com.daciosoftware.shop.shopping.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,7 +15,7 @@ public class AuthService {
     private String authApiURL;
 
     @Transactional
-    public AuthUserDTO createAuthUser(CreateAuthUserDTO createAuthUserDTO) {
+    public AuthUserDTO getUserAuthenticated(String token) {
 
         try {
 
@@ -26,9 +24,8 @@ public class AuthService {
                     .build();
 
             Mono<AuthUserDTO> user = webClient
-                    .post()
-                    .uri("/auth/user/customer")
-                    .bodyValue(createAuthUserDTO)
+                    .get()
+                    .uri("/auth/user/authenticated/" + token)
                     .retrieve()
                     .bodyToMono(AuthUserDTO.class);
 

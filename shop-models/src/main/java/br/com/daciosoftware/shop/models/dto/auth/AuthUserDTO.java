@@ -18,20 +18,19 @@ public class AuthUserDTO {
 	private String nome;
 	private String username;
 	private String email;
-	@JsonIgnore
 	private String keyToken;
 	private Set<RuleDTO> rules;
 
-	public static AuthUserDTO convert(AuthUser user) {
-		AuthUserDTO userDTO = new AuthUserDTO();
-		userDTO.setId(user.getId());
-		userDTO.setNome(user.getNome());
-		userDTO.setUsername(user.getUsername());
-		userDTO.setEmail(user.getEmail());
-		userDTO.setKeyToken(user.getKeyToken());
-		if (user.getRules() != null)
-			userDTO.setRules(user.getRules().stream().map(RuleDTO::convert).collect(Collectors.toSet()));
-		return userDTO;
+	public static AuthUserDTO convert(AuthUser authUser) {
+		AuthUserDTO authUserDTO = new AuthUserDTO();
+		authUserDTO.setId(authUser.getId());
+		authUserDTO.setNome(authUser.getNome());
+		authUserDTO.setUsername(authUser.getUsername());
+		authUserDTO.setEmail(authUser.getEmail());
+		authUserDTO.setKeyToken(authUser.getKeyToken());
+		if (authUser.getRules() != null)
+			authUserDTO.setRules(authUser.getRules().stream().map(RuleDTO::convert).collect(Collectors.toSet()));
+		return authUserDTO;
 	}
 
 }

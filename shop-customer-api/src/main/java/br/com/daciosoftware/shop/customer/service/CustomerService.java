@@ -16,7 +16,10 @@ import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -176,6 +179,7 @@ public class CustomerService {
 		
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = RuntimeException.class)
 	public AuthUserDTO createAuthUser(Long customerId, PasswordDTO password) {
 
 		if (!password.getPassword().equals(password.getRePassword())) {
@@ -189,10 +193,15 @@ public class CustomerService {
 		createAuthUserDTO.setUsername(customerDTO.getEmail());
 		createAuthUserDTO.setEmail(customerDTO.getEmail());
 
-		System.err.println(createAuthUserDTO);
-		System.err.printf("Password: %s%n", password);
+		AuthUserDTO authUserDTO = authService.createAuthUser(createAuthUserDTO);
 
-		return authService.createAuthUser(createAuthUserDTO);
+		customerDTO.setKeyAuth(authUserDTO.getKeyToken());
+		Customer customer = Customer.convert(customerDTO);
+
+		customerRepository.save(customer);
+
+		return authUserDTO;
+
 	}
 
 	public CreateCustomerUserDTO saveCustomerUser(CreateCustomerUserDTO createCustomerUserDTO) {

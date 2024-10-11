@@ -43,7 +43,7 @@ public class Customer {
 		customer.setEndereco(customerDTO.getEndereco());
 		customer.setEmail(customerDTO.getEmail());
 		customer.setTelefone(customerDTO.getTelefone());
-		customer.setKeyAuth(customer.getKeyAuth());
+		customer.setKeyAuth(customerDTO.getKeyAuth());
 		customer.setDataCadastro(customerDTO.getDataCadastro());
 		if (customerDTO.getInteresses() != null)
 			customer.setInteresses(customerDTO.getInteresses().stream().map(Category::convert).collect(Collectors.toSet()));

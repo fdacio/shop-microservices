@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.shopping.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopNotFoundException;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.shopping.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
@@ -30,6 +31,8 @@ public class ShoppingService {
 	private CustomerService customerService;
 	@Autowired
 	private ProductService productService;
+	@Autowired
+	private AuthService authService;
 	@PersistenceContext
 	private EntityManager entityManager;
 	
@@ -56,7 +59,10 @@ public class ShoppingService {
 	}
 
 	@Transactional
-	public ShopDTO save(ShopDTO shopDTO, String customerKeyAuth) {
+	public ShopDTO save(ShopDTO shopDTO, String token) {
+
+		AuthUserDTO authUserDTO = authService.getUserAuthenticated(token);
+		String customerKeyAuth = authUserDTO.getKeyToken();
 		CustomerDTO customerDTO = customerService.validCustomerKeyAuth(shopDTO.getCustomer(), customerKeyAuth);
 		List<ItemDTO> itensDTO = productService.findItens(shopDTO);
 		Float total = itensDTO.stream().map(i -> (i.getPreco()*i.getQuantidade()) ).reduce((float)0, Float::sum);

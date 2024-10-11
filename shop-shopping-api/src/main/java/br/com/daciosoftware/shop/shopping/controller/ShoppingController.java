@@ -37,8 +37,8 @@ public class ShoppingController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ShopDTO save(@Valid @RequestBody ShopDTO shopDTO, @RequestHeader String customerKeyAuth) {
-		return shoppingService.save(shopDTO, customerKeyAuth);
+	public ShopDTO save(@Valid @RequestBody ShopDTO shopDTO, @RequestHeader("Authorization") String token) {
+		return shoppingService.save(shopDTO, token);
 	}
 	
 	@DeleteMapping("/{id}")

@@ -41,8 +41,8 @@ public class AuthUser {
 		user.setId(userDTO.getId());
 		user.setNome(userDTO.getNome());
 		user.setUsername(userDTO.getEmail());
-		user.setEmail(user.getEmail());
-		user.setKeyToken(user.getKeyToken());
+		user.setEmail(userDTO.getEmail());
+		user.setKeyToken(userDTO.getKeyToken());
 		if (userDTO.getRules() != null) {
 			user.setRules(userDTO.getRules().stream().map(Rule::convert).collect(Collectors.toSet()));
 		}
