@@ -13,6 +13,7 @@ services:
 
   gateway:
     image: loja/shop-gateway-api
+    #build: "./gateway"
     ports:
       - "8880:8080"
     environment:
@@ -37,6 +38,7 @@ services:
 
   auth:
     image: loja/shop-auth-api
+    #build: "./auth"
     ports:
       - "8881:8081"
     environment:
@@ -53,6 +55,7 @@ services:
 
   product:
     image: loja/shop-product-api
+    #build: "./product"
     ports:
       - "8882:8082"
     volumes:
@@ -71,6 +74,7 @@ services:
 
   customer:
     image: loja/shop-customer-api
+    #build: "./customer"
     ports:
       - "8883:8083"
     environment:
@@ -89,6 +93,7 @@ services:
 
   shopping:
     image: loja/shop-shopping-api
+    #build: "./shopping"
     ports:
       - "8884:8084"
     environment:

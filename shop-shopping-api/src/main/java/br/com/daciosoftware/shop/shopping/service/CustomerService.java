@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.shopping.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.InvalidUserKeyException;
-import br.com.daciosoftware.shop.exceptions.exceptions.UserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.CustomerInvalidKeyException;
+import br.com.daciosoftware.shop.exceptions.exceptions.CustomerNotFoundException;
 import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +31,7 @@ public class CustomerService {
 			return user.block();
 			
 		} catch (Exception e) {
-			throw new UserNotFoundException();
+			throw new CustomerNotFoundException();
 		}
 	}
 	
@@ -51,7 +51,7 @@ public class CustomerService {
 			return user.block();
 			
 		} catch (Exception e) {
-			throw new InvalidUserKeyException();
+			throw new CustomerInvalidKeyException();
 		}
 	}
 

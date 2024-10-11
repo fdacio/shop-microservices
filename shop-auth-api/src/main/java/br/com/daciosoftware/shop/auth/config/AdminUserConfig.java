@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.auth.config;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
+import br.com.daciosoftware.shop.models.dto.auth.RuleEnum;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class AdminUserConfig implements CommandLineRunner {
         String userName = "admin@daciosoftware.com.br";
         String password = authService.bCryptPasswordEncoder().encode("123456");
         String email = "admin@daciosoftware.com.br";
-        Set<Rule> rule = Set.of(ruleRepository.findByNome("Admin"));
-
+        Rule rule = ruleRepository.findByNome(RuleEnum.ADMIN.getName()).orElseThrow();
+        Set<Rule> ruleAdmin = Set.of(rule);
         Optional<AuthUser> user = authRepository.findByUsername(userName);
         if (user.isEmpty()) {
             AuthUser admin = new AuthUser();
@@ -42,7 +43,7 @@ public class AdminUserConfig implements CommandLineRunner {
             admin.setEmail(email);
             admin.setPassword(password);
             admin.setKeyToken(authService.geraKeyTokenForCreateUser(userName));
-            admin.setRules(rule);
+            admin.setRules(ruleAdmin);
             admin.setDataCadastro(LocalDateTime.now());
             authRepository.save(admin);
         }

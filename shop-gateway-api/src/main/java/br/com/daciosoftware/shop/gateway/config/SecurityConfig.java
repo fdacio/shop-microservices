@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
@@ -20,6 +21,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebFluxSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -31,10 +33,10 @@ public class SecurityConfig {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
+                        .pathMatchers(HttpMethod.POST, "/customer/user").permitAll()
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        //.pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Admin")
-                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Basic")
+                        .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Admin", "SCOPE_Basic")
                         .pathMatchers(HttpMethod.GET, "/auth/user").hasAuthority("SCOPE_Admin")
                         .pathMatchers(HttpMethod.GET, "/auth/user/*").hasAuthority("SCOPE_Admin")
                         .anyExchange().authenticated())

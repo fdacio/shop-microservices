@@ -24,19 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class CustomerControllerTest {
 
 	@InjectMocks
-	private CustomerController userController;
+	private CustomerController customerController;
 
 	@Mock
-	private CustomerService userService;
+	private CustomerService customerService;
 
 	private MockMvc mockMvc;
 
 	@BeforeEach
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+		mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
 	}
 
 	@Test
@@ -50,9 +50,9 @@ public class UserControllerTest {
 		users.add(userDTO);
 		users.add(userDTO2);
 
-		Mockito.when(userService.findAll()).thenReturn(users);
+		Mockito.when(customerService.findAll()).thenReturn(users);
 
-		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user"))
+		MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/customer"))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
 		String resp = mvcResult.getResponse().getContentAsString();
@@ -67,7 +67,8 @@ public class UserControllerTest {
 					+ "\"email\":\"usuario@exemplo.com\","
 					+ "\"telefone\":\"(85) 9 9971-8151\","
 					+ "\"dataCadastro\":null,"
-					+ "\"interesses\":null"
+					+ "\"interesses\":null,"
+				    + "\"keyAuth\":null"
 				+ "},"
 				+ "{"
 					+ "\"id\":2,"
@@ -77,7 +78,8 @@ public class UserControllerTest {
 					+ "\"email\":\"usuario@exemplo.com\","
 					+ "\"telefone\":\"(85) 9 9971-8151\","
 					+ "\"dataCadastro\":null,"
-					+ "\"interesses\":null"
+					+ "\"interesses\":null,"
+				    + "\"keyAuth\":null"
 				+ "}"
 			+ "]", 	resp);
 
@@ -92,11 +94,11 @@ public class UserControllerTest {
 		ObjectMapper mapper = new ObjectMapper();
 		String payload = mapper.writeValueAsString(userDTO);
 
-		Mockito.when(userService.save(Mockito.any())).thenReturn(userDTO);
+		Mockito.when(customerService.save(Mockito.any())).thenReturn(userDTO);
 
 		MvcResult mvcResult = mockMvc
 				.perform(MockMvcRequestBuilders
-						.post("/user")
+						.post("/customer")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(payload))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();

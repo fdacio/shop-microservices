@@ -1,8 +1,13 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.UserCpfExistsException;
-import br.com.daciosoftware.shop.exceptions.exceptions.UserEmailExistsException;
-import br.com.daciosoftware.shop.exceptions.exceptions.UserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthPasswordNotMatchException;
+import br.com.daciosoftware.shop.exceptions.exceptions.CustomerCpfExistsException;
+import br.com.daciosoftware.shop.exceptions.exceptions.CustomerEmailExistsException;
+import br.com.daciosoftware.shop.exceptions.exceptions.CustomerNotFoundException;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerUserDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.product.Category;
@@ -24,6 +29,8 @@ public class CustomerService {
 	private CustomerRepository customerRepository;
 	@Autowired
 	private CategoryService categoryService;
+	@Autowired
+	private AuthService authService;
 
     public List<CustomerDTO> findAll() {
 		return customerRepository.findAll()
@@ -36,7 +43,7 @@ public class CustomerService {
 	public CustomerDTO findById(Long userId) {
 		return customerRepository.findById(userId)
 				.map(CustomerDTO::convert)
-				.orElseThrow(UserNotFoundException::new);
+				.orElseThrow(CustomerNotFoundException::new);
 	}
 
 	public List<CustomerDTO> findByNome(String nome) {
@@ -49,19 +56,19 @@ public class CustomerService {
 	public CustomerDTO findByCpf(String cpf) {
 		return customerRepository.findByCpf(cpf)
 				.map(CustomerDTO::convert)
-				.orElseThrow(UserNotFoundException::new);
+				.orElseThrow(CustomerNotFoundException::new);
 	}
 	
 	public CustomerDTO findByEmail(String email) {
 		return customerRepository.findByEmail(email)
 				.map(CustomerDTO::convert)
-				.orElseThrow(UserNotFoundException::new);
+				.orElseThrow(CustomerNotFoundException::new);
 	}
 	
 	private void validCpfUnique(String cpf) {
 		Optional<CustomerDTO> userDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);
 		if (userDTO.isPresent()) {
-			throw new UserCpfExistsException();
+			throw new CustomerCpfExistsException();
 		}
 	}
 	
@@ -69,9 +76,9 @@ public class CustomerService {
 		Optional<CustomerDTO> userDTO = customerRepository.findByEmail(email).map(CustomerDTO::convert);
 		if (userDTO.isPresent()) {
 			if (id == null) {
-				throw new UserEmailExistsException();
+				throw new CustomerEmailExistsException();
 			} else if (!id.equals(userDTO.get().getId())) {
-				throw new UserEmailExistsException();
+				throw new CustomerEmailExistsException();
 			}
 		}
 	}
@@ -167,6 +174,31 @@ public class CustomerService {
 		
 		return groupByCategory;
 		
+	}
+
+	public AuthUserDTO createAuthUser(Long customerId, PasswordDTO password) {
+
+		if (!password.getPassword().equals(password.getRePassword())) {
+			throw new AuthPasswordNotMatchException();
+		}
+
+		CustomerDTO customerDTO = findById(customerId);
+		CreateAuthUserDTO createAuthUserDTO = new CreateAuthUserDTO();
+		createAuthUserDTO.setNome(customerDTO.getNome());
+		createAuthUserDTO.setPassword(password.getPassword());
+		createAuthUserDTO.setUsername(customerDTO.getEmail());
+		createAuthUserDTO.setEmail(customerDTO.getEmail());
+
+		System.err.println(createAuthUserDTO);
+		System.err.printf("Password: %s%n", password);
+
+		return authService.createAuthUser(createAuthUserDTO);
+	}
+
+	public CreateCustomerUserDTO saveCustomerUser(CreateCustomerUserDTO createCustomerUserDTO) {
+		CustomerDTO customerDTO = save(createCustomerUserDTO.getCustomer());
+		createAuthUser(customerDTO.getId(), createCustomerUserDTO.getPassword());
+		return createCustomerUserDTO;
 	}
 
 }

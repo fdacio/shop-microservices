@@ -7,8 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class UpdatePasswordDTO {
+public class PasswordDTO {
 
-    private String newPassword;
+    private String password;
     private String rePassword;
 }

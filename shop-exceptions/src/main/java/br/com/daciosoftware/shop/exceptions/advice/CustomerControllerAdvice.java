@@ -8,16 +8,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDateTime;
-
-@ControllerAdvice(basePackages = {"br.com.daciosoftware.shop.user.controller"})
-public class UserControllerAdvice {
+@ControllerAdvice(basePackages = {"br.com.daciosoftware.shop.customer.controller"})
+public class CustomerControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(UserNotFoundException.class)
-    public ErrorDTO handleUserNotFound(UserNotFoundException userNotFoundException) {
-        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Usuário não encontrado");
+    @ExceptionHandler(CustomerNotFoundException.class)
+    public ErrorDTO handleCustomerNotFound(CustomerNotFoundException userNotFoundException) {
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cliente não encontrado");
     }
 
     @ResponseBody
@@ -29,16 +27,23 @@ public class UserControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UserCpfExistsException.class)
-    public ErrorDTO handleUserCpfExistsException(UserCpfExistsException ex) {
+    @ExceptionHandler(CustomerCpfExistsException.class)
+    public ErrorDTO handleCustomerCpfExistsException(CustomerCpfExistsException ex) {
         return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "CPF já existe");
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UserEmailExistsException.class)
-    public ErrorDTO handleUserEmailExistsException(UserEmailExistsException ex) {
+    @ExceptionHandler(CustomerEmailExistsException.class)
+    public ErrorDTO handleCustomerEmailExistsException(CustomerEmailExistsException ex) {
         return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Email já existe");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AuthPasswordNotMatchException.class)
+    public ErrorDTO handlePasswordNotMatchException(AuthPasswordNotMatchException ex) {
+        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Password do cliente não correspondem");
     }
 
 }

@@ -1,10 +1,10 @@
 package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.InvalidUserKeyException;
+import br.com.daciosoftware.shop.exceptions.exceptions.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopNotFoundException;
-import br.com.daciosoftware.shop.exceptions.exceptions.UserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.CustomerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import java.time.LocalDateTime;
 
 @ControllerAdvice(basePackages = {"br.com.daciosoftware.shop.shopping.controller"})
 public class ShoppingControllerAdvice {
@@ -28,8 +26,8 @@ public class ShoppingControllerAdvice {
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ExceptionHandler(UserNotFoundException.class)
-	public ErrorDTO handleUserNotFound(UserNotFoundException userNotFoundException) {
+	@ExceptionHandler(CustomerNotFoundException.class)
+	public ErrorDTO handleUserNotFound(CustomerNotFoundException userNotFoundException) {
 		return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "SHOP - Usuário não encontrado");
 	}
 	
@@ -42,8 +40,8 @@ public class ShoppingControllerAdvice {
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-	@ExceptionHandler(InvalidUserKeyException.class)
-	public ErrorDTO handleInvalidKeyCustomer(InvalidUserKeyException invalidUserKeyException) {
+	@ExceptionHandler(CustomerInvalidKeyException.class)
+	public ErrorDTO handleInvalidKeyCustomer(CustomerInvalidKeyException invalidUserKeyException) {
 		return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "SHOP - Chave do usuário inválida");
 
 	}

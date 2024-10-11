@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.auth.controller;
 
-import br.com.daciosoftware.shop.auth.service.TokenService;
 import br.com.daciosoftware.shop.auth.service.AuthService;
+import br.com.daciosoftware.shop.auth.service.TokenService;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,12 @@ public class AuthController {
         return authService.createUser(createAuthUserDTO);
     }
 
+    @PostMapping("/user/customer")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthUserDTO createUserFromCustomer(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
+        return authService.createUserFromCustomer(createAuthUserDTO);
+    }
+
     @GetMapping("/user")
     public List<AuthUserDTO> findAll() {
         System.err.println("User list all");
@@ -52,7 +58,7 @@ public class AuthController {
 
     @PutMapping("/update-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public AuthUserDTO updatePassword(@RequestBody UpdatePasswordDTO newPassword, @RequestHeader("Authorization") String token) {
+    public AuthUserDTO updatePassword(@RequestBody PasswordDTO newPassword, @RequestHeader("Authorization") String token) {
         return  authService.updatePassword(newPassword, token);
     }
 

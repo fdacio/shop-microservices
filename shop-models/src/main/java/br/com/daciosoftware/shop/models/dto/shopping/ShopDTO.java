@@ -23,7 +23,7 @@ public class ShopDTO {
 	private Long id;
 	private LocalDateTime data;
 	private Float total;
-	@NotNull(message="Informe o usuário")
+	@NotNull(message="Cliente não informado")
 	private CustomerDTO customer;
 	@NotNull(message="Informe os itens")
 	@NotEmpty(message="Informe pelo menos um item")

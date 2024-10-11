@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.exceptions.advice;
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthExpiredTokenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthInvalidLoginException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthPasswordNotMatchException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,7 +33,14 @@ public class AuthControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthExpiredTokenException.class)
-    public ErrorDTO handleAuthExpiereTokek(AuthExpiredTokenException authExpiredTokenException) {
+    public ErrorDTO handleAuthExpireToken(AuthExpiredTokenException authExpiredTokenException) {
         return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Token expirado. Refaça o login");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AuthPasswordNotMatchException.class)
+    public ErrorDTO handlePasswordNotMatchException(AuthPasswordNotMatchException ex) {
+        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Password do usuário não correspondem");
     }
 }

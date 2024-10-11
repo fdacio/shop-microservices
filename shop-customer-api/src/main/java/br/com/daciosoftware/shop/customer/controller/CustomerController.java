@@ -1,5 +1,9 @@
 package br.com.daciosoftware.shop.customer.controller;
 
+import br.com.daciosoftware.shop.customer.service.AuthService;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerUserDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.customer.service.CustomerService;
 import jakarta.validation.Valid;
@@ -18,6 +22,9 @@ public class CustomerController {
 
 	@Autowired
 	private CustomerService customerService;
+
+	@Autowired
+	private AuthService authService;
 	
 	@GetMapping
 	public List<CustomerDTO> findAll() {
@@ -34,7 +41,19 @@ public class CustomerController {
 	public CustomerDTO save(@RequestBody @Valid CustomerDTO customerDTO) {
 		return customerService.save(customerDTO);
 	}
-	
+
+	@PostMapping("/user")
+	@ResponseStatus(HttpStatus.CREATED)
+	public CreateCustomerUserDTO createCustomerAuthUser(@RequestBody @Valid CreateCustomerUserDTO createCustomerUserDTO) {
+		return customerService.saveCustomerUser(createCustomerUserDTO);
+	}
+
+	@PostMapping("/user/{id}")
+	@ResponseStatus(HttpStatus.CREATED)
+	public AuthUserDTO createAuthUser(@PathVariable Long id, @RequestBody PasswordDTO password) {
+		return customerService.createAuthUser(id, password);
+	}
+
 	@GetMapping("/{cpf}/cpf")
 	public CustomerDTO findByCpf(@PathVariable String cpf) {
 		return customerService.findByCpf(cpf);

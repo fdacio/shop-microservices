@@ -5,6 +5,7 @@ import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthExpiredTokenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthInvalidLoginException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthPasswordNotMatchException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
@@ -30,7 +31,6 @@ public class AuthService {
 
     @Autowired
     private TokenService tokenConfig;
-
 
     private AuthUser getAuthUserFromToken(String token) {
         try {
@@ -66,7 +66,7 @@ public class AuthService {
     }
 
     public AuthUserDTO createUser(CreateAuthUserDTO createAuthUserDTO) {
-        Rule rule = ruleRepository.findByNome("Basic");
+        Rule rule = ruleRepository.findByNome(RuleEnum.BASIC.getName()).orElseThrow();
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
         authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
@@ -98,14 +98,27 @@ public class AuthService {
         authRepository.delete(AuthUser.convert(findById(userId)));
     }
 
-    public AuthUserDTO updatePassword(UpdatePasswordDTO password, String token) {
+    public AuthUserDTO updatePassword(PasswordDTO newPassword, String token) {
+        if (!newPassword.getPassword().equals(newPassword.getRePassword())) {
+            throw new AuthPasswordNotMatchException();
+        }
         AuthUser authUser = getAuthUserFromToken(token);
-        authUser.setPassword(bCryptPasswordEncoder().encode(password.getNewPassword()));
+        authUser.setPassword(bCryptPasswordEncoder().encode(newPassword.getPassword()));
         return AuthUserDTO.convert(authRepository.save(authUser));
     }
 
     public AuthUserDTO findAuthenticatedUser(String token) {
         return AuthUserDTO.convert(getAuthUserFromToken(token));
+    }
+
+    public AuthUserDTO createUserFromCustomer(CreateAuthUserDTO createAuthUserDTO) {
+        Rule rule = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow();
+        AuthUser authUser = AuthUser.convert(createAuthUserDTO);
+        authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
+        authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
+        authUser.setRules(Set.of(rule));
+        authUser.setDataCadastro(LocalDateTime.now());
+        return AuthUserDTO.convert(authRepository.save(authUser));
     }
 
 }
