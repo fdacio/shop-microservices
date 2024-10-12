@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -42,6 +43,11 @@ public class AuthController {
     public List<AuthUserDTO> findAll() {
         System.err.println("User list all");
         return authService.findAll();
+    }
+
+    @GetMapping("/rule")
+    public String[] rules() {
+        return Arrays.stream(RuleEnum.values()).map(RuleEnum::getName).toArray(String[]::new);
     }
 
     @GetMapping("/user/{id}")

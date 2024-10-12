@@ -1,16 +1,21 @@
 package br.com.daciosoftware.shop.models.dto.auth;
 
 import lombok.Getter;
+import org.springframework.stereotype.Component;
 
 @Getter
+@Component
 public enum RuleEnum {
-    ADMIN("Admin"),
-    BASIC("Basic"),
-    CUSTOMER("Customer");
+    ADMIN(1L, "Admin"),
+    BASIC(2L, "Basic"),
+    CUSTOMER(3L, "Customer"),
+    GUEST(4L, "Guest");
 
     private final String name;
+    private final Long code;
 
-    RuleEnum(String name) {
+    RuleEnum(Long code, String name) {
+        this.code = code;
         this.name = name;
     }
 

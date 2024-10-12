@@ -46,7 +46,13 @@ public class ShoppingController {
 	public void delete(@PathVariable Long id) {
 		shoppingService.delete(id);
 	}
-	
+
+	@GetMapping("/my-shops")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ShopDTO> findShopsCustomerAuthenticated(@RequestHeader("Authorization") String token) {
+		return shoppingService.findShopsCustomerAuthenticated(token);
+	}
+
 	@GetMapping("/customer/{customerId}")
 	public List<ShopDTO> findByCustomerIndentifier(@PathVariable Long customerId) {
 		return shoppingService.findByCustomerIndentifier(customerId);

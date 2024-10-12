@@ -1,10 +1,7 @@
 package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthExpiredTokenException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthInvalidLoginException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthPasswordNotMatchException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,5 +39,19 @@ public class AuthControllerAdvice {
     @ExceptionHandler(AuthPasswordNotMatchException.class)
     public ErrorDTO handlePasswordNotMatchException(AuthPasswordNotMatchException ex) {
         return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Password do usuário não correspondem");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AuthUsernameExistsException.class)
+    public ErrorDTO handleAuthUserUsernameExistsException(AuthUsernameExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Username já existe");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AuthEmailExistsException.class)
+    public ErrorDTO handleAuthUserEmailExistsException(AuthEmailExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
     }
 }

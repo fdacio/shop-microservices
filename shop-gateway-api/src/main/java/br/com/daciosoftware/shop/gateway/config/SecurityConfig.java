@@ -15,6 +15,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -29,16 +30,45 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        System.err.println("[### Security Gateway Filter Chain ###] ");
+
+        String SCOPE_PREFIX = "SCOPE_";
+        final String[] ALL_SCOPES = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).toArray(String[]::new);
+        final String SCOPE_ADMIN = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("admin")).findFirst().orElse("");
+        final String SCOPE_BASIC = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("basic")).findFirst().orElse("");
+        final String SCOPE_CUSTOMER = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("customer")).findFirst().orElse("");
+
+        System.err.println("[#### Security Gateway Filter Chain ####] ");
+        System.err.printf("All Scope %s%n", Arrays.toString(ALL_SCOPES));
+        System.err.printf("Scope Admin %s%n", SCOPE_ADMIN);
+        System.err.printf("Scope Basic %s%n", SCOPE_BASIC);
+        System.err.printf("Scope Customer %s%n", SCOPE_CUSTOMER);
+
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-                        .pathMatchers(HttpMethod.POST, "/customer/user").permitAll()
+
+                        //Routes no authenticated - permitAll()
+                        .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority("SCOPE_Admin", "SCOPE_Basic", "SCOPE_Customer")
-                        .pathMatchers(HttpMethod.GET, "/auth/user").hasAuthority("SCOPE_Admin")
-                        .pathMatchers(HttpMethod.GET, "/auth/user/*").hasAuthority("SCOPE_Admin")
+
+                        //**** Routes authenticated ****
+                        //Route authenticated for all scopes
+                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
+
+                        //Route for resources user (auth) - only rule SCOPE_Admin
+                        .pathMatchers("/auth/user", "/auth/user/*").hasAuthority(SCOPE_ADMIN)
+
+                        //Route for resources product
+                        .pathMatchers(HttpMethod.GET, "/product/pageable").hasAnyAuthority(ALL_SCOPES)
+                        .pathMatchers("/product", "/product/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_BASIC)
+                        .pathMatchers("/category", "/category/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_BASIC)
+
+                        //Route for resources shopping
+                        .pathMatchers(HttpMethod.POST, "/shopping").hasAnyAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.GET, "/shopping/my-shops").hasAnyAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers("/shopping", "/shopping/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_BASIC)
+
                         .anyExchange().authenticated())
                 //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))

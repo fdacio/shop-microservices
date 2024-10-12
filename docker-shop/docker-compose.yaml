@@ -110,5 +110,6 @@ services:
       interval: 80s
       timeout: 10s
       retries: 1
-
+networks:
+  shop-net:
 

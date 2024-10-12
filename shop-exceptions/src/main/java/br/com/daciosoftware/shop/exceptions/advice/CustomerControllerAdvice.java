@@ -26,24 +26,24 @@ public class CustomerControllerAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerCpfExistsException.class)
     public ErrorDTO handleCustomerCpfExistsException(CustomerCpfExistsException ex) {
-        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "CPF já existe");
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "CPF já existe");
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerEmailExistsException.class)
     public ErrorDTO handleCustomerEmailExistsException(CustomerEmailExistsException ex) {
-        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Email já existe");
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthPasswordNotMatchException.class)
     public ErrorDTO handlePasswordNotMatchException(AuthPasswordNotMatchException ex) {
-        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Password do cliente não correspondem");
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Password do cliente não correspondem");
     }
 
     @ResponseBody

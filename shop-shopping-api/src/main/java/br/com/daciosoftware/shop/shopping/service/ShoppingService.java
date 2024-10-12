@@ -35,7 +35,13 @@ public class ShoppingService {
 	private AuthService authService;
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
+	private CustomerDTO getCustomerAuthenticated(String token) {
+		AuthUserDTO authUserDTO = authService.getUserAuthenticated(token);
+		String customerKeyAuth = authUserDTO.getKeyToken();
+		return customerService.validCustomerKeyAuth(customerKeyAuth);
+	}
+
 	public List<ShopDTO> findAll() {
 		
 		List<Shop> shops = shopRepository.findAll();
@@ -61,9 +67,7 @@ public class ShoppingService {
 	@Transactional
 	public ShopDTO save(ShopDTO shopDTO, String token) {
 
-		AuthUserDTO authUserDTO = authService.getUserAuthenticated(token);
-		String customerKeyAuth = authUserDTO.getKeyToken();
-		CustomerDTO customerDTO = customerService.validCustomerKeyAuth(customerKeyAuth);
+		CustomerDTO customerDTO = getCustomerAuthenticated(token);
 
 		List<ItemDTO> itensDTO = productService.findItens(shopDTO);
 		Float total = itensDTO.stream().map(i -> (i.getPreco()*i.getQuantidade()) ).reduce((float)0, Float::sum);
@@ -126,4 +130,8 @@ public class ShoppingService {
 
 	}
 
+	public List<ShopDTO> findShopsCustomerAuthenticated(String token) {
+		CustomerDTO customerDTO = getCustomerAuthenticated(token);
+		return findByCustomerIndentifier(customerDTO.getId());
+	}
 }

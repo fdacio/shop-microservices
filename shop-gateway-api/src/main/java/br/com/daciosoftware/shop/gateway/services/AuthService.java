@@ -24,5 +24,17 @@ public class AuthService {
         return mono.block();
     }
 
+    public String[] getRules() {
+        WebClient webClient = WebClient.builder().baseUrl(authApiURL).build();
+
+        Mono<String[]> mono = webClient
+                .get()
+                .uri("/auth/rule")
+                .retrieve()
+                .bodyToMono(String[].class);
+
+        return mono.block();
+
+    }
 
 }
