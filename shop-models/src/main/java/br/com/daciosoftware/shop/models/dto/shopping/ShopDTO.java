@@ -23,7 +23,6 @@ public class ShopDTO {
 	private Long id;
 	private LocalDateTime data;
 	private Float total;
-	@NotNull(message="Cliente não informado")
 	private CustomerDTO customer;
 	@NotNull(message="Informe os itens")
 	@NotEmpty(message="Informe pelo menos um item")
@@ -34,7 +33,7 @@ public class ShopDTO {
 		shopDTO.setId(shop.getId());
 		shopDTO.setData(shop.getData());
 		shopDTO.setTotal(shop.getTotal());
-		shopDTO.setCustomer(CustomerDTO.convert(shop.getUser()));
+		shopDTO.setCustomer(CustomerDTO.convert(shop.getCustomer()));
 		List<ItemDTO> itensDTO = shop.getItens()
 				.stream()
 				.map(ItemDTO::convert)

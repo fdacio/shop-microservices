@@ -46,4 +46,11 @@ public class CustomerControllerAdvice {
         return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Password do cliente não correspondem");
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CustomerInvalidKeyException.class)
+    public ErrorDTO handleCustomerInvalidKeyAuthException(CustomerInvalidKeyException ex) {
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Chave de autenticação inválida");
+    }
+
 }

@@ -50,8 +50,8 @@ public class AuthController {
         return authService.findById(id);
     }
 
-    @GetMapping("/user/{username}")
-    public AuthUserDTO findByUsername(@PathVariable(name = "username") String username) {
+    @GetMapping("/user/search")
+    public AuthUserDTO findByUsername(@RequestParam(name = "username") String username) {
         return authService.findByUsername(username);
     }
 
@@ -67,15 +67,10 @@ public class AuthController {
         return  authService.updatePassword(newPassword, token);
     }
 
-    @GetMapping("/user/authenticated")
+    @PostMapping("/user/authenticated")
     @ResponseStatus(HttpStatus.OK)
     public AuthUserDTO userAuthenticated(@RequestHeader("Authorization") String token) {
         return  authService.findAuthenticatedUser(token);
-    }
-
-    @GetMapping("/jwt-encoder")
-    public JwtEncoder getJwtEncoder()  {
-        return tokenConfig.jwtEncoder();
     }
 
     @GetMapping("/healthcheck")

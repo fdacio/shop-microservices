@@ -62,6 +62,8 @@ public class AuthService {
     }
 
     public AuthUserDTO createUser(CreateAuthUserDTO createAuthUserDTO) {
+        validUsernameUnique(createAuthUserDTO.getUsername(), null);
+        validEmailUnique(createAuthUserDTO.getEmail(), null);
         Rule rule = ruleRepository.findByNome(RuleEnum.BASIC.getName()).orElseThrow();
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
         authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));

@@ -83,7 +83,12 @@ public class CustomerController {
 	@GetMapping("/pageable")
 	public Page<CustomerDTO> getcustomerPage(Pageable page) {
 		return customerService.getAllPage(page);
-	}	
+	}
+
+	@PostMapping("/valid-key-auth")
+	public CustomerDTO validaKeyAuth(@RequestHeader(name = "customerKeyAuth") String customerKeyAuth) {
+		return customerService.findByKeyAuth(customerKeyAuth);
+	}
 	
 	@PatchMapping("/update-key-all")
 	public List<CustomerDTO> updateKeyAll() {

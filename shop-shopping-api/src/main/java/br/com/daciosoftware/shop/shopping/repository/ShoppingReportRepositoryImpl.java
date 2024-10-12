@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.shopping.repository;
 
 import br.com.daciosoftware.shop.models.dto.shopping.ShopSummaryReportDTO;
-import br.com.daciosoftware.shop.models.dto.shopping.ShopUserReportDTO;
+import br.com.daciosoftware.shop.models.dto.shopping.ShopCustomerReportDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -46,7 +46,7 @@ public class ShoppingReportRepositoryImpl implements ShoppingReportRepository {
 	}
 
 	@Override
-	public List<ShopUserReportDTO> getShopUserByDate(LocalDate dataInicio, LocalDate dataFim) {
+	public List<ShopCustomerReportDTO> getShopCustomerByDate(LocalDate dataInicio, LocalDate dataFim) {
 		return List.of();
 	}
 

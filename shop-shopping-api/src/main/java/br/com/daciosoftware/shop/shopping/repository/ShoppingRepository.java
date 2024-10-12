@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface ShoppingRepository extends JpaRepository<Shop, Long>, ShoppingReportRepository {
 
-	@Query("select s from shop s where s.user.id = :userId")
-	List<Shop> findByUserIdentifier(Long userId);
+	@Query("select s from shop s where s.customer.id = :customerId")
+	List<Shop> findByCustomerIdentifier(Long customerId);
 }

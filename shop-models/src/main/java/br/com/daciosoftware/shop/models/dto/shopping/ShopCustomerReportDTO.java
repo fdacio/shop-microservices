@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShopUserReportDTO {
+public class ShopCustomerReportDTO {
 
     CustomerDTO customer;
     Integer count;

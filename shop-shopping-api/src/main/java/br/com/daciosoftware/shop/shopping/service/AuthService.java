@@ -1,8 +1,10 @@
 package br.com.daciosoftware.shop.shopping.service;
 
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnAuthorizedException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
-import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,23 +19,27 @@ public class AuthService {
     @Transactional
     public AuthUserDTO getUserAuthenticated(String token) {
 
-        try {
 
-            WebClient webClient = WebClient.builder()
-                    .baseUrl(authApiURL)
-                    .build();
+        WebClient webClient = WebClient.builder()
+                .baseUrl(authApiURL)
+                .build();
 
-            Mono<AuthUserDTO> user = webClient
-                    .get()
-                    .uri("/auth/user/authenticated/" + token)
-                    .retrieve()
-                    .bodyToMono(AuthUserDTO.class);
+        Mono<AuthUserDTO> user = webClient
+                .post()
+                .uri("/auth/user/authenticated")
+                .header("Authorization", token)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        response -> switch (response.statusCode().value()) {
+                            case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                            case 404 -> Mono.error(new AuthUserNotFoundException());
+                            default -> Mono.error(new Exception("Erro no microsserviço de autorização"));
+                        })
+                .bodyToMono(AuthUserDTO.class);
 
-            return user.block();
+        return user.block();
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
     }
 }

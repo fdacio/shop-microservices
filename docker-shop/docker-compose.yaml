@@ -1,7 +1,7 @@
 services:
 
   postgres:
-    image: postgres:16.1-alpine
+    image: postgres:16.1-alpine3.19
     ports:
       - "5435:5432"
     volumes:
@@ -32,7 +32,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://gateway:8080/gateway/healthcheck" ]
-      interval: 30s
+      interval: 20s
       timeout: 10s
       retries: 1
 
@@ -49,8 +49,8 @@ services:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://auth:8081/auth/healthcheck" ]
-      interval: 120s
-      timeout: 30s
+      interval: 80s
+      timeout: 10s
       retries: 1
 
   product:
@@ -68,8 +68,8 @@ services:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://product:8082/product/healthcheck" ]
-      interval: 120s
-      timeout: 30s
+      interval: 80s
+      timeout: 10s
       retries: 1
 
   customer:
@@ -87,8 +87,8 @@ services:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://customer:8083/customer/healthcheck" ]
-      interval: 120s
-      timeout: 30s
+      interval: 80s
+      timeout: 10s
       retries: 1
 
   shopping:
@@ -107,8 +107,8 @@ services:
       - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://shopping:8084/shopping/healthcheck" ]
-      interval: 120s
-      timeout: 30s
+      interval: 80s
+      timeout: 10s
       retries: 1
 
 

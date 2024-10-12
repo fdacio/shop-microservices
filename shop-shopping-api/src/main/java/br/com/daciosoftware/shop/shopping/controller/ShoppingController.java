@@ -47,13 +47,13 @@ public class ShoppingController {
 		shoppingService.delete(id);
 	}
 	
-	@GetMapping("/user/{userId}")
-	public List<ShopDTO> findByUserIndentifier(@PathVariable Long userId) {
-		return shoppingService.findByUserIndentifier(userId);
+	@GetMapping("/customer/{customerId}")
+	public List<ShopDTO> findByCustomerIndentifier(@PathVariable Long customerId) {
+		return shoppingService.findByCustomerIndentifier(customerId);
 	}
 
 	@GetMapping("/filters")
-	public List<ShopDTO> getShopByFilters(
+	public List<ShopDTO> findShopsByFilters(
 			@RequestParam(name = "dataInicio", required = true)
 			@DateTimeFormat(pattern = "dd/MM/yyyy")
 			LocalDate dataInicio,
@@ -63,7 +63,7 @@ public class ShoppingController {
 			@RequestParam(name = "valorMinimo", required = false)
 			Float valorMinimo)
 	{
-		return shoppingService.getShopByFilters(dataInicio, dataFim, valorMinimo);
+		return shoppingService.findShopsByFilters(dataInicio, dataFim, valorMinimo);
 	}
 
 	@GetMapping("/healthcheck")

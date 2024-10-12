@@ -1,9 +1,6 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthPasswordNotMatchException;
-import br.com.daciosoftware.shop.exceptions.exceptions.CustomerCpfExistsException;
-import br.com.daciosoftware.shop.exceptions.exceptions.CustomerEmailExistsException;
-import br.com.daciosoftware.shop.exceptions.exceptions.CustomerNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
@@ -67,7 +64,13 @@ public class CustomerService {
 				.map(CustomerDTO::convert)
 				.orElseThrow(CustomerNotFoundException::new);
 	}
-	
+
+	public CustomerDTO findByKeyAuth(String keyAuth) {
+		return customerRepository.findByKeyAuth(keyAuth)
+				.map(CustomerDTO::convert)
+				.orElseThrow(CustomerInvalidKeyException::new);
+	}
+
 	private void validCpfUnique(String cpf) {
 		Optional<CustomerDTO> userDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);
 		if (userDTO.isPresent()) {

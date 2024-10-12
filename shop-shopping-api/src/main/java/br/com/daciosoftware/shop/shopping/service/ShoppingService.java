@@ -50,8 +50,8 @@ public class ShoppingService {
 		return shopRepository.findById(id).map(ShopDTO::convert).orElseThrow(ShopNotFoundException::new);
 	}
 
-	public List<ShopDTO> findByUserIndentifier(Long userId) {
-		List<Shop> shops = shopRepository.findByUserIdentifier(userId);
+	public List<ShopDTO> findByCustomerIndentifier(Long userId) {
+		List<Shop> shops = shopRepository.findByCustomerIdentifier(userId);
 		return shops
 				.stream()
 				.map(ShopDTO::convert)
@@ -63,7 +63,8 @@ public class ShoppingService {
 
 		AuthUserDTO authUserDTO = authService.getUserAuthenticated(token);
 		String customerKeyAuth = authUserDTO.getKeyToken();
-		CustomerDTO customerDTO = customerService.validCustomerKeyAuth(shopDTO.getCustomer(), customerKeyAuth);
+		CustomerDTO customerDTO = customerService.validCustomerKeyAuth(customerKeyAuth);
+
 		List<ItemDTO> itensDTO = productService.findItens(shopDTO);
 		Float total = itensDTO.stream().map(i -> (i.getPreco()*i.getQuantidade()) ).reduce((float)0, Float::sum);
 		
@@ -91,7 +92,7 @@ public class ShoppingService {
 		return shopRepository.findAll(pageable).map(ShopDTO::convert);
 	}
 
-	public List<ShopDTO> getShopByFilters(LocalDate dataInicio, LocalDate dataFim, Float valorMinimo) {
+	public List<ShopDTO> findShopsByFilters(LocalDate dataInicio, LocalDate dataFim, Float valorMinimo) {
 
 		StringBuilder sbSql = new StringBuilder();
 		sbSql.append("select s from shop s \n");
