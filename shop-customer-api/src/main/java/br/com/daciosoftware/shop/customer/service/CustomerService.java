@@ -13,7 +13,6 @@ import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +88,7 @@ public class CustomerService {
 		}
 	}
 
+	@Transactional
 	public CustomerDTO save(CustomerDTO customerDTO) {
 		validCpfUnique(customerDTO.getCpf());
 		validEmailUnique(customerDTO.getEmail(), null);
@@ -182,14 +182,20 @@ public class CustomerService {
 		
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = RuntimeException.class)
+	@Transactional
 	public AuthUserDTO createAuthUser(Long customerId, PasswordDTO password) {
+
+		CustomerDTO customerDTO = findById(customerId);
+
+		if (customerDTO.getKeyAuth() != null && !customerDTO.getKeyAuth().isEmpty()) {
+			throw new CustomerAuthUserConflictException();
+		}
 
 		if (!password.getPassword().equals(password.getRePassword())) {
 			throw new AuthPasswordNotMatchException();
 		}
 
-		CustomerDTO customerDTO = findById(customerId);
+
 		CreateAuthUserDTO createAuthUserDTO = new CreateAuthUserDTO();
 		createAuthUserDTO.setNome(customerDTO.getNome());
 		createAuthUserDTO.setPassword(password.getPassword());
@@ -207,10 +213,13 @@ public class CustomerService {
 
 	}
 
-	public CreateCustomerUserDTO saveCustomerUser(CreateCustomerUserDTO createCustomerUserDTO) {
+	@Transactional
+	public CreateCustomerUserDTO createCustomerAndAuthUser(CreateCustomerUserDTO createCustomerUserDTO) {
 		CustomerDTO customerDTO = save(createCustomerUserDTO.getCustomer());
 		createAuthUser(customerDTO.getId(), createCustomerUserDTO.getPassword());
 		return createCustomerUserDTO;
 	}
+
+
 
 }

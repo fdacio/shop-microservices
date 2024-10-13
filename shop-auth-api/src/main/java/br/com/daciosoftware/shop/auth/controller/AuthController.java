@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.auth.controller;
 import br.com.daciosoftware.shop.auth.service.AuthService;
 import br.com.daciosoftware.shop.auth.service.TokenService;
 import br.com.daciosoftware.shop.models.dto.auth.*;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -77,6 +78,12 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public AuthUserDTO userAuthenticated(@RequestHeader("Authorization") String token) {
         return  authService.findAuthenticatedUser(token);
+    }
+
+    @PostMapping("/user/{id}/customer")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CustomerDTO createCustomerFromAuthUser(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {
+        return authService.createCustomerFromAuthUser(id, customerDTO);
     }
 
     @GetMapping("/healthcheck")

@@ -45,6 +45,7 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: dacio@04
+      CUSTOMER_API_URL: http://customer:8083
     depends_on:
       - postgres
     healthcheck:
@@ -110,6 +111,3 @@ services:
       interval: 80s
       timeout: 10s
       retries: 1
-networks:
-  shop-net:
-

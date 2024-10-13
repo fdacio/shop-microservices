@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.auth.config;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthRuleNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.RuleEnum;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
@@ -32,7 +33,7 @@ public class AdminUserConfig implements CommandLineRunner {
         String userName = "admin@daciosoftware.com.br";
         String password = authService.bCryptPasswordEncoder().encode("123456");
         String email = "admin@daciosoftware.com.br";
-        Rule rule = ruleRepository.findByNome(RuleEnum.ADMIN.getName()).orElseThrow();
+        Rule rule = ruleRepository.findByNome(RuleEnum.ADMIN.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.ADMIN.getName()));
         Set<Rule> ruleAdmin = Set.of(rule);
         Optional<AuthUser> user = authRepository.findByUsername(userName);
         if (user.isEmpty()) {

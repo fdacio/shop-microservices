@@ -54,4 +54,33 @@ public class AuthControllerAdvice {
     public ErrorDTO handleAuthUserEmailExistsException(AuthEmailExistsException ex) {
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
     }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CustomerCpfExistsException.class)
+    public ErrorDTO handleCustomerCpfExistsException(CustomerCpfExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "CPF já existe");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CustomerEmailExistsException.class)
+    public ErrorDTO handleCustomerEmailExistsException(CustomerEmailExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AuthUserCustomerConflictException.class)
+    public ErrorDTO handleAuthUserCustomerConflictException(AuthUserCustomerConflictException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Usuário já vinculado a um cliente");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(AuthRuleNotFoundException.class)
+    public ErrorDTO handleAuthRuleNotFoundException(AuthRuleNotFoundException ex) {
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), String.format("Rule %s não encontrada", ex.getRuleName()));
+    }
+
 }

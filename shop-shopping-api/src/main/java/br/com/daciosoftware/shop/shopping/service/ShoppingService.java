@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.shopping.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.ShopNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.ShoppingNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.shopping.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
@@ -53,7 +53,7 @@ public class ShoppingService {
 	}
 
 	public ShopDTO findById(Long id) {
-		return shopRepository.findById(id).map(ShopDTO::convert).orElseThrow(ShopNotFoundException::new);
+		return shopRepository.findById(id).map(ShopDTO::convert).orElseThrow(ShoppingNotFoundException::new);
 	}
 
 	public List<ShopDTO> findByCustomerIndentifier(Long userId) {

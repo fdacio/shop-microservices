@@ -5,12 +5,14 @@ import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +30,8 @@ public class AuthService {
     private RuleRepository ruleRepository;
     @Autowired
     private TokenService tokenConfig;
+    @Autowired
+    private CustomerService customerService;
 
     private String getKeyTokenFromToken(String token) {
         try {
@@ -64,7 +68,7 @@ public class AuthService {
     public AuthUserDTO createUser(CreateAuthUserDTO createAuthUserDTO) {
         validUsernameUnique(createAuthUserDTO.getUsername(), null);
         validEmailUnique(createAuthUserDTO.getEmail(), null);
-        Rule rule = ruleRepository.findByNome(RuleEnum.BASIC.getName()).orElseThrow();
+        Rule rule = ruleRepository.findByNome(RuleEnum.BASIC.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.BASIC.getName()));
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
         authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
@@ -92,7 +96,7 @@ public class AuthService {
                 .orElseThrow(AuthUserNotFoundException::new);
     }
 
-    public AuthUserDTO update (Long authUserId, UpdateAuthUserDTO updateAuthUserDTO) {
+    public AuthUserDTO update(Long authUserId, UpdateAuthUserDTO updateAuthUserDTO) {
         AuthUserDTO authUserDTO = findById(authUserId);
         validUsernameUnique(updateAuthUserDTO.getUsername(), authUserId);
         validEmailUnique(updateAuthUserDTO.getEmail(), authUserId);
@@ -122,13 +126,24 @@ public class AuthService {
     public AuthUserDTO createUserFromCustomer(CreateAuthUserDTO createAuthUserDTO) {
         validUsernameUnique(createAuthUserDTO.getUsername(), null);
         validEmailUnique(createAuthUserDTO.getEmail(), null);
-        Rule rule = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow();
+        Rule rule = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.CUSTOMER.getName()));
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
         authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
         authUser.setRules(Set.of(rule));
         authUser.setDataCadastro(LocalDateTime.now());
         return AuthUserDTO.convert(authRepository.save(authUser));
+    }
+
+    @Transactional
+    public CustomerDTO createCustomerFromAuthUser(Long userId, CustomerDTO customerDTO) {
+        validCreateCustomerFromAuthUser(customerDTO);
+        Rule ruleCustomer = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.CUSTOMER.getName()));
+        AuthUser authUser = authRepository.findById(userId).orElseThrow(AuthUserNotFoundException::new);
+        authUser.getRules().add(ruleCustomer);
+        authRepository.save(authUser);
+        customerDTO.setKeyAuth(authUser.getKeyToken());
+        return customerService.createCustomer(customerDTO);
     }
 
     private void validUsernameUnique(String username, Long id) {
@@ -150,6 +165,13 @@ public class AuthService {
             } else if (!id.equals(authUserDTO.get().getId())) {
                 throw new AuthEmailExistsException();
             }
+        }
+    }
+
+    private void validCreateCustomerFromAuthUser(CustomerDTO customerDTO) {
+
+        if (customerDTO.getKeyAuth() != null && !customerDTO.getKeyAuth().isEmpty()) {
+            throw new AuthUserCustomerConflictException();
         }
     }
 

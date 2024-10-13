@@ -12,6 +12,5 @@ import lombok.*;
 public class CreateCustomerUserDTO {
 
     private CustomerDTO customer;
-    @JsonIgnore
     private PasswordDTO password;
 }

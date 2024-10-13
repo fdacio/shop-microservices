@@ -44,8 +44,8 @@ public class CustomerController {
 
 	@PostMapping("/user")
 	@ResponseStatus(HttpStatus.CREATED)
-	public CreateCustomerUserDTO saveCustomerAuthUser(@RequestBody @Valid CreateCustomerUserDTO createCustomerUserDTO) {
-		return customerService.saveCustomerUser(createCustomerUserDTO);
+	public CreateCustomerUserDTO createCustomerAndAuthUser(@RequestBody @Valid CreateCustomerUserDTO createCustomerUserDTO) {
+		return customerService.createCustomerAndAuthUser(createCustomerUserDTO);
 	}
 
 	@PostMapping("/{id}/user")

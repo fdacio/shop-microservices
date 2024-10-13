@@ -4,6 +4,7 @@ import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.dto.ValidErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnAuthorizedException;
+import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.net.NoRouteToHostException;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +27,17 @@ import java.util.Map;
 		"br.com.daciosoftware.shop.product.controller",
 		"br.com.daciosoftware.shop.shopping.controller",
 		"br.com.daciosoftware.shop.auth.controller",
+		"br.com.daciosoftware.shop.gateway.*",
 		"br.com.daciosoftware.shop.models.*" })
 public class ApplicationControllerAdvice {
+
+
+	@ResponseBody
+	@ExceptionHandler(ShopGenericException.class)
+	@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+	public ErrorDTO handleShopGenericError(ShopGenericException ex) {
+		return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage());
+	}
 	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -79,5 +91,12 @@ public class ApplicationControllerAdvice {
 	public ErrorDTO handleAuthForbiddenExceptionError(AuthForbiddenException ex) {
 		return  new ErrorDTO(HttpStatus.FORBIDDEN.value(), "Recurso não autorizado");
 	}
-	
+
+	@ResponseBody
+	@ResponseStatus(HttpStatus.BAD_GATEWAY)
+	@ExceptionHandler(NoRouteToHostException.class)
+	public ErrorDTO handleAuthForbiddenExceptionError(NoRouteToHostException ex) {
+		return  new ErrorDTO(HttpStatus.BAD_GATEWAY.value(), "Microsserviço indisponível");
+	}
+
 }

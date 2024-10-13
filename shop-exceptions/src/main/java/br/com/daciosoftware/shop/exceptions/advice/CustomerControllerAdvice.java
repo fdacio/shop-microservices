@@ -39,6 +39,21 @@ public class CustomerControllerAdvice {
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
     }
 
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AuthUsernameExistsException.class)
+    public ErrorDTO handleAuthUserUsernameExistsException(AuthUsernameExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Username já existe");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AuthEmailExistsException.class)
+    public ErrorDTO handleAuthUserEmailExistsException(AuthEmailExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
+    }
+
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthPasswordNotMatchException.class)
@@ -51,6 +66,13 @@ public class CustomerControllerAdvice {
     @ExceptionHandler(CustomerInvalidKeyException.class)
     public ErrorDTO handleCustomerInvalidKeyAuthException(CustomerInvalidKeyException ex) {
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Chave de autenticação inválida");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CustomerAuthUserConflictException.class)
+    public ErrorDTO handleCustomerAuthUserConflictException(CustomerAuthUserConflictException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Cliente já vinculado a um usuário");
     }
 
 }

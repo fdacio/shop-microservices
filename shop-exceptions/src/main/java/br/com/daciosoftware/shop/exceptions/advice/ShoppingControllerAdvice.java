@@ -4,7 +4,7 @@ import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
-import br.com.daciosoftware.shop.exceptions.exceptions.ShopNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.ShoppingNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,8 +16,8 @@ public class ShoppingControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ShopNotFoundException.class)
-    public ErrorDTO handleUserNotFound(ShopNotFoundException shopNotFoundException) {
+    @ExceptionHandler(ShoppingNotFoundException.class)
+    public ErrorDTO handleUserNotFound(ShoppingNotFoundException shopNotFoundException) {
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "SHOP - Venda não encontrado");
 
     }
