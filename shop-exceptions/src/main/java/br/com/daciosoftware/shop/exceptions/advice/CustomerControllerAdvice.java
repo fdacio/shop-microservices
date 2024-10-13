@@ -42,8 +42,8 @@ public class CustomerControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(AuthUsernameExistsException.class)
-    public ErrorDTO handleAuthUserUsernameExistsException(AuthUsernameExistsException ex) {
+    @ExceptionHandler(AuthUserUsernameExistsException.class)
+    public ErrorDTO handleAuthUserUsernameExistsException(AuthUserUsernameExistsException ex) {
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Username já existe");
     }
 

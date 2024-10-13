@@ -2,6 +2,7 @@ package br.com.daciosoftware.shop.shopping.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnAuthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
 import br.com.daciosoftware.shop.models.dto.shopping.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.shopping.ShopDTO;
@@ -36,7 +37,7 @@ public class ProductService {
                             response -> switch (response.statusCode().value()) {
                                 case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
                                 case 404 -> Mono.error(new ProductNotFoundException());
-                                default -> Mono.error(new Exception("Erro no microsserviço de clientes"));
+                                default -> Mono.error(new ShopGenericException("Erro no microsserviço product"));
                             }).bodyToMono(ProductDTO.class);
 
             ProductDTO productDTO = product.block();

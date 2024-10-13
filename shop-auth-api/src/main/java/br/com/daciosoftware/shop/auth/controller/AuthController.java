@@ -1,13 +1,11 @@
 package br.com.daciosoftware.shop.auth.controller;
 
 import br.com.daciosoftware.shop.auth.service.AuthService;
-import br.com.daciosoftware.shop.auth.service.TokenService;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -19,9 +17,6 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
-
-    @Autowired
-    private TokenService tokenConfig;
 
     @PostMapping("/login")
     public TokenDTO login(@RequestBody LoginDTO loginDTO) {
@@ -55,6 +50,12 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public AuthUserDTO findById(@PathVariable Long id) {
         return authService.findById(id);
+    }
+
+    @GetMapping("/user/{keyToken}/key-token")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthUserDTO findByKeyToken(@PathVariable String keyToken) {
+        return authService.findByKeyToken(keyToken);
     }
 
     @GetMapping("/user/search")

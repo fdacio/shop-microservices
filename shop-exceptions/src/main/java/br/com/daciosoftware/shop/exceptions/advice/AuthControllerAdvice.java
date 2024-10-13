@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDateTime;
-
 @ControllerAdvice(basePackages = {"br.com.daciosoftware.shop.auth.controller"})
 public class AuthControllerAdvice {
 
@@ -43,8 +41,8 @@ public class AuthControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(AuthUsernameExistsException.class)
-    public ErrorDTO handleAuthUserUsernameExistsException(AuthUsernameExistsException ex) {
+    @ExceptionHandler(AuthUserUsernameExistsException.class)
+    public ErrorDTO handleAuthUserUsernameExistsException(AuthUserUsernameExistsException ex) {
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Username já existe");
     }
 
@@ -82,5 +80,13 @@ public class AuthControllerAdvice {
     public ErrorDTO handleAuthRuleNotFoundException(AuthRuleNotFoundException ex) {
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), String.format("Rule %s não encontrada", ex.getRuleName()));
     }
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(AuthUserInvalidKeyTokenException.class)
+    public ErrorDTO handleAuthUserInvalidKeyTokenException(AuthUserInvalidKeyTokenException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Inválido key token do usuário");
+    }
+
+    //AuthUserInvalidKeyTokenException
 
 }

@@ -90,6 +90,10 @@ public class AuthService {
                 .orElseThrow(AuthUserNotFoundException::new);
     }
 
+    public AuthUserDTO findByKeyToken(String keyToken) {
+        return authRepository.findByKeyToken(keyToken).map(AuthUserDTO::convert).orElseThrow(AuthUserNotFoundException::new);
+    }
+
     public AuthUserDTO findByUsername(String userName) {
         return authRepository.findByUsername(userName)
                 .map(AuthUserDTO::convert)
@@ -137,9 +141,9 @@ public class AuthService {
 
     @Transactional
     public CustomerDTO createCustomerFromAuthUser(Long userId, CustomerDTO customerDTO) {
-        validCreateCustomerFromAuthUser(customerDTO);
-        Rule ruleCustomer = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.CUSTOMER.getName()));
         AuthUser authUser = authRepository.findById(userId).orElseThrow(AuthUserNotFoundException::new);
+        validCreateCustomerFromAuthUser(authUser.getKeyToken());
+        Rule ruleCustomer = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.CUSTOMER.getName()));
         authUser.getRules().add(ruleCustomer);
         authRepository.save(authUser);
         customerDTO.setKeyAuth(authUser.getKeyToken());
@@ -150,9 +154,9 @@ public class AuthService {
         Optional<AuthUserDTO> authUserDTO = authRepository.findByUsername(username).map(AuthUserDTO::convert);
         if (authUserDTO.isPresent()) {
             if (id == null) {
-                throw new AuthUsernameExistsException();
+                throw new AuthUserUsernameExistsException();
             } else if (!id.equals(authUserDTO.get().getId())) {
-                throw new AuthUsernameExistsException();
+                throw new AuthUserUsernameExistsException();
             }
         }
     }
@@ -168,9 +172,9 @@ public class AuthService {
         }
     }
 
-    private void validCreateCustomerFromAuthUser(CustomerDTO customerDTO) {
-
-        if (customerDTO.getKeyAuth() != null && !customerDTO.getKeyAuth().isEmpty()) {
+    private void validCreateCustomerFromAuthUser(String keyToken) {
+        CustomerDTO customerDTO = customerService.findCustomerByKeyToken(keyToken);
+        if (customerDTO != null) {
             throw new AuthUserCustomerConflictException();
         }
     }

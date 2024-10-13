@@ -1,10 +1,7 @@
 package br.com.daciosoftware.shop.customer.service;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUsernameExistsException;
-import br.com.daciosoftware.shop.exceptions.exceptions.CustomerCpfExistsException;
-import br.com.daciosoftware.shop.exceptions.exceptions.CustomerEmailExistsException;
-import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
+import br.com.daciosoftware.shop.exceptions.exceptions.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,38 +17,56 @@ public class AuthService {
     @Value("${auth.api.url}")
     private String authApiURL;
 
+    public AuthUserDTO findAuthUserByKeyToken(String keyToken) {
+        WebClient webClient = WebClient.builder()
+                .baseUrl(authApiURL)
+                .build();
+        Mono<AuthUserDTO> authUser = webClient
+                .get()
+                .uri("/auth/user/" + keyToken + "/key-token")
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        response -> switch (response.statusCode().value()) {
+                            case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                            case 404 -> Mono.error(new AuthUserInvalidKeyTokenException());
+                            default -> Mono.error(new ShopGenericException("Erro no microsserviço customer"));
+                        })
+                .bodyToMono(AuthUserDTO.class);
+
+        return authUser.block();
+    }
+
     @Transactional
     public AuthUserDTO createAuthUser(CreateAuthUserDTO createAuthUserDTO) {
 
+        WebClient webClient = WebClient.builder()
+                .baseUrl(authApiURL)
+                .build();
 
-
-            WebClient webClient = WebClient.builder()
-                    .baseUrl(authApiURL)
-                    .build();
-
-            Mono<AuthUserDTO> user = webClient
-                    .post()
-                    .uri("/auth/user/customer")
-                    .bodyValue(createAuthUserDTO)
-                    .retrieve()
-                    .onStatus(
-                            HttpStatusCode::isError,
-                            response -> {
-                                ErrorDTO errorDTO = response.bodyToMono(ErrorDTO.class).block();
-                                if (errorDTO != null) {
-                                    if (errorDTO.getMessage().toLowerCase().contains("username")) {
-                                        return Mono.error(new AuthUsernameExistsException());
-                                    }
-                                    return Mono.error(new ShopGenericException(errorDTO.getMessage()));
-
-                                } else {
-                                    return Mono.error(new ShopGenericException("Error no microsserviço auth"));
+        Mono<AuthUserDTO> user = webClient
+                .post()
+                .uri("/auth/user/customer")
+                .bodyValue(createAuthUserDTO)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        response -> {
+                            ErrorDTO errorDTO = response.bodyToMono(ErrorDTO.class).block();
+                            if (errorDTO != null) {
+                                if (errorDTO.getMessage().toLowerCase().contains("username")) {
+                                    return Mono.error(new AuthUserUsernameExistsException());
                                 }
-                            }
-                    )
-                    .bodyToMono(AuthUserDTO.class);
+                                return Mono.error(new ShopGenericException(errorDTO.getMessage()));
 
-            return user.block();
+                            } else {
+                                return Mono.error(new ShopGenericException("Error no microsserviço auth"));
+                            }
+                        }
+                )
+                .bodyToMono(AuthUserDTO.class);
+
+        return user.block();
 
 
     }

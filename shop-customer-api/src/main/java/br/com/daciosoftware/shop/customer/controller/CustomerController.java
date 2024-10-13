@@ -1,11 +1,10 @@
 package br.com.daciosoftware.shop.customer.controller;
 
-import br.com.daciosoftware.shop.customer.service.AuthService;
+import br.com.daciosoftware.shop.customer.service.CustomerService;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerUserDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
-import br.com.daciosoftware.shop.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,9 +22,6 @@ public class CustomerController {
 	@Autowired
 	private CustomerService customerService;
 
-	@Autowired
-	private AuthService authService;
-	
 	@GetMapping
 	public List<CustomerDTO> findAll() {
 		return customerService.findAll();
@@ -89,7 +85,12 @@ public class CustomerController {
 	public CustomerDTO validaKeyAuth(@RequestHeader(name = "customerKeyAuth") String customerKeyAuth) {
 		return customerService.findByKeyAuth(customerKeyAuth);
 	}
-	
+
+	@GetMapping("/{customerKeyAuth}/key-token")
+	public CustomerDTO findByKeyToken(@PathVariable String customerKeyAuth) {
+		return customerService.findByKeyAuth(customerKeyAuth);
+	}
+
 	@PatchMapping("/update-key-all")
 	public List<CustomerDTO> updateKeyAll() {
 		return customerService.updateKeyAll();

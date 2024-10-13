@@ -1,20 +1,19 @@
 package br.com.daciosoftware.shop.customer.service;
 
+import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerUserDTO;
-import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
-import br.com.daciosoftware.shop.models.entity.product.Category;
+import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Customer;
-import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
+import br.com.daciosoftware.shop.models.entity.product.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -188,7 +187,10 @@ public class CustomerService {
 		CustomerDTO customerDTO = findById(customerId);
 
 		if (customerDTO.getKeyAuth() != null && !customerDTO.getKeyAuth().isEmpty()) {
-			throw new CustomerAuthUserConflictException();
+			AuthUserDTO authUserDTO = authService.findAuthUserByKeyToken(customerDTO.getKeyAuth());
+			if (authUserDTO != null) {
+				throw new CustomerAuthUserConflictException();
+			}
 		}
 
 		if (!password.getPassword().equals(password.getRePassword())) {
