@@ -33,7 +33,7 @@ public class ShoppingControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(CustomerInvalidKeyException.class)
     public ErrorDTO handleInvalidKeyCustomer(CustomerInvalidKeyException invalidUserKeyException) {
-        return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "SHOP - Chave do cliente inválida");
+        return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "SHOP - Chave de autenticação inválida");
 
     }
 

@@ -1,10 +1,13 @@
 package br.com.daciosoftware.shop.customer.service;
 
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnAuthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.CategoryNotFoundException;
-import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
+import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
+import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -16,47 +19,69 @@ import java.util.Set;
 @Service
 public class CategoryService {
 
-	@Value("${product.api.url}")
-	private String productApiURL;
+    @Value("${product.api.url}")
+    private String productApiURL;
 
-	public Set<CategoryDTO> findCategorysByUser(CustomerDTO userDTO) {
+    public Set<CategoryDTO> findCategorysByUser(CustomerDTO userDTO) {
 
-		Set<CategoryDTO> categorysDTO = new HashSet<>();
+        Set<CategoryDTO> categorysDTO = new HashSet<>();
 
-		if (userDTO.getInteresses() != null) {
+        if (userDTO.getInteresses() != null) {
 
-			WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
+            try {
 
-			for (CategoryDTO c : userDTO.getInteresses()) {
-				try {
-					Long categoryId = c.getId();
-					Mono<CategoryDTO> category = webClient
-							.get()
-							.uri("/category/" + categoryId)
-							.retrieve()
-							.bodyToMono(CategoryDTO.class);
-					categorysDTO.add(category.block());
-				} catch (Exception e) {
-					throw new CategoryNotFoundException();
-				}
-			}
-		}
+                WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
-		return categorysDTO;
-	}
+                for (CategoryDTO c : userDTO.getInteresses()) {
+                    Long categoryId = c.getId();
+                    Mono<CategoryDTO> category = webClient
+                            .get()
+                            .uri("/category/" + categoryId)
+                            .retrieve()
+                            .onStatus(
+                                    HttpStatusCode::isError,
+                                    response -> switch (response.statusCode().value()) {
+                                        case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                                        case 404 -> Mono.error(new CategoryNotFoundException());
+                                        default ->
+                                                Mono.error(new ShopGenericException("Erro no microsserviço product"));
+                                    })
+                            .bodyToMono(CategoryDTO.class);
+                    categorysDTO.add(category.block());
 
-	public List<CategoryDTO> findAll() {
+                }
+            } catch (Exception e) {
+                throw new ShopGenericException("Erro no microsserviço product");
+            }
+        }
 
-		WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
-		try {
-			Mono<List<CategoryDTO>> response = webClient
-					.get()
-					.uri("/category")
-					.retrieve()
-					.bodyToMono(new ParameterizedTypeReference<List<CategoryDTO>>() {});
-			return response.block();
-		} catch (Exception e) {
-			throw new CategoryNotFoundException();
-		}
-	}
+        return categorysDTO;
+    }
+
+    public List<CategoryDTO> findAll() {
+
+        WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
+
+        try {
+
+            Mono<List<CategoryDTO>> categorys = webClient
+                    .get()
+                    .uri("/category")
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> switch (response.statusCode().value()) {
+                                case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                                case 404 -> Mono.error(new CategoryNotFoundException());
+                                default -> Mono.error(new ShopGenericException("Erro no microsserviço product"));
+                            })
+                    .bodyToMono(new ParameterizedTypeReference<>() {
+                    });
+
+            return categorys.block();
+
+        } catch (Exception e) {
+            throw new ShopGenericException("Erro no microsserviço product");
+        }
+    }
 }

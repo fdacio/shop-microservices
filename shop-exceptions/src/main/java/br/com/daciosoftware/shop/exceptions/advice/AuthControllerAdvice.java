@@ -80,13 +80,20 @@ public class AuthControllerAdvice {
     public ErrorDTO handleAuthRuleNotFoundException(AuthRuleNotFoundException ex) {
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), String.format("Rule %s não encontrada", ex.getRuleName()));
     }
+
     @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthUserInvalidKeyTokenException.class)
     public ErrorDTO handleAuthUserInvalidKeyTokenException(AuthUserInvalidKeyTokenException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Inválido key token do usuário");
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Chave de autenticação inválida");
     }
 
-    //AuthUserInvalidKeyTokenException
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CustomerInvalidKeyException.class)
+    public ErrorDTO handleAuthUserInvalidKeyTokenException(CustomerInvalidKeyException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Chave de autenticação inválida");
+    }
+    //CustomerInvalidKeyException
 
 }

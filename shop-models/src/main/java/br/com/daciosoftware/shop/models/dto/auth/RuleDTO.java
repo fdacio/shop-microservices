@@ -1,8 +1,6 @@
 package br.com.daciosoftware.shop.models.dto.auth;
 
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Objects;
@@ -13,7 +11,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @ToString
 public class RuleDTO {
-
 
     private Long id;
     private String nome;

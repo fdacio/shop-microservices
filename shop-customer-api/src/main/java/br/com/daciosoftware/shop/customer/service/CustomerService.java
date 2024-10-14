@@ -68,6 +68,10 @@ public class CustomerService {
 				.map(CustomerDTO::convert)
 				.orElseThrow(CustomerInvalidKeyException::new);
 	}
+	public boolean hasKeyAuth(String keyAuth) {
+		return customerRepository.findByKeyAuth(keyAuth)
+				.map(CustomerDTO::convert).isPresent();
+	}
 
 	private void validCpfUnique(String cpf) {
 		Optional<CustomerDTO> userDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);

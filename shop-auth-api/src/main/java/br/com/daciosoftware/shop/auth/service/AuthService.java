@@ -68,7 +68,7 @@ public class AuthService {
     public AuthUserDTO createUser(CreateAuthUserDTO createAuthUserDTO) {
         validUsernameUnique(createAuthUserDTO.getUsername(), null);
         validEmailUnique(createAuthUserDTO.getEmail(), null);
-        Rule rule = ruleRepository.findByNome(RuleEnum.BASIC.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.BASIC.getName()));
+        Rule rule = ruleRepository.findByNome(RuleEnum.OPERATOR.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.OPERATOR.getName()));
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
         authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
@@ -173,8 +173,8 @@ public class AuthService {
     }
 
     private void validCreateCustomerFromAuthUser(String keyToken) {
-        CustomerDTO customerDTO = customerService.findCustomerByKeyToken(keyToken);
-        if (customerDTO != null) {
+        Boolean customerHasKeyToken = customerService.customerHasKeyToken(keyToken);
+        if (customerHasKeyToken) {
             throw new AuthUserCustomerConflictException();
         }
     }

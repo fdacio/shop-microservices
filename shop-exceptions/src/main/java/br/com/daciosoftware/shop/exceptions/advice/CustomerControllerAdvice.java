@@ -62,10 +62,10 @@ public class CustomerControllerAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerInvalidKeyException.class)
     public ErrorDTO handleCustomerInvalidKeyAuthException(CustomerInvalidKeyException ex) {
-        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Chave de autenticação inválida");
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Chave de autenticação inválida");
     }
 
     @ResponseBody

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public enum RuleEnum {
     ADMIN(1L, "Admin"),
-    BASIC(2L, "Basic"),
+    OPERATOR(2L, "Operator"),
     CUSTOMER(3L, "Customer"),
     GUEST(4L, "Guest");
 

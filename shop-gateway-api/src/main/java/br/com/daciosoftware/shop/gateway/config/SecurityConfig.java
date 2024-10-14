@@ -34,13 +34,13 @@ public class SecurityConfig {
         String SCOPE_PREFIX = "SCOPE_";
         final String[] ALL_SCOPES = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).toArray(String[]::new);
         final String SCOPE_ADMIN = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("admin")).findFirst().orElse("");
-        final String SCOPE_BASIC = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("basic")).findFirst().orElse("");
+        final String SCOPE_OPERATOR = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("operator")).findFirst().orElse("");
         final String SCOPE_CUSTOMER = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("customer")).findFirst().orElse("");
 
         System.err.println("[#### Security Gateway Filter Chain ####] ");
         System.err.printf("All Scope %s%n", Arrays.toString(ALL_SCOPES));
         System.err.printf("Scope Admin %s%n", SCOPE_ADMIN);
-        System.err.printf("Scope Basic %s%n", SCOPE_BASIC);
+        System.err.printf("Scope Operator %s%n", SCOPE_OPERATOR);
         System.err.printf("Scope Customer %s%n", SCOPE_CUSTOMER);
 
         return http
@@ -48,8 +48,8 @@ public class SecurityConfig {
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
 
                         //Routes no authenticated - permitAll()
-                        .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
 
                         //**** Routes authenticated ****
@@ -57,17 +57,20 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
 
                         //Route for resources user (auth) - only rule SCOPE_Admin
-                        .pathMatchers("/auth/user", "/auth/user/*").hasAuthority(SCOPE_ADMIN)
+                        .pathMatchers("/auth/user", "/auth/user/*", "/auth/user/**").hasAuthority(SCOPE_ADMIN)
+
+                        //Route for resources customer
+                        .pathMatchers("/customer", "/customer/*", "/customer/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         //Route for resources product
                         .pathMatchers(HttpMethod.GET, "/product/pageable").hasAnyAuthority(ALL_SCOPES)
-                        .pathMatchers("/product", "/product/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_BASIC)
-                        .pathMatchers("/category", "/category/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_BASIC)
+                        .pathMatchers("/product", "/product/*", "/product/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/category", "/category/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         //Route for resources shopping
                         .pathMatchers(HttpMethod.POST, "/shopping").hasAnyAuthority(SCOPE_CUSTOMER)
                         .pathMatchers(HttpMethod.GET, "/shopping/my-shops").hasAnyAuthority(SCOPE_CUSTOMER)
-                        .pathMatchers("/shopping", "/shopping/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_BASIC)
+                        .pathMatchers("/shopping", "/shopping/*", "/shopping/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         .anyExchange().authenticated())
                 //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -17,24 +17,28 @@ public class CustomerService {
     @Value("${customer.api.url}")
     private String customerApiURL;
 
-    public CustomerDTO findCustomerByKeyToken(String keyToken) {
+    public Boolean customerHasKeyToken(String keyToken) {
         WebClient webClient = WebClient.builder()
                 .baseUrl(customerApiURL)
                 .build();
-        Mono<CustomerDTO> customer = webClient
-                .get()
-                .uri("/customer/" + keyToken + "/key-token")
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::isError,
-                        response -> switch (response.statusCode().value()) {
-                            case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
-                            case 404 -> Mono.error(new CustomerInvalidKeyException());
-                            default -> Mono.error(new ShopGenericException("Erro no microsserviço customer"));
-                        })
-                .bodyToMono(CustomerDTO.class);
+        try {
+            Mono<Boolean> customer = webClient
+                    .get()
+                    .uri("/customer/" + keyToken + "/key-token")
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> switch (response.statusCode().value()) {
+                                case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                                default -> Mono.error(new ShopGenericException("Erro no microsserviço customer"));
+                            })
+                    .bodyToMono(Boolean.class);
 
-        return customer.block();
+            return customer.block();
+
+        } catch (Exception e) {
+            throw new ShopGenericException("Erro no microsserviço customer");
+        }
 
     }
 
