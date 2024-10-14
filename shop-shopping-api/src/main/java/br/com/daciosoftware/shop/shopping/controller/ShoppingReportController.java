@@ -40,10 +40,10 @@ public class ShoppingReportController {
 
 	@GetMapping("/periodo")
 	public ResponseEntity<?> getReportResumoVendas(
-			@RequestParam(name = "dataInicio", required = true) 
+			@RequestParam(name = "dataInicio")
 			@DateTimeFormat(pattern = "dd/MM/yyyy")
 			LocalDate dataInicio, 
-			@RequestParam(name = "dataFim", required = true) 
+			@RequestParam(name = "dataFim")
 			@DateTimeFormat(pattern = "dd/MM/yyyy")
 			LocalDate dataFim) 
 	{

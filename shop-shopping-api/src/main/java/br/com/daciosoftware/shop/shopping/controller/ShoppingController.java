@@ -60,7 +60,7 @@ public class ShoppingController {
 
 	@GetMapping("/filters")
 	public List<ShopDTO> findShopsByFilters(
-			@RequestParam(name = "dataInicio", required = true)
+			@RequestParam(name = "dataInicio")
 			@DateTimeFormat(pattern = "dd/MM/yyyy")
 			LocalDate dataInicio,
 			@RequestParam(name = "dataFim", required = false)
