@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnAuthorizedException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnauthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserInvalidKeyTokenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
@@ -33,7 +32,7 @@ public class AuthService {
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> switch (response.statusCode().value()) {
-                                case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                                case 401, 403 -> Mono.error(new AuthUnauthorizedException());
                                 case 404 -> Mono.error(new AuthUserInvalidKeyTokenException());
                                 default -> Mono.error(new ShopGenericException("Erro no microsserviço auth"));
                             })
@@ -62,7 +61,7 @@ public class AuthService {
                             response -> {
                                 System.err.println(response.statusCode().value());
                                 switch (response.statusCode().value()) {
-                                    case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                                    case 401, 403 -> Mono.error(new AuthUnauthorizedException());
                                     case 409 -> Mono.error(new AuthUserUsernameExistsException());
                                     default -> Mono.error(new ShopGenericException("Erro no microsserviço auth"));
                                 }

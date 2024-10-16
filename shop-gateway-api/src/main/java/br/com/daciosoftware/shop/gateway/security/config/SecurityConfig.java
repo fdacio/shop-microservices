@@ -1,6 +1,8 @@
-package br.com.daciosoftware.shop.gateway.config;
+package br.com.daciosoftware.shop.gateway.security.config;
 
-import br.com.daciosoftware.shop.gateway.services.AuthService;
+import br.com.daciosoftware.shop.gateway.security.exception.CustomAccessDeniedHandler;
+import br.com.daciosoftware.shop.gateway.security.exception.CustomAuthenticationEntryPoint;
+import br.com.daciosoftware.shop.gateway.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,6 +76,8 @@ public class SecurityConfig {
 
                         .anyExchange().authenticated())
                 //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.accessDeniedHandler(new CustomAccessDeniedHandler()).authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+                //.addFilterBefore(new ExceptionHandlerFilter(), SecurityWebFiltersOrder.LAST)
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
                 .build();
     }

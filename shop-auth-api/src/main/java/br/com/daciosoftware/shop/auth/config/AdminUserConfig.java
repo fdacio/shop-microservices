@@ -26,7 +26,7 @@ public class AdminUserConfig implements CommandLineRunner {
     private RuleRepository ruleRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args)  {
 
         String nome = "Administrador";
         String userName = "admin@daciosoftware.com.br";
@@ -47,7 +47,6 @@ public class AdminUserConfig implements CommandLineRunner {
                     admin.setRules(ruleAdmin);
                     admin.setDataCadastro(LocalDateTime.now());
                     authRepository.save(admin);
-
                 });
     }
 

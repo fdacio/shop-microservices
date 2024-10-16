@@ -1,4 +1,4 @@
-package br.com.daciosoftware.shop.gateway.services;
+package br.com.daciosoftware.shop.gateway.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

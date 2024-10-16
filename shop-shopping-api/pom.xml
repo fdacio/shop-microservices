@@ -24,11 +24,13 @@
 			<groupId>br.com.daciosoftware</groupId>
 			<artifactId>shop-models</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>br.com.daciosoftware</groupId>
 			<artifactId>shop-exceptions</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

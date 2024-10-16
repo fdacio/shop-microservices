@@ -3,7 +3,7 @@ package br.com.daciosoftware.shop.exceptions.advice;
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.dto.ValidErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthForbiddenException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnAuthorizedException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnauthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -26,7 +26,7 @@ import java.util.Map;
 		"br.com.daciosoftware.shop.product.controller",
 		"br.com.daciosoftware.shop.shopping.controller",
 		"br.com.daciosoftware.shop.auth.controller",
-		"br.com.daciosoftware.shop.gateway.*",
+		"br.com.daciosoftware.shop.gateway.security.exception",
 		"br.com.daciosoftware.shop.models.*" })
 public class ApplicationControllerAdvice {
 
@@ -79,8 +79,8 @@ public class ApplicationControllerAdvice {
 
 	@ResponseBody
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-	@ExceptionHandler(AuthUnAuthorizedException.class)
-	public ErrorDTO handleAuthUnAuthorizedExceptionError(AuthUnAuthorizedException ex) {
+	@ExceptionHandler(AuthUnauthorizedException.class)
+	public ErrorDTO handleAuthUnAuthorizedExceptionError(AuthUnauthorizedException ex) {
 		return  new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Recurso não autorizado");
 	}
 

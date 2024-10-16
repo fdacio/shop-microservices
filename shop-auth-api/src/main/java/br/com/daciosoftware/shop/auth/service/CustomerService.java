@@ -29,7 +29,7 @@ public class CustomerService {
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> switch (response.statusCode().value()) {
-                                case 401, 403 -> Mono.error(new AuthUnAuthorizedException());
+                                case 401, 403 -> Mono.error(new AuthUnauthorizedException());
                                 default -> Mono.error(new ShopGenericException("Erro no microsserviço customer"));
                             })
                     .bodyToMono(Boolean.class);
