@@ -76,6 +76,11 @@ public class ProductController {
         return productService.findAllPageable(pageable);
     }
 
+    @GetMapping("/all/home")
+    public Page<ProductDTO> findAllPageableForHomePage(Pageable pageable) {
+        return productService.findAllPageable(pageable);
+    }
+
     @PostMapping("/report-pdf")
     public ResponseEntity<?> reportPdf(@RequestBody ProductReportRequestDTO productDTO) {
         ByteArrayOutputStream pdfStream = productService.geraReportPdf(productDTO);
@@ -88,7 +93,7 @@ public class ProductController {
 
     @GetMapping("/healthcheck")
     public String healthcheck () {
-        return "ok";
+        return "Product service is health !!!";
     }
 
 }

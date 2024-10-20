@@ -2,7 +2,7 @@ package br.com.daciosoftware.shop.gateway.security.config;
 
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAccessDeniedHandler;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAuthenticationEntryPoint;
-import br.com.daciosoftware.shop.gateway.service.AuthService;
+import br.com.daciosoftware.shop.gateway.security.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +13,16 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -32,26 +36,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-
+        System.err.println("**** Setting SecurityWebFilterChain **** ");
         String SCOPE_PREFIX = "SCOPE_";
         final String[] ALL_SCOPES = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).toArray(String[]::new);
         final String SCOPE_ADMIN = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("admin")).findFirst().orElse("");
         final String SCOPE_OPERATOR = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("operator")).findFirst().orElse("");
         final String SCOPE_CUSTOMER = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("customer")).findFirst().orElse("");
 
-        System.err.println("[#### Security Gateway Filter Chain ####] ");
-        System.err.printf("All Scope %s%n", Arrays.toString(ALL_SCOPES));
-        System.err.printf("Scope Admin %s%n", SCOPE_ADMIN);
-        System.err.printf("Scope Operator %s%n", SCOPE_OPERATOR);
-        System.err.printf("Scope Customer %s%n", SCOPE_CUSTOMER);
-
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // configurações para teste de localhost:3000
+                //.cors(ServerHttpSecurity.CorsSpec::disable) // descomentar para ambiente de produção, quando o frontend no mesmo servidor do backend
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-
                         //Routes no authenticated - permitAll()
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
+                        .pathMatchers(HttpMethod.GET, "/product/all/home", "/product/all/home/*").permitAll()
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
 
                         //**** Routes authenticated ****
@@ -94,6 +94,19 @@ public class SecurityConfig {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        System.err.println("**** Setting Config CORS **** ");
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
 

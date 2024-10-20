@@ -10,6 +10,6 @@ public class GatewayController {
 
     @GetMapping("/healthcheck")
     public String healthcheck () {
-        return "ok";
+        return "Gateway service is health!";
     }
 }
