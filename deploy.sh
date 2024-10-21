@@ -2,9 +2,6 @@
 HOST="138.197.210.74"
 USER="moderar"
 PREFIX="*"
-#shop-auth-api-0.0.1-SNAPSHOT
-# shellcheck disable=SC1073
-# shellcheck disable=SC2046
 
 if [ $# -gt 0 ]; then
     PREFIX=$1
