@@ -32,7 +32,8 @@ public class TokenService {
     public TokenDTO getToken(AuthUserDTO authUserDTO) {
 
         var now = Instant.now();
-        long expire = 300L;
+        //long expire = 300L; // 300 second / 5 min
+        long expire = 10L; // 10 second
 
         String scopes = authUserDTO.getRules()
                 .stream()

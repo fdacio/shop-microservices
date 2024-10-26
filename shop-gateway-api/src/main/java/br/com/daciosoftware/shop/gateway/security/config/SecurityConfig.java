@@ -56,7 +56,7 @@ public class SecurityConfig {
 
                         //**** Routes authenticated ****
                         //Route authenticated for all scopes
-                        .pathMatchers(HttpMethod.GET, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
+                        .pathMatchers(HttpMethod.POST, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
 
                         //Route for resources user (auth) - only rule SCOPE_Admin
                         .pathMatchers("/auth/user", "/auth/user/*", "/auth/user/**").hasAuthority(SCOPE_ADMIN)
