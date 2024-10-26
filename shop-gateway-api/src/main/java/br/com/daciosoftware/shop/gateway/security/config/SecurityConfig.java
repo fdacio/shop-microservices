@@ -69,10 +69,10 @@ public class SecurityConfig {
                         .pathMatchers("/product", "/product/*", "/product/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .pathMatchers("/category", "/category/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
-                        //Route for resources shopping
-                        .pathMatchers(HttpMethod.POST, "/shopping").hasAnyAuthority(SCOPE_CUSTOMER)
-                        .pathMatchers(HttpMethod.GET, "/shopping/my-shops").hasAnyAuthority(SCOPE_CUSTOMER)
-                        .pathMatchers("/shopping", "/shopping/*", "/shopping/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        //Route for resources orders
+                        .pathMatchers(HttpMethod.POST, "/order").hasAnyAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.GET, "/order/my-order").hasAnyAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers("/order", "/order/*", "/order/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         .anyExchange().authenticated())
                 //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

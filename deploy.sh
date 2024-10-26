@@ -6,7 +6,7 @@ PREFIX="*"
 #shop-auth-api
 #shop-gateway-api
 #shop-product-api
-#shop-shopping-api
+#shop-order-api
 #shop-customers-api
 
 

@@ -24,7 +24,7 @@ import java.util.Map;
 @ControllerAdvice(basePackages = {
 		"br.com.daciosoftware.shop.customer.controller",
 		"br.com.daciosoftware.shop.product.controller",
-		"br.com.daciosoftware.shop.shopping.controller",
+		"br.com.daciosoftware.shop.order.controller",
 		"br.com.daciosoftware.shop.auth.controller",
 		"br.com.daciosoftware.shop.gateway.security.exception",
 		"br.com.daciosoftware.shop.models.*" })

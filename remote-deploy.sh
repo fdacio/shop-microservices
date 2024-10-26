@@ -4,7 +4,7 @@
 cd /home/moderar/sistemas/shop
 cp -f ./shop-auth*.jar ./auth
 cp -f ./shop-gateway*.jar ./gateway
-cp -f ./shop-shopping*.jar ./shoopping
+cp -f ./shop-order*.jar ./order
 cp -f ./shop-product*.jar ./product
 cp -f ./shop-customer*.jar ./customer
 #docker-compose down
