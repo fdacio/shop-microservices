@@ -5,9 +5,9 @@
     "description": "A description for 'product.api.url'"
   },
   {
-    "name": "shopping.api.url",
+    "name": "order.api.url",
     "type": "java.lang.String",
-    "description": "A description for 'shopping.api.url'"
+    "description": "A description for 'order.api.url'"
   },
   {
     "name": "user.api.url",

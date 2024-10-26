@@ -18,8 +18,8 @@ public class ShopGatewayApiApplication {
 	private String productApiUrl;
 	@Value("${customer.api.url}")
 	private String customerApiUrl;
-	@Value("${shopping.api.url}")
-	private String shoppinpApiUrl;
+	@Value("${order.api.url}")
+	private String orderApiUrl;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ShopGatewayApiApplication.class, args);
@@ -33,7 +33,7 @@ public class ShopGatewayApiApplication {
 				.route("product_route", r -> r.path("/product/**").uri(productApiUrl))
 				.route("product_route", r -> r.path("/category/**").uri(productApiUrl))
 				.route("customer_route", r -> r.path("/customer/**").uri(customerApiUrl))
-				.route("shopping_route", r -> r.path("/shopping/**").uri(shoppinpApiUrl))
+				.route("order_route", r -> r.path("/order/**").uri(orderApiUrl))
 				.build();
 	}
 
