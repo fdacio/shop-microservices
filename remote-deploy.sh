@@ -7,8 +7,10 @@ cp -f ./shop-gateway*.jar ./gateway
 cp -f ./shop-order*.jar ./order
 cp -f ./shop-product*.jar ./product
 cp -f ./shop-customer*.jar ./customer
-#docker-compose down
+
+docker-compose down --remove-orphans
 docker-compose build
 docker-compose up -d
 docker-compose ps | grep "java" | awk '{print $1, $5, $6}' | tr ' ' '\t'
+
 echo "Fim do deploy";
