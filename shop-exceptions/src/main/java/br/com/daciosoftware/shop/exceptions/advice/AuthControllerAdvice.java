@@ -96,4 +96,11 @@ public class AuthControllerAdvice {
     }
     //CustomerInvalidKeyException
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(AuthConfigNotFoundException.class)
+    public ErrorDTO handleAuthConfigNotFound(AuthConfigNotFoundException authConfigNotFoundException) {
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Configuração não encontrada");
+    }
+
 }

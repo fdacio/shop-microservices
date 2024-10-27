@@ -1,13 +1,12 @@
 package br.com.daciosoftware.shop.auth.service;
 
 import br.com.daciosoftware.shop.auth.component.RsaKey;
-import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
-import br.com.daciosoftware.shop.models.dto.auth.RuleDTO;
-import br.com.daciosoftware.shop.models.dto.auth.TokenDTO;
+import br.com.daciosoftware.shop.models.dto.auth.*;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class TokenService {
+
+    @Autowired
+    private ConfigService configService;
 
     public JwtEncoder jwtEncoder() {
         try {
@@ -31,9 +33,10 @@ public class TokenService {
 
     public TokenDTO getToken(AuthUserDTO authUserDTO) {
 
+        ConfigDTO configDTO = configService.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
+
         var now = Instant.now();
-        //long expire = 300L; // 300 second / 5 min
-        long expire = 10L; // 10 second
+        long expire = Long.getLong(configDTO.getValor());
 
         String scopes = authUserDTO.getRules()
                 .stream()

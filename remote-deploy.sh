@@ -11,6 +11,7 @@ cp -f ./shop-customer*.jar ./customer
 docker-compose down --remove-orphans
 docker-compose build
 docker-compose up -d
+echo "up containers";
+sleep 50
 docker-compose ps | grep "java" | awk '{print $1, $5, $6}' | tr ' ' '\t'
-
 echo "Fim do deploy";
