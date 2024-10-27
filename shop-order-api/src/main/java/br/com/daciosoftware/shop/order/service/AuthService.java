@@ -1,9 +1,8 @@
 package br.com.daciosoftware.shop.order.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnauthorizedException;
+import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
-import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;

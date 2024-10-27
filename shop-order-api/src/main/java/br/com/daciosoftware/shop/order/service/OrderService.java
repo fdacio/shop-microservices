@@ -1,11 +1,10 @@
 package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.OrderNotFoundException;
-import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.order.Order;
 import br.com.daciosoftware.shop.order.repository.OrderRepository;
 import jakarta.persistence.EntityManager;
