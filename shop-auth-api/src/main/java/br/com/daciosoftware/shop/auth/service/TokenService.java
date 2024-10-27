@@ -33,10 +33,15 @@ public class TokenService {
 
     public TokenDTO getToken(AuthUserDTO authUserDTO) {
 
-        ConfigDTO configDTO = configService.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
-
         var now = Instant.now();
-        long expire = Long.getLong(configDTO.getValor());
+        long expire;
+        try {
+            ConfigDTO configDTO = configService.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
+            expire = Long.parseLong(configDTO.getValor());
+            System.out.println(configDTO);
+        } catch (Exception e){
+            expire = 300L;
+        }
 
         String scopes = authUserDTO.getRules()
                 .stream()

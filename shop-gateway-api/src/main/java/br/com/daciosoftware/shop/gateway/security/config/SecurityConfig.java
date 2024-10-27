@@ -60,6 +60,7 @@ public class SecurityConfig {
 
                         //Route for resources user (auth) - only rule SCOPE_Admin
                         .pathMatchers("/auth/user", "/auth/user/*", "/auth/user/**").hasAuthority(SCOPE_ADMIN)
+                        .pathMatchers("/auth/config", "/auth/config/*", "/auth/config/**").hasAuthority(SCOPE_ADMIN)
 
                         //Route for resources customer
                         .pathMatchers("/customer", "/customer/*", "/customer/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)

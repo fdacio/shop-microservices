@@ -4,6 +4,7 @@ import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException
 import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnauthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -18,13 +19,13 @@ public class AuthService {
     private String authApiURL;
 
     @Transactional
-    public AuthUserDTO getUserAuthenticated(String token) {
+    public AuthUserKeyTokenDTO getUserAuthenticated(String token) {
 
         WebClient webClient = WebClient.builder()
                 .baseUrl(authApiURL)
                 .build();
 
-        Mono<AuthUserDTO> user = webClient
+        Mono<AuthUserKeyTokenDTO> user = webClient
                 .post()
                 .uri("/auth/user/authenticated")
                 .header("Authorization", token)
@@ -36,7 +37,7 @@ public class AuthService {
                             case 404 -> Mono.error(new AuthUserNotFoundException());
                             default -> Mono.error(new ShopGenericException("Erro no microsserviço auth"));
                         })
-                .bodyToMono(AuthUserDTO.class);
+                .bodyToMono(AuthUserKeyTokenDTO.class);
 
         return user.block();
 

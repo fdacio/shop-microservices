@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.models.dto.auth;
 
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.Set;
@@ -17,6 +18,7 @@ public class AuthUserDTO {
 	private String nome;
 	private String username;
 	private String email;
+	@JsonIgnore
 	private String keyToken;
 	private Set<RuleDTO> rules;
 

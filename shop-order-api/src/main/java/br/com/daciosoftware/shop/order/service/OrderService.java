@@ -2,6 +2,7 @@ package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.OrderNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
@@ -37,7 +38,7 @@ public class OrderService {
 	private EntityManager entityManager;
 
 	private CustomerDTO getCustomerAuthenticated(String token) {
-		AuthUserDTO authUserDTO = authService.getUserAuthenticated(token);
+		AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
 		String customerKeyAuth = authUserDTO.getKeyToken();
 		return customerService.validCustomerKeyAuth(customerKeyAuth);
 	}

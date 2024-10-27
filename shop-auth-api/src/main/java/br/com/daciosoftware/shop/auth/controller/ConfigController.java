@@ -7,20 +7,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/config")
+@RequestMapping("/auth")
 public class ConfigController {
 
     @Autowired
     private ConfigService configService;
 
-    @PostMapping
+    @GetMapping("/config")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ConfigDTO> findAll() {
+        return configService.findAll();
+    }
+
+    @PostMapping("/config")
     @ResponseStatus(HttpStatus.CREATED)
     public ConfigDTO save(@RequestBody ConfigDTO configDTO) {
         return configService.save(configDTO);
     }
 
-    @PatchMapping("/{chave}")
+    @PatchMapping("/config/{chave}")
     @ResponseStatus(HttpStatus.OK)
     public ConfigDTO update(@PathVariable String chave, @RequestBody ConfigDTO configDTO) {
         ConfigDTO config = configService.findByChave(chave);
@@ -30,7 +38,13 @@ public class ConfigController {
         return configService.save(config);
     }
 
-    @PatchMapping("/update-expire-token")
+    @GetMapping("/config/expire-token")
+    @ResponseStatus(HttpStatus.OK)
+    public ConfigDTO findExpireToken() {
+        return configService.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
+    }
+
+    @PatchMapping("/config/expire-token")
     @ResponseStatus(HttpStatus.OK)
     public ConfigDTO updateExpireToken(@RequestBody ConfigDTO configDTO) {
         return update(ConfigEnum.EXPIRE_TOKEN.getChave(), configDTO);

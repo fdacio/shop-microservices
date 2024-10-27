@@ -8,10 +8,14 @@ cp -f ./shop-order*.jar ./order
 cp -f ./shop-product*.jar ./product
 cp -f ./shop-customer*.jar ./customer
 
+SLEEP=60
+if [ $# -eq 0 ]; then
 docker-compose down --remove-orphans
+SLEEP=80
+fi
 docker-compose build
 docker-compose up -d
-echo "up containers";
-sleep 50
+echo "Up containers. Wait the end of deploy ...";
+sleep $SLEEP
 docker-compose ps | grep "java" | awk '{print $1, $5, $6}' | tr ' ' '\t'
-echo "Fim do deploy";
+echo "Deploy complete!!!";
