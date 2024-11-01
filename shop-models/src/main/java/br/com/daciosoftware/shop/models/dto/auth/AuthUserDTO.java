@@ -16,6 +16,7 @@ public class AuthUserDTO {
 
 	private Long id;
 	private String nome;
+	private String nomeSobrenome;
 	private String username;
 	private String email;
 	@JsonIgnore
@@ -26,6 +27,7 @@ public class AuthUserDTO {
 		AuthUserDTO authUserDTO = new AuthUserDTO();
 		authUserDTO.setId(authUser.getId());
 		authUserDTO.setNome(authUser.getNome());
+		authUserDTO.setNomeSobrenome(getNomeSobrenome(authUser.getNome()));
 		authUserDTO.setUsername(authUser.getUsername());
 		authUserDTO.setEmail(authUser.getEmail());
 		authUserDTO.setKeyToken(authUser.getKeyToken());
@@ -34,4 +36,8 @@ public class AuthUserDTO {
 		return authUserDTO;
 	}
 
+	private static String getNomeSobrenome(String fullName) {
+		String[] name = fullName.split(" ");
+		return name[0] + " " + name[name.length - 1];
+	}
 }

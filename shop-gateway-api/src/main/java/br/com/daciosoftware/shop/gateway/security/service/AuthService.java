@@ -34,7 +34,6 @@ public class AuthService {
                 .bodyToMono(String[].class);
 
         return mono.block();
-
     }
 
 }

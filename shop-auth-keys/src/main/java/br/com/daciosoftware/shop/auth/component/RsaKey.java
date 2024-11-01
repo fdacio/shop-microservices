@@ -1,7 +1,5 @@
 package br.com.daciosoftware.shop.auth.component;
 
-import br.com.daciosoftware.shop.models.dto.auth.PrivateKeyDTO;
-import br.com.daciosoftware.shop.models.dto.auth.PublicKeyDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

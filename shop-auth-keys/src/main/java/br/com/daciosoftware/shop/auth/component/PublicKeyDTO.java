@@ -1,0 +1,15 @@
+package br.com.daciosoftware.shop.auth.component;
+
+
+public class PublicKeyDTO {
+
+    private String content;
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+}

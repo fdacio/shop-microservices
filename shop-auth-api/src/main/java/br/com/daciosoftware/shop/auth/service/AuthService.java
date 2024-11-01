@@ -8,17 +8,23 @@ import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
+
+import com.nimbusds.jwt.JWT;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +39,7 @@ public class AuthService {
     @Autowired
     private CustomerService customerService;
 
+
     private String getKeyTokenFromToken(String token) {
         try {
             return Jwts.parser()
@@ -40,8 +47,24 @@ public class AuthService {
                     .parseClaimsJws(token.replace("Bearer ", ""))
                     .getBody()
                     .getSubject();
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
             throw new AuthExpiredTokenException();
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new ShopGenericException(e.getMessage());
+        }
+    }
+
+    public String getKeyTokenFromTokenForRefresh(String token) {
+        try {
+            String publicKey = new RsaKey().getPublicKeyDTO().getContent();
+            byte[] encoded = Base64.getDecoder().decode(publicKey);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) keyFactory.generatePublic(keySpec);
+            ReactiveJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder.withPublicKey(rsaPublicKey).build();
+            return Objects.requireNonNull(jwtDecoder.decode(token).block()).getSubject();
+        } catch (Exception e) {
+            throw new ShopGenericException(e.getMessage());
         }
     }
 
@@ -63,6 +86,18 @@ public class AuthService {
         AuthUserDTO authUserDTO = AuthUserDTO.convert(user);
         return tokenConfig.getToken(authUserDTO);
 
+    }
+
+    public AuthUserDTO findAuthenticatedUser(String token) {
+        String keyToken = getKeyTokenFromToken(token);
+        AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
+        return AuthUserDTO.convert(authUser);
+    }
+
+    public TokenDTO refreshToken(TokenDTO tokenExpired) {
+        String keyToken = getKeyTokenFromTokenForRefresh(tokenExpired.getToken());
+        AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
+        return tokenConfig.getToken(AuthUserDTO.convert(authUser));
     }
 
     public AuthUserDTO createUser(CreateAuthUserDTO createAuthUserDTO) {
@@ -121,11 +156,6 @@ public class AuthService {
         return AuthUserDTO.convert(authRepository.save(authUser));
     }
 
-    public AuthUserDTO findAuthenticatedUser(String token) {
-        String keyToken = getKeyTokenFromToken(token);
-        AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
-        return AuthUserDTO.convert(authUser);
-    }
 
     public AuthUserDTO createUserFromCustomer(CreateAuthUserDTO createAuthUserDTO) {
         validUsernameUnique(createAuthUserDTO.getUsername(), null);

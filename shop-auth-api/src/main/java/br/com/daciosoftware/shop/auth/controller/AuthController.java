@@ -23,6 +23,18 @@ public class AuthController {
         return authService.login(loginDTO);
     }
 
+    @PostMapping("/refresh-token")
+    @ResponseStatus(HttpStatus.OK)
+    public TokenDTO refreshToken(@RequestBody TokenDTO token) {
+        return authService.refreshToken(token);
+    }
+
+    @PostMapping("/user/authenticated")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthUserDTO userAuthenticated(@RequestHeader("Authorization") String token) {
+        return  authService.findAuthenticatedUser(token);
+    }
+
     @PostMapping("/user")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthUserDTO createUser(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
@@ -75,11 +87,6 @@ public class AuthController {
         return  authService.updatePassword(newPassword, token);
     }
 
-    @PostMapping("/user/authenticated")
-    @ResponseStatus(HttpStatus.OK)
-    public AuthUserDTO userAuthenticated(@RequestHeader("Authorization") String token) {
-        return  authService.findAuthenticatedUser(token);
-    }
 
     @PostMapping("/user/{id}/customer")
     @ResponseStatus(HttpStatus.CREATED)

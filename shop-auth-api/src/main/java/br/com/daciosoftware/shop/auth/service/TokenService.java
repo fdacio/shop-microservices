@@ -35,10 +35,10 @@ public class TokenService {
 
         var now = Instant.now();
         long expire;
+
         try {
             ConfigDTO configDTO = configService.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
             expire = Long.parseLong(configDTO.getValor());
-            System.out.println(configDTO);
         } catch (Exception e){
             expire = 300L;
         }

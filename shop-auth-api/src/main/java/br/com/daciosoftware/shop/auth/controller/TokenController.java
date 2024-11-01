@@ -17,4 +17,5 @@ public class TokenController {
     public String publicKey() throws Exception {
         return rsaKey.getPublicKeyDTO().getContent();
     }
+
 }

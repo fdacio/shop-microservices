@@ -2,20 +2,26 @@ package br.com.daciosoftware.shop.gateway.security.config;
 
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAccessDeniedHandler;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAuthenticationEntryPoint;
+import br.com.daciosoftware.shop.gateway.security.filter.ExpiredTokenFilter;
 import br.com.daciosoftware.shop.gateway.security.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableLoadTimeWeaving;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.server.WebFilter;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
@@ -28,7 +34,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebFluxSecurity
-@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -50,6 +55,7 @@ public class SecurityConfig {
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
                         //Routes no authenticated - permitAll()
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
                         .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
                         .pathMatchers(HttpMethod.GET, "/product/all/home", "/product/all/home/*").permitAll()
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
@@ -78,9 +84,11 @@ public class SecurityConfig {
                         .anyExchange().authenticated())
                 //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(new CustomAccessDeniedHandler()).authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
-                //.addFilterBefore(new ExceptionHandlerFilter(), SecurityWebFiltersOrder.LAST)
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
+                .addFilterBefore(new ExpiredTokenFilter(), SecurityWebFiltersOrder.FIRST)
                 .build();
+
+
     }
 
     @Bean
@@ -93,7 +101,7 @@ public class SecurityConfig {
             RSAPublicKey rsaPublicKey = (RSAPublicKey) keyFactory.generatePublic(keySpec);
             return NimbusReactiveJwtDecoder.withPublicKey(rsaPublicKey).build();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -103,11 +111,13 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept",  "Authorization"));
+        configuration.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept", "Authorization"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
 }
 

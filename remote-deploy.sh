@@ -8,7 +8,7 @@ cp -f ./shop-order*.jar ./order
 cp -f ./shop-product*.jar ./product
 cp -f ./shop-customer*.jar ./customer
 
-SLEEP=60
+SLEEP=30
 if [ $# -eq 0 ]; then
 docker-compose down --remove-orphans
 SLEEP=80
