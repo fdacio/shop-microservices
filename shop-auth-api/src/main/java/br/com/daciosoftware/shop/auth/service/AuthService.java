@@ -4,6 +4,7 @@ import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.*;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
@@ -37,6 +38,7 @@ public class AuthService {
     public String getKeyTokenIdUserByTokenJWT(String token) {
         try {
             String publicKey = new RsaKey().getPublicKeyDTO().getContent();
+            //String publicKey = new RsaKey().getPublicKeyDTO().toString();
             byte[] encoded = Base64.getDecoder().decode(publicKey);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);

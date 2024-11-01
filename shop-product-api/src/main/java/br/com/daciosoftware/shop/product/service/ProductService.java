@@ -1,8 +1,8 @@
 package br.com.daciosoftware.shop.product.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.ProductIdentifieViolationException;
-import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
-import br.com.daciosoftware.shop.exceptions.exceptions.ReportPdfException;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductIdentifieViolationException;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductReportPdfException;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
 import br.com.daciosoftware.shop.models.dto.product.ProductReportRequestDTO;
@@ -228,7 +228,7 @@ public class ProductService {
 
         } catch (DocumentException | IOException | URISyntaxException e) {
 
-            throw new ReportPdfException();
+            throw new ProductReportPdfException();
         }
     }
 

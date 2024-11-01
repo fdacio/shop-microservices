@@ -33,19 +33,25 @@ public class ValidTokenFilter implements WebFilter {
                         .setSigningKey(new RsaKey().getRsaPrivateKey())
                         .parseClaimsJws(token);
             } catch (SignatureException ex) {
-                log.error(ex.getMessage());
                 // Invalid signature/claims
+                log.error(ex.getMessage());
+                throw ex;
             } catch (ExpiredJwtException ex) {
-                throw new AuthExpiredTokenException();
+                //throw new AuthExpiredTokenException();
+                log.error(ex.getMessage());
+                throw ex;
             } catch (UnsupportedJwtException ex) {
-                log.error(ex.getMessage());
                 // Unsupported JWT token
+                log.error(ex.getMessage());
+                throw ex;
             } catch (MalformedJwtException ex) {
-                log.error(ex.getMessage());
                 // Malformed JWT token
-            } catch (IllegalArgumentException ex) {
                 log.error(ex.getMessage());
+                throw ex;
+            } catch (IllegalArgumentException ex) {
                 // JWT token is empty
+                log.error(ex.getMessage());
+                throw ex;
             } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                 log.error(e.getMessage());
                 throw new RuntimeException(e);

@@ -1,7 +1,7 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserInvalidKeyTokenException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserUsernameExistsException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserInvalidKeyTokenException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;

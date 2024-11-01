@@ -1,7 +1,8 @@
 package br.com.daciosoftware.shop.customer.service;
 
 import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
-import br.com.daciosoftware.shop.exceptions.exceptions.*;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;

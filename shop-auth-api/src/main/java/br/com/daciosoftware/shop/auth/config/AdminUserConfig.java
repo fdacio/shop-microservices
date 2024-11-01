@@ -3,7 +3,7 @@ package br.com.daciosoftware.shop.auth.config;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthRuleNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthRuleNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.RuleEnum;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;

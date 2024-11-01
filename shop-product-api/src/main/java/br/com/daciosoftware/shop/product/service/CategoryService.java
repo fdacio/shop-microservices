@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.product.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.CategoryNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.entity.product.Category;
 import br.com.daciosoftware.shop.product.repository.CategoryRepository;

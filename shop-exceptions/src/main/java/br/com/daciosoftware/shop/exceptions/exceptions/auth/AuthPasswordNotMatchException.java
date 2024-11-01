@@ -1,4 +1,4 @@
-package br.com.daciosoftware.shop.exceptions.exceptions;
+package br.com.daciosoftware.shop.exceptions.exceptions.auth;
 
 import java.io.Serial;
 

@@ -3,6 +3,8 @@ package br.com.daciosoftware.shop.auth.service;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.*;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerCpfExistsException;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerEmailExistsException;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -29,7 +31,7 @@ public class CustomerService {
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> switch (response.statusCode().value()) {
-                                case 401, 403 -> Mono.error(new AuthUnauthorizedException());
+                                case 401, 403 -> Mono.error(new ShopGenericException("Recurso não autorizado"));
                                 default -> Mono.error(new ShopGenericException("Erro no microsserviço customer"));
                             })
                     .bodyToMono(Boolean.class);

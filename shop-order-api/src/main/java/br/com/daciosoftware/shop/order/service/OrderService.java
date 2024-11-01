@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.order.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.OrderNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;

@@ -57,7 +57,7 @@
             <artifactId>tomcat-embed-core</artifactId>
         </dependency>
 
-	</dependencies>
+    </dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

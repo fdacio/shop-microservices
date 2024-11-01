@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthConfigNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthConfigNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.ConfigDTO;
 import br.com.daciosoftware.shop.models.entity.auth.Config;
 import org.springframework.beans.factory.annotation.Autowired;

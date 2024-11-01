@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.order.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;

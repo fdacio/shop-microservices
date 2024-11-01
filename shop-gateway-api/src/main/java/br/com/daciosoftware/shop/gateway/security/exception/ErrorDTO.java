@@ -18,6 +18,10 @@ public class ErrorDTO {
 		this.date = LocalDateTime.now();
 	}
 
+	public int getStatus() {
+		return status;
+	}
+
 	@Override
 	public String toString() {
 		return String.format(

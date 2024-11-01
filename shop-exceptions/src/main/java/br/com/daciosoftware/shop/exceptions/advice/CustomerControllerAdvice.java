@@ -1,7 +1,11 @@
 package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.*;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthEmailExistsException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

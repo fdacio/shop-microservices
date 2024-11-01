@@ -12,4 +12,5 @@ public class PublicKeyDTO {
     public void setContent(String content) {
         this.content = content;
     }
+
 }

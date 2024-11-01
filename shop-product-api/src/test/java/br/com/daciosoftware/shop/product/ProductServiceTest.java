@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.product;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
 import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
 import br.com.daciosoftware.shop.models.entity.product.Category;
 import br.com.daciosoftware.shop.models.entity.product.Product;

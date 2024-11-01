@@ -1,10 +1,10 @@
 package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUserNotFoundException;
-import br.com.daciosoftware.shop.exceptions.exceptions.CustomerInvalidKeyException;
-import br.com.daciosoftware.shop.exceptions.exceptions.ProductNotFoundException;
-import br.com.daciosoftware.shop.exceptions.exceptions.OrderNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
+import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
