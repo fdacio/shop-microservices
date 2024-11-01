@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = { "br.com.daciosoftware.shop.auth.repository" })
-@ComponentScan(basePackages = { "br.com.daciosoftware.shop.auth.*", "br.com.daciosoftware.shop.exceptions.*", "br.com.daciosoftware.shop.security.gateway.*" })
+@ComponentScan(basePackages = { "br.com.daciosoftware.shop.auth.*", "br.com.daciosoftware.shop.exceptions.*", "br.com.daciosoftware.shop.security.gateway.*", "br.com.daciosoftware.shop.auth.keys.*" })
 @EntityScan(basePackages = { "br.com.daciosoftware.shop.models.entity" })
 public class ShopAuthApiApplication {
 

@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
-import br.com.daciosoftware.shop.auth.component.RsaKey;
+import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;

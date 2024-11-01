@@ -87,7 +87,6 @@ public class AuthController {
         return  authService.updatePassword(newPassword, token);
     }
 
-
     @PostMapping("/user/{id}/customer")
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerDTO createCustomerFromAuthUser(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {

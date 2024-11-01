@@ -1,4 +1,4 @@
-package br.com.daciosoftware.shop.auth.component;
+package br.com.daciosoftware.shop.auth.keys.component;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;

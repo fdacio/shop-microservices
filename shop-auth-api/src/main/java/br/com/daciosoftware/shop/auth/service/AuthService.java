@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
-import br.com.daciosoftware.shop.auth.component.RsaKey;
+import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.*;
@@ -8,20 +8,15 @@ import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
-
-import com.nimbusds.jwt.JWT;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -39,22 +34,7 @@ public class AuthService {
     @Autowired
     private CustomerService customerService;
 
-
-    private String getKeyTokenFromToken(String token) {
-        try {
-            return Jwts.parser()
-                    .setSigningKey(new RsaKey().getRsaPrivateKey())
-                    .parseClaimsJws(token.replace("Bearer ", ""))
-                    .getBody()
-                    .getSubject();
-        } catch (ExpiredJwtException e) {
-            throw new AuthExpiredTokenException();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new ShopGenericException(e.getMessage());
-        }
-    }
-
-    public String getKeyTokenFromTokenForRefresh(String token) {
+    public String getKeyTokenIdUserByTokenJWT(String token) {
         try {
             String publicKey = new RsaKey().getPublicKeyDTO().getContent();
             byte[] encoded = Base64.getDecoder().decode(publicKey);
@@ -89,13 +69,13 @@ public class AuthService {
     }
 
     public AuthUserDTO findAuthenticatedUser(String token) {
-        String keyToken = getKeyTokenFromToken(token);
+        String keyToken = getKeyTokenIdUserByTokenJWT(token);
         AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         return AuthUserDTO.convert(authUser);
     }
 
     public TokenDTO refreshToken(TokenDTO tokenExpired) {
-        String keyToken = getKeyTokenFromTokenForRefresh(tokenExpired.getToken());
+        String keyToken = getKeyTokenIdUserByTokenJWT(tokenExpired.getToken());
         AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         return tokenConfig.getToken(AuthUserDTO.convert(authUser));
     }
@@ -150,7 +130,7 @@ public class AuthService {
         if (!newPassword.getPassword().equals(newPassword.getRePassword())) {
             throw new AuthPasswordNotMatchException();
         }
-        String keyToken = getKeyTokenFromToken(token);
+        String keyToken = getKeyTokenIdUserByTokenJWT(token);
         AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         authUser.setPassword(bCryptPasswordEncoder().encode(newPassword.getPassword()));
         return AuthUserDTO.convert(authRepository.save(authUser));

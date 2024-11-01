@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "br.com.daciosoftware.shop.gateway.*" })
+@ComponentScan(basePackages = { "br.com.daciosoftware.shop.gateway.*", "br.com.daciosoftware.shop.auth.keys.*" })
 public class ShopGatewayApiApplication {
 
 	@Value("${auth.api.url}")

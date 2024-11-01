@@ -1,7 +1,6 @@
-package br.com.daciosoftware.shop.auth.component;
+package br.com.daciosoftware.shop.auth.keys.component;
 
-
-public class PublicKeyDTO {
+public class PrivateKeyDTO {
 
     private String content;
 
@@ -12,4 +11,5 @@ public class PublicKeyDTO {
     public void setContent(String content) {
         this.content = content;
     }
+
 }

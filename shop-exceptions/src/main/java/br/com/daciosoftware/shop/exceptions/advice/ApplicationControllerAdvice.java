@@ -2,8 +2,6 @@ package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.dto.ValidErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthForbiddenException;
-import br.com.daciosoftware.shop.exceptions.exceptions.AuthUnauthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.net.NoRouteToHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +23,6 @@ import java.util.Map;
 		"br.com.daciosoftware.shop.product.controller",
 		"br.com.daciosoftware.shop.order.controller",
 		"br.com.daciosoftware.shop.auth.controller",
-		"br.com.daciosoftware.shop.gateway.security.exception",
 		"br.com.daciosoftware.shop.models.*" })
 public class ApplicationControllerAdvice {
 
@@ -77,25 +73,6 @@ public class ApplicationControllerAdvice {
 	}
 
 
-	@ResponseBody
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-	@ExceptionHandler(AuthUnauthorizedException.class)
-	public ErrorDTO handleAuthUnAuthorizedExceptionError(AuthUnauthorizedException ex) {
-		return  new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Recurso não autorizado");
-	}
 
-	@ResponseBody
-	@ResponseStatus(HttpStatus.FORBIDDEN)
-	@ExceptionHandler(AuthForbiddenException.class)
-	public ErrorDTO handleAuthForbiddenExceptionError(AuthForbiddenException ex) {
-		return  new ErrorDTO(HttpStatus.FORBIDDEN.value(), "Recurso não autorizado");
-	}
-
-	@ResponseBody
-	@ResponseStatus(HttpStatus.BAD_GATEWAY)
-	@ExceptionHandler(NoRouteToHostException.class)
-	public ErrorDTO handleAuthForbiddenExceptionError(NoRouteToHostException ex) {
-		return  new ErrorDTO(HttpStatus.BAD_GATEWAY.value(), "Microsserviço indisponível");
-	}
 
 }

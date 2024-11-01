@@ -26,13 +26,6 @@ public class AuthControllerAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AuthExpiredTokenException.class)
-    public ErrorDTO handleAuthExpireToken(AuthExpiredTokenException authExpiredTokenException) {
-        return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Token expirado. Refaça o login");
-    }
-
-    @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AuthPasswordNotMatchException.class)
     public ErrorDTO handlePasswordNotMatchException(AuthPasswordNotMatchException ex) {

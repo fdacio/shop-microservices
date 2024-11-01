@@ -11,19 +11,6 @@ public class AuthService {
     @Value("${auth.api.url}")
     private String authApiURL;
 
-    public String getContentPublicKey() {
-
-        WebClient webClient = WebClient.builder().baseUrl(authApiURL).build();
-
-        Mono<String> mono = webClient
-                .get()
-                .uri("/auth/token/public-key")
-                .retrieve()
-                .bodyToMono(String.class);
-
-        return mono.block();
-    }
-
     public String[] getRules() {
         WebClient webClient = WebClient.builder().baseUrl(authApiURL).build();
 

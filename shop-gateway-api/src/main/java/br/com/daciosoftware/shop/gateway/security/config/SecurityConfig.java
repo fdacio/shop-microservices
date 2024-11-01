@@ -1,27 +1,23 @@
 package br.com.daciosoftware.shop.gateway.security.config;
 
+import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAccessDeniedHandler;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAuthenticationEntryPoint;
-import br.com.daciosoftware.shop.gateway.security.filter.ExpiredTokenFilter;
+import br.com.daciosoftware.shop.gateway.security.filter.ValidTokenFilter;
 import br.com.daciosoftware.shop.gateway.security.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableLoadTimeWeaving;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.server.WebFilter;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
@@ -38,6 +34,8 @@ public class SecurityConfig {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private RsaKey rsaKey;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -85,7 +83,7 @@ public class SecurityConfig {
                 //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(new CustomAccessDeniedHandler()).authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
-                .addFilterBefore(new ExpiredTokenFilter(), SecurityWebFiltersOrder.FIRST)
+                .addFilterBefore(new ValidTokenFilter(), SecurityWebFiltersOrder.FIRST)
                 .build();
 
 
@@ -94,7 +92,7 @@ public class SecurityConfig {
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         try {
-            String publicKey = authService.getContentPublicKey();
+            String publicKey = rsaKey.getPublicKeyDTO().getContent();
             byte[] encoded = Base64.getDecoder().decode(publicKey);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
