@@ -38,7 +38,6 @@ public class AuthService {
     public String getKeyTokenIdUserByTokenJWT(String token) {
         try {
             String publicKey = new RsaKey().getPublicKeyDTO().getContent();
-            //String publicKey = new RsaKey().getPublicKeyDTO().toString();
             byte[] encoded = Base64.getDecoder().decode(publicKey);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
@@ -71,7 +70,7 @@ public class AuthService {
     }
 
     public AuthUserDTO findAuthenticatedUser(String token) {
-        String keyToken = getKeyTokenIdUserByTokenJWT(token);
+        String keyToken = getKeyTokenIdUserByTokenJWT(token.replace("Bearer ", ""));
         AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         return AuthUserDTO.convert(authUser);
     }
