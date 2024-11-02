@@ -1,24 +1,19 @@
 package br.com.daciosoftware.shop.auth.service;
 
-import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
-import br.com.daciosoftware.shop.exceptions.exceptions.*;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,15 +32,14 @@ public class AuthService {
 
     public String getKeyTokenIdUserByTokenJWT(String token) {
         try {
-            String publicKey = new RsaKey().getPublicKeyDTO().getContent();
-            byte[] encoded = Base64.getDecoder().decode(publicKey);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
-            RSAPublicKey rsaPublicKey = (RSAPublicKey) keyFactory.generatePublic(keySpec);
-            ReactiveJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder.withPublicKey(rsaPublicKey).build();
-            return Objects.requireNonNull(jwtDecoder.decode(token).block()).getSubject();
-        } catch (Exception e) {
-            throw new ShopGenericException(e.getMessage());
+            String[] chunks = token.split("\\.");
+            Base64.Decoder decoder = Base64.getUrlDecoder();
+            String payload = new String(decoder.decode(chunks[1]));
+            ObjectMapper objectMapper = new ObjectMapper();
+            TokenPayloadDTO payloadDTO = objectMapper.readValue(payload, TokenPayloadDTO.class);
+            return payloadDTO.getSub();
+        } catch (JsonProcessingException e) {
+            throw new AuthUserInvalidKeyTokenException();
         }
     }
 
