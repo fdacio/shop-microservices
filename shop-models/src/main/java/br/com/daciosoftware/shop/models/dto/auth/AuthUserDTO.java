@@ -37,7 +37,12 @@ public class AuthUserDTO {
 	}
 
 	private static String getNomeSobrenome(String fullName) {
+
 		String[] name = fullName.split(" ");
+
+		if ( name.length == 0) return "";
+		if ( name.length == 1) return name[0];
+
 		return name[0] + " " + name[name.length - 1];
 	}
 }
