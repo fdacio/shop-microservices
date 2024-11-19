@@ -158,7 +158,6 @@ public class AuthService {
     }
 
     /* Private Methods */
-
     /**
      * Método utilizado para obter o KeyToken (campo identificador do AuthUser),
      * a partir do JWT Token
