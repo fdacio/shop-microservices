@@ -38,7 +38,7 @@ public class AuthController {
     @PostMapping("/user")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthUserDTO createUser(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
-        return authService.createUser(createAuthUserDTO);
+        return authService.createOperatorUser(createAuthUserDTO);
     }
 
     @PostMapping("/user/customer")
@@ -85,6 +85,12 @@ public class AuthController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public AuthUserDTO updatePassword(@RequestBody PasswordDTO newPassword, @RequestHeader("Authorization") String token) {
         return  authService.updatePassword(newPassword, token);
+    }
+
+    @PatchMapping("/user/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthUserDTO update(@PathVariable Long id, @RequestBody UpdateAuthUserDTO updateAuthUserDTO) {
+        return authService.update(id, updateAuthUserDTO);
     }
 
     @PostMapping("/user/{id}/customer")

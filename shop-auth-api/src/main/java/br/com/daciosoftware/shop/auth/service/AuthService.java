@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
-import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
@@ -24,32 +23,11 @@ public class AuthService {
     @Autowired
     private AuthRepository authRepository;
     @Autowired
-    private RuleRepository ruleRepository;
+    private RuleService ruleService;
     @Autowired
     private TokenService tokenConfig;
     @Autowired
     private CustomerService customerService;
-
-    public String getKeyTokenIdUserByTokenJWT(String token) {
-        try {
-            String[] chunks = token.split("\\.");
-            Base64.Decoder decoder = Base64.getUrlDecoder();
-            String payload = new String(decoder.decode(chunks[1]));
-            ObjectMapper objectMapper = new ObjectMapper();
-            TokenPayloadDTO payloadDTO = objectMapper.readValue(payload, TokenPayloadDTO.class);
-            return payloadDTO.getSub();
-        } catch (JsonProcessingException e) {
-            throw new AuthUserInvalidKeyTokenException();
-        }
-    }
-
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    public String geraKeyTokenForCreateUser(String value) {
-        return UUID.nameUUIDFromBytes(value.getBytes()).toString();
-    }
 
     public TokenDTO login(LoginDTO loginDTO) {
         AuthUser user = authRepository.findByUsername(loginDTO.getUsername())
@@ -75,16 +53,42 @@ public class AuthService {
         return tokenConfig.getToken(AuthUserDTO.convert(authUser));
     }
 
-    public AuthUserDTO createUser(CreateAuthUserDTO createAuthUserDTO) {
+    public AuthUserDTO createOperatorUser(CreateAuthUserDTO createAuthUserDTO) {
+        RuleDTO rule = ruleService.findByNome(RuleEnum.OPERATOR.getName());
+        return createUser(createAuthUserDTO, rule);
+    }
+
+    public AuthUserDTO createAdminUser(CreateAuthUserDTO createAuthUserDTO) {
+        RuleDTO rule = ruleService.findByNome(RuleEnum.ADMIN.getName());
+        return createUser(createAuthUserDTO, rule);
+    }
+
+    public AuthUserDTO createUserFromCustomer(CreateAuthUserDTO createAuthUserDTO) {
+        RuleDTO rule = ruleService.findByNome(RuleEnum.CUSTOMER.getName());
+        return createUser(createAuthUserDTO, rule);
+    }
+
+    @Transactional
+    public CustomerDTO createCustomerFromAuthUser(Long userId, CustomerDTO customerDTO) {
+        AuthUser authUser = authRepository.findById(userId).orElseThrow(AuthUserNotFoundException::new);
+        validCreateCustomerFromAuthUser(authUser.getKeyToken());
+        RuleDTO ruleCustomer = ruleService.findByNome(RuleEnum.CUSTOMER.getName());
+        authUser.getRules().add(Rule.convert(ruleCustomer));
+        authRepository.save(authUser);
+        customerDTO.setKeyAuth(authUser.getKeyToken());
+        return customerService.createCustomer(customerDTO);
+    }
+
+    private AuthUserDTO createUser(CreateAuthUserDTO createAuthUserDTO, RuleDTO ruleDTO) {
         validUsernameUnique(createAuthUserDTO.getUsername(), null);
         validEmailUnique(createAuthUserDTO.getEmail(), null);
-        Rule rule = ruleRepository.findByNome(RuleEnum.OPERATOR.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.OPERATOR.getName()));
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
         authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
-        authUser.setRules(Set.of(rule));
+        authUser.setRules(Set.of(Rule.convert(ruleDTO)));
         authUser.setDataCadastro(LocalDateTime.now());
         return AuthUserDTO.convert(authRepository.save(authUser));
+
     }
 
     public List<AuthUserDTO> findAll() {
@@ -110,15 +114,37 @@ public class AuthService {
                 .orElseThrow(AuthUserNotFoundException::new);
     }
 
-    public AuthUserDTO update(Long authUserId, UpdateAuthUserDTO updateAuthUserDTO) {
-        AuthUserDTO authUserDTO = findById(authUserId);
-        validUsernameUnique(updateAuthUserDTO.getUsername(), authUserId);
-        validEmailUnique(updateAuthUserDTO.getEmail(), authUserId);
-        return authUserDTO;
-    }
-
     public void delete(Long userId) {
         authRepository.delete(AuthUser.convert(findById(userId)));
+    }
+
+    @Transactional
+    public AuthUserDTO update(Long id, UpdateAuthUserDTO updateAuthUserDTO) {
+        AuthUserDTO authUserDTO = findById(id);
+
+        validUsernameUnique(updateAuthUserDTO.getUsername(), id);
+        validEmailUnique(updateAuthUserDTO.getEmail(), id);
+
+        boolean isUpdateNome = updateAuthUserDTO.getNome() != null && !updateAuthUserDTO.getNome().equals(authUserDTO.getNome());
+        boolean isUpdateUsername = updateAuthUserDTO.getUsername() != null && !updateAuthUserDTO.getUsername().equals(authUserDTO.getUsername());
+        boolean isUpdateEmail = updateAuthUserDTO.getEmail() != null && !updateAuthUserDTO.getEmail().equals(authUserDTO.getEmail());
+
+        if (isUpdateNome) {
+            authUserDTO.setNome(updateAuthUserDTO.getNome());
+        }
+        if (isUpdateUsername) {
+            authUserDTO.setUsername(updateAuthUserDTO.getUsername());
+        }
+        if (isUpdateEmail) {
+            authUserDTO.setEmail(updateAuthUserDTO.getEmail());
+        }
+
+        AuthUser authUser = AuthUser.convert(authUserDTO);
+
+        authRepository.update(authUser);
+
+        return AuthUserDTO.convert(authUser);
+
     }
 
     public AuthUserDTO updatePassword(PasswordDTO newPassword, String token) {
@@ -131,28 +157,38 @@ public class AuthService {
         return AuthUserDTO.convert(authRepository.save(authUser));
     }
 
+    /* Private Methods */
 
-    public AuthUserDTO createUserFromCustomer(CreateAuthUserDTO createAuthUserDTO) {
-        validUsernameUnique(createAuthUserDTO.getUsername(), null);
-        validEmailUnique(createAuthUserDTO.getEmail(), null);
-        Rule rule = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.CUSTOMER.getName()));
-        AuthUser authUser = AuthUser.convert(createAuthUserDTO);
-        authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
-        authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
-        authUser.setRules(Set.of(rule));
-        authUser.setDataCadastro(LocalDateTime.now());
-        return AuthUserDTO.convert(authRepository.save(authUser));
+    /**
+     * Método utilizado para obter o KeyToken (campo identificador do AuthUser),
+     * a partir do JWT Token
+     * */
+    private String getKeyTokenIdUserByTokenJWT(String token) {
+        try {
+            String[] chunks = token.split("\\.");
+            Base64.Decoder decoder = Base64.getUrlDecoder();
+            String payload = new String(decoder.decode(chunks[1]));
+            ObjectMapper objectMapper = new ObjectMapper();
+            TokenPayloadDTO payloadDTO = objectMapper.readValue(payload, TokenPayloadDTO.class);
+            return payloadDTO.getSub();
+        } catch (JsonProcessingException e) {
+            throw new AuthUserInvalidKeyTokenException();
+        }
     }
 
-    @Transactional
-    public CustomerDTO createCustomerFromAuthUser(Long userId, CustomerDTO customerDTO) {
-        AuthUser authUser = authRepository.findById(userId).orElseThrow(AuthUserNotFoundException::new);
-        validCreateCustomerFromAuthUser(authUser.getKeyToken());
-        Rule ruleCustomer = ruleRepository.findByNome(RuleEnum.CUSTOMER.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.CUSTOMER.getName()));
-        authUser.getRules().add(ruleCustomer);
-        authRepository.save(authUser);
-        customerDTO.setKeyAuth(authUser.getKeyToken());
-        return customerService.createCustomer(customerDTO);
+    /**
+     * Método utilizado para criptografar o password do AuthUser
+     */
+    private BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    /**
+     * Método utilizado para gerar o KeyToken(campo identificador do AuthUser)
+     * através da classe UUID a partir de uma String, que no caso é o username
+     * do AuthUser
+     * */
+    private String geraKeyTokenForCreateUser(String username) {
+        return UUID.nameUUIDFromBytes(username.getBytes()).toString();
     }
 
     private void validUsernameUnique(String username, Long id) {

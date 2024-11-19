@@ -1,18 +1,14 @@
 package br.com.daciosoftware.shop.auth.config;
 
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
-import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
-import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthRuleNotFoundException;
-import br.com.daciosoftware.shop.models.dto.auth.RuleEnum;
-import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
-import br.com.daciosoftware.shop.models.entity.auth.Rule;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Optional;
 
 
 @Configuration
@@ -22,32 +18,26 @@ public class AdminUserConfig implements CommandLineRunner {
     private AuthRepository authRepository;
     @Autowired
     private AuthService authService;
-    @Autowired
-    private RuleRepository ruleRepository;
 
     @Override
-    public void run(String... args)  {
+    public void run(String... args) {
 
         String nome = "Administrador";
         String userName = "admin@daciosoftware.com.br";
-        String password = authService.bCryptPasswordEncoder().encode("123456");
+        String password = "123456";
         String email = "admin@daciosoftware.com.br";
-        Rule rule = ruleRepository.findByNome(RuleEnum.ADMIN.getName()).orElseThrow(() -> new AuthRuleNotFoundException(RuleEnum.ADMIN.getName()));
-        Set<Rule> ruleAdmin = Set.of(rule);
-        authRepository.findByUsername(userName).ifPresentOrElse(
-                (user) -> System.err.printf("Usuário %s já cadastrado%n", user.getNome()),
-                () -> {
-                    AuthUser admin = new AuthUser();
-                    admin.setId(1L);
-                    admin.setNome(nome);
-                    admin.setUsername(userName);
-                    admin.setEmail(email);
-                    admin.setPassword(password);
-                    admin.setKeyToken(authService.geraKeyTokenForCreateUser(userName));
-                    admin.setRules(ruleAdmin);
-                    admin.setDataCadastro(LocalDateTime.now());
-                    authRepository.save(admin);
-                });
+        Optional<AuthUserDTO> optional = Optional.ofNullable(authService.findByUsername(userName));
+        if (optional.isEmpty()) {
+            CreateAuthUserDTO admin = new CreateAuthUserDTO();
+            admin.setId(1L);
+            admin.setNome(nome);
+            admin.setUsername(userName);
+            admin.setEmail(email);
+            admin.setPassword(password);
+            AuthUserDTO authUserDTO = authService.createAdminUser(admin);
+            System.err.printf("Usuário %s criado com sucesso%n", authUserDTO.getNome());
+        }
+
     }
 
 }

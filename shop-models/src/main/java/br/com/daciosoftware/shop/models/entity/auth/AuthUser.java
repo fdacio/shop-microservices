@@ -30,7 +30,7 @@ public class AuthUser {
 	private String hashRecoveryPassword;
 	private LocalDateTime dataCadastro;
 
-	@OneToMany
+	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(schema="auth", name="user_rule",
 			joinColumns = @JoinColumn(name="user_id"),
 			inverseJoinColumns = @JoinColumn(name="rule_id"))

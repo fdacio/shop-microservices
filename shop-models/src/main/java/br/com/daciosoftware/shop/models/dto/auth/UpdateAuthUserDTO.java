@@ -10,9 +10,8 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 public class UpdateAuthUserDTO {
-    private Long id;
+
     private String nome;
     private String username;
     private String email;
-    private Set<RuleDTO> rules;
 }
