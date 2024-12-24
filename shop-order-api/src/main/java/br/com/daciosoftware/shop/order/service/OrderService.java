@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.order.service;
 
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
@@ -82,7 +83,26 @@ public class OrderService {
 		
 		return OrderDTO.convert(order);
 	}
-	
+
+	public OrderDTO update(OrderDTO orderDTO, String token) {
+
+		CustomerDTO customerDTO = getCustomerAuthenticated(token);
+
+		if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
+			throw new CustomerInvalidKeyException();
+		}
+
+		List<ItemDTO> itensDTO = productService.findItens(orderDTO);
+		Float total = itensDTO.stream().map(i -> (i.getPreco()*i.getQuantidade()) ).reduce((float)0, Float::sum);
+		orderDTO.setTotal(total);
+		orderDTO.setItens(itensDTO);
+
+		Order order = Order.convert(orderDTO);
+		order = orderRepository.save(order);
+
+		return OrderDTO.convert(order);
+	}
+
 	public void delete (Long orderId) {
 		Optional<Order> orderOptional = orderRepository.findById(orderId);
 		if (orderOptional.isPresent()) {

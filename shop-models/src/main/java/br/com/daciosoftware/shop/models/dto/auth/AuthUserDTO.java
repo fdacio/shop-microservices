@@ -19,7 +19,6 @@ public class AuthUserDTO {
 	private String nomeSobrenome;
 	private String username;
 	private String email;
-	@JsonIgnore
 	private String keyToken;
 	private Set<RuleDTO> rules;
 

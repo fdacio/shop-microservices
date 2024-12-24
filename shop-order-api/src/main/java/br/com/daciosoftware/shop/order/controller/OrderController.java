@@ -40,7 +40,13 @@ public class OrderController {
 	public OrderDTO save(@Valid @RequestBody OrderDTO orderDTO, @RequestHeader("Authorization") String token) {
 		return orderService.save(orderDTO, token);
 	}
-	
+
+	@PutMapping
+	@ResponseStatus(HttpStatus.OK)
+	public OrderDTO update(@Valid @RequestBody OrderDTO orderDTO, @RequestHeader("Authorization") String token) {
+		return orderService.update(orderDTO, token);
+	}
+
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {

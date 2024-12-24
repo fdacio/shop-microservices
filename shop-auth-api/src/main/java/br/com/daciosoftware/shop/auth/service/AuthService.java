@@ -181,6 +181,7 @@ public class AuthService {
     private BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     /**
      * Método utilizado para gerar o KeyToken(campo identificador do AuthUser)
      * através da classe UUID a partir de uma String, que no caso é o username

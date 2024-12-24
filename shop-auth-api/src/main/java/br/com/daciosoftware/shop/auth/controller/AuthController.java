@@ -49,7 +49,6 @@ public class AuthController {
 
     @GetMapping("/user")
     public List<AuthUserDTO> findAll() {
-        System.err.println("User list all");
         return authService.findAll();
     }
 
@@ -98,6 +97,8 @@ public class AuthController {
     public CustomerDTO createCustomerFromAuthUser(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {
         return authService.createCustomerFromAuthUser(id, customerDTO);
     }
+
+
 
     @GetMapping("/healthcheck")
     public String healthcheck () {
