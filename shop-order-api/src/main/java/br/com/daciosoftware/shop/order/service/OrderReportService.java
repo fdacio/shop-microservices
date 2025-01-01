@@ -176,6 +176,7 @@ public class OrderReportService {
         PdfPCell pdfPCellLabelItens = new PdfPCell(new Phrase("Itens", fontNormal));
         pdfPCellLabelItens.setHorizontalAlignment(Element.ALIGN_CENTER);
         pdfPCellLabelItens.setColspan(4);
+        pdfPCellLabelItens.setPadding(PADDING);
         table.addCell(pdfPCellLabelItens);
 
         PdfPTable tableItens = new PdfPTable(5);
