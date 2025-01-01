@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.order.service;
 
+import br.com.daciosoftware.shop.models.dto.order.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderSummaryReportDTO;
 import br.com.daciosoftware.shop.order.repository.OrderReportRepositoryImpl;
@@ -110,8 +111,8 @@ public class OrderReportService {
         table.setWidths(widths);
 
         Font fontBold = new Font(FontFamily.HELVETICA, 12, FontStyle.BOLD.ordinal());
-        Font fontNormal = new Font(FontFamily.HELVETICA, 14, FontStyle.NORMAL.ordinal());
-        final float PADDING = 2;
+        Font fontNormal = new Font(FontFamily.HELVETICA, 12, FontStyle.NORMAL.ordinal());
+        final float PADDING = 8;
 
         PdfPCell cell1 = new PdfPCell(new Phrase("Nº", fontBold));
         cell1.setPadding(PADDING);
@@ -177,7 +178,62 @@ public class OrderReportService {
         pdfPCellLabelItens.setColspan(4);
         table.addCell(pdfPCellLabelItens);
 
+        PdfPTable tableItens = new PdfPTable(5);
+        tableItens.setWidthPercentage(100);
+        float[] widthsItens = {10, 45, 15, 15, 15};
+        tableItens.setWidths(widthsItens);
+        PdfPCell cell5 = new PdfPCell(new Phrase("Item", fontBold));
+        cell5.setPadding(PADDING);
+        PdfPCell cell6 = new PdfPCell(new Phrase("Descrição", fontBold));
+        cell6.setPadding(PADDING);
+        PdfPCell cell7 = new PdfPCell(new Phrase("Quantidade", fontBold));
+        cell7.setPadding(PADDING);
+        PdfPCell cell8 = new PdfPCell(new Phrase("Valor Unit.", fontBold));
+        cell8.setPadding(PADDING);
+        PdfPCell cell9 = new PdfPCell(new Phrase("Valor Total", fontBold));
+        cell9.setPadding(PADDING);
+
+        tableItens.addCell(cell5);
+        tableItens.addCell(cell6);
+        tableItens.addCell(cell7);
+        tableItens.addCell(cell8);
+        tableItens.addCell(cell9);
+
+        int n = 1;
+        for (ItemDTO item: shopDTO.getItens()) {
+
+            String num =  String.valueOf(n);
+            String nome = item.getProduct().getNome();
+            String quantidade = String.valueOf(item.getQuantidade());
+            String vrUnit = String.format("R$ %,.2f", item.getPreco());
+            String vrTotal = String.format("R$ %,.2f", item.getQuantidade() * item.getPreco());
+
+
+            PdfPCell cell10 = new PdfPCell(new Phrase( num, fontNormal));
+            cell10.setPadding(PADDING);
+            PdfPCell cell11 = new PdfPCell(new Phrase( nome, fontNormal));
+            cell11.setPadding(PADDING);
+            PdfPCell cell12 = new PdfPCell(new Phrase( quantidade, fontNormal));
+            cell12.setPadding(PADDING);
+            cell12.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            PdfPCell cell13 = new PdfPCell(new Phrase( vrUnit, fontNormal));
+            cell13.setPadding(PADDING);
+            cell13.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            PdfPCell cell14 = new PdfPCell(new Phrase( vrTotal, fontNormal));
+            cell14.setPadding(PADDING);
+            cell14.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+            tableItens.addCell(cell10);
+            tableItens.addCell(cell11);
+            tableItens.addCell(cell12);
+            tableItens.addCell(cell13);
+            tableItens.addCell(cell14);
+
+            n++;
+        }
+
         document.add(table);
+        document.add(tableItens);
     }
 
     private void addHeaderReport(Document document, String title) throws DocumentException {
