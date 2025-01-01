@@ -19,7 +19,7 @@ public class OrderReportController {
 
 	@Autowired
 	OrderReportService orderReportService;
-	
+
 	@GetMapping("/demo/{id}")
 	public ResponseEntity<?> getReportDemoVenda(@PathVariable Long id) {
 		try {
@@ -27,7 +27,7 @@ public class OrderReportController {
 			ByteArrayOutputStream pdfStream = orderReportService.getReportDemoVenda(id);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=shop-demo.pdf");
+			headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=order-demo.pdf");
 			headers.setContentLength(pdfStream.size());
 
 			return new ResponseEntity<>(pdfStream.toByteArray(), headers, HttpStatus.OK);
@@ -38,7 +38,7 @@ public class OrderReportController {
 
 	}
 
-	@GetMapping("/periodo")
+	@GetMapping("/date")
 	public ResponseEntity<?> getReportResumoVendas(
 			@RequestParam(name = "dataInicio")
 			@DateTimeFormat(pattern = "dd/MM/yyyy")
@@ -53,7 +53,7 @@ public class OrderReportController {
 	        ByteArrayOutputStream pdfStream = orderReportService.getReportResumoVendas(dataInicio, dataFim);
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.setContentType(MediaType.APPLICATION_PDF);
-	        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=shop-resume.pdf");
+	        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=order-resume.pdf");
 	        headers.setContentLength(pdfStream.size());
 	        
 	        return new ResponseEntity<>(pdfStream.toByteArray(), headers, HttpStatus.OK);

@@ -41,10 +41,10 @@ public class OrderController {
 		return orderService.save(orderDTO, token);
 	}
 
-	@PutMapping
+	@PatchMapping
 	@ResponseStatus(HttpStatus.OK)
-	public OrderDTO update(@Valid @RequestBody OrderDTO orderDTO, @RequestHeader("Authorization") String token) {
-		return orderService.update(orderDTO, token);
+	public OrderDTO update(@PathVariable Long id, @Valid @RequestBody OrderDTO orderDTO, @RequestHeader("Authorization") String token) {
+		return orderService.update(id, orderDTO, token);
 	}
 
 	@DeleteMapping("/{id}")

@@ -1,6 +1,5 @@
 package br.com.daciosoftware.shop.gateway.security.exception;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,7 @@ public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntry
     //Authentication entry point has commenced method when failures occur
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex){
-        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Recurso não autorizado");
+        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Recurso não autorizado!!!");
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatusCode(HttpStatus.UNAUTHORIZED);

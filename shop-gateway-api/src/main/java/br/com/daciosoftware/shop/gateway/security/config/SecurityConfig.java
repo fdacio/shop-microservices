@@ -63,22 +63,22 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
 
                         //Route for resources user (auth) - only rule SCOPE_Admin
-                        .pathMatchers("/auth/user", "/auth/user/*", "/auth/user/**").hasAuthority(SCOPE_ADMIN)
-                        .pathMatchers("/auth/config", "/auth/config/*", "/auth/config/**").hasAuthority(SCOPE_ADMIN)
+                        .pathMatchers("/auth/user/**").hasAuthority(SCOPE_ADMIN)
+                        .pathMatchers( "/auth/config/**").hasAuthority(SCOPE_ADMIN)
 
                         //Route for resources customer
-                        .pathMatchers("/customer", "/customer/*", "/customer/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/customer/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         //Route for resources product
                         .pathMatchers(HttpMethod.GET, "/product/pageable").hasAnyAuthority(ALL_SCOPES)
-                        .pathMatchers("/product", "/product/*", "/product/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
-                        .pathMatchers("/category", "/category/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/product/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/category/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         //Route for resources orders
-                        .pathMatchers(HttpMethod.POST, "/order").hasAnyAuthority(SCOPE_CUSTOMER)
-                        .pathMatchers(HttpMethod.GET, "/order/my-order").hasAnyAuthority(SCOPE_CUSTOMER)
-                        .pathMatchers("/order", "/order/*", "/order/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
-
+                        .pathMatchers(HttpMethod.POST, "/order").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.GET, "/order/my-orders").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers("/order/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/order/report/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .anyExchange().authenticated())
                 //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception
@@ -87,8 +87,6 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
                 .addFilterBefore(new ValidTokenFilter(), SecurityWebFiltersOrder.FIRST)
                 .build();
-
-
     }
 
     @Bean

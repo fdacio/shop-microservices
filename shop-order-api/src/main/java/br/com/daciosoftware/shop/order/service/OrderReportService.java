@@ -39,7 +39,7 @@ public class OrderReportService {
 
         document.open();
 
-        addHeaderReport(document, "Demonstrativo da Venda");
+        addHeaderReport(document, "Demo Order");
 
         OrderDTO shopDTO = orderService.findById(shopId);
         addRowsReportDemoVenda(document, shopDTO);
@@ -103,8 +103,81 @@ public class OrderReportService {
 
     }
 
-    private void addRowsReportDemoVenda(Document document, OrderDTO shopDTO) {
+    private void addRowsReportDemoVenda(Document document, OrderDTO shopDTO) throws DocumentException {
+        PdfPTable table = new PdfPTable(4);
+        table.setWidthPercentage(100);
+        float[] widths = {20, 30, 30, 20};
+        table.setWidths(widths);
 
+        Font fontBold = new Font(FontFamily.HELVETICA, 12, FontStyle.BOLD.ordinal());
+        Font fontNormal = new Font(FontFamily.HELVETICA, 14, FontStyle.NORMAL.ordinal());
+        final float PADDING = 2;
+
+        PdfPCell cell1 = new PdfPCell(new Phrase("Nº", fontBold));
+        cell1.setPadding(PADDING);
+        PdfPCell cell2 = new PdfPCell(new Phrase("Data", fontBold));
+        cell2.setPadding(PADDING);
+        PdfPCell cell3 = new PdfPCell(new Phrase("Hora", fontBold));
+        cell3.setPadding(PADDING);
+        PdfPCell cell4 = new PdfPCell(new Phrase("Valor Total", fontBold));
+        cell4.setPadding(PADDING);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+
+        DateTimeFormatter dtfData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter dtfHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+
+        String numero = String.valueOf(shopDTO.getId());
+        String data = shopDTO.getData().format(dtfData);
+        String hora = shopDTO.getData().format(dtfHora);
+        String valorTotal = String.format("R$ %,.2f", shopDTO.getTotal());
+
+        PdfPCell pdfPCellNum = new PdfPCell(new Phrase(numero, fontNormal));
+        PdfPCell pdfPCellData = new PdfPCell(new Phrase(data, fontNormal));
+        PdfPCell pdfPCellHora = new PdfPCell(new Phrase(hora, fontNormal));
+        PdfPCell pdfPCellValor = new PdfPCell(new Phrase(valorTotal, fontNormal));
+        pdfPCellValor.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        pdfPCellNum.setPadding(PADDING);
+        pdfPCellData.setPadding(PADDING);
+        pdfPCellHora.setPadding(PADDING);
+        pdfPCellValor.setPadding(PADDING);
+
+        table.addCell(pdfPCellNum);
+        table.addCell(pdfPCellData);
+        table.addCell(pdfPCellHora);
+        table.addCell(pdfPCellValor);
+
+        String customerName = shopDTO.getCustomer().getNome();
+        String customerCPF = shopDTO.getCustomer().getCpf();
+
+        PdfPCell pdfPCellLabelName = new PdfPCell(new Phrase("Nome", fontBold));
+        pdfPCellLabelName.setColspan(3);
+        pdfPCellLabelName.setPadding(PADDING);
+        PdfPCell pdfPCellLabelCpf = new PdfPCell(new Phrase("CPF", fontBold));
+        pdfPCellLabelCpf.setPadding(PADDING);
+
+        table.addCell(pdfPCellLabelName);
+        table.addCell(pdfPCellLabelCpf);
+
+        PdfPCell pdfPCellCustomerName = new PdfPCell(new Phrase(customerName, fontNormal));
+        pdfPCellCustomerName.setColspan(3);
+        pdfPCellCustomerName.setPadding(PADDING);
+
+        PdfPCell pdfPCellCustomerCpf = new PdfPCell(new Phrase(customerCPF, fontNormal));
+        pdfPCellCustomerCpf.setPadding(PADDING);
+
+        table.addCell(pdfPCellCustomerName);
+        table.addCell(pdfPCellCustomerCpf);
+
+        PdfPCell pdfPCellLabelItens = new PdfPCell(new Phrase("Itens", fontNormal));
+        pdfPCellLabelItens.setHorizontalAlignment(Element.ALIGN_CENTER);
+        pdfPCellLabelItens.setColspan(4);
+        table.addCell(pdfPCellLabelItens);
+
+        document.add(table);
     }
 
     private void addHeaderReport(Document document, String title) throws DocumentException {
