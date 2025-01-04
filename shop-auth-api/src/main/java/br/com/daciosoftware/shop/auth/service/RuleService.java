@@ -16,6 +16,9 @@ public class RuleService {
     public RuleDTO findByNome(final String nome) {
         return RuleDTO.convert(ruleRepository.findByNome(nome).orElseThrow(() -> new AuthRuleNotFoundException(nome)));
     }
+    public RuleDTO findById(final Long id) {
+        return RuleDTO.convert(ruleRepository.findById(id).orElseThrow(() -> new AuthRuleNotFoundException("Rule:"+id)));
+    }
 
     public RuleDTO save(RuleDTO ruleDTO) {
         Rule rule = ruleRepository.save(Rule.convert(ruleDTO));

@@ -77,6 +77,10 @@ public class SecurityConfig {
                         //Route for resources orders
                         .pathMatchers(HttpMethod.POST, "/order").hasAuthority(SCOPE_CUSTOMER)
                         .pathMatchers(HttpMethod.GET, "/order/my-orders").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.GET, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.PATCH, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.DELETE, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
+
                         .pathMatchers("/order/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .pathMatchers("/order/report/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .anyExchange().authenticated())

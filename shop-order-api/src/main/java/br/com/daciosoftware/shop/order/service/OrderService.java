@@ -57,6 +57,17 @@ public class OrderService {
 		return orderRepository.findById(id).map(OrderDTO::convert).orElseThrow(OrderNotFoundException::new);
 	}
 
+	public OrderDTO findById(Long id, String token) {
+
+		OrderDTO orderDTO = findById(id);
+
+		CustomerDTO customerDTO = getCustomerAuthenticated(token);
+		if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
+			throw new CustomerInvalidKeyException();
+		}
+		return findById(id);
+	}
+
 	public List<OrderDTO> findByCustomerIndentifier(Long userId) {
 		List<Order> orders = orderRepository.findByCustomerIdentifier(userId);
 		return orders
@@ -86,10 +97,17 @@ public class OrderService {
 
 	public OrderDTO update(Long id, OrderDTO orderDTO, String token) {
 
+		OrderDTO orderUpdateDTO = findById(id);
+
 		CustomerDTO customerDTO = getCustomerAuthenticated(token);
-		if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
+		if (!orderUpdateDTO.getCustomer().getId().equals(customerDTO.getId())) {
 			throw new CustomerInvalidKeyException();
 		}
+
+		return update(id, orderDTO);
+	}
+
+	public OrderDTO update(Long id, OrderDTO orderDTO) {
 
 		OrderDTO orderUpdateDTO = findById(id);
 
@@ -104,13 +122,20 @@ public class OrderService {
 		return OrderDTO.convert(order);
 	}
 
-	public void delete (Long orderId) {
-		Optional<Order> orderOptional = orderRepository.findById(orderId);
-		if (orderOptional.isPresent()) {
-			orderRepository.delete(orderOptional.get());
-		} else {
-			throw new RuntimeException("Venda não encontrada");
+	public void delete (Long id, String token) {
+
+		OrderDTO orderDeleteDTO = findById(id);
+		CustomerDTO customerDTO = getCustomerAuthenticated(token);
+		if (!orderDeleteDTO.getCustomer().getId().equals(customerDTO.getId())) {
+			throw new CustomerInvalidKeyException();
 		}
+
+		delete(id);
+	}
+
+	public void delete (Long id) {
+		OrderDTO orderDTO = findById(id);
+		orderRepository.delete(Order.convert(orderDTO));
 	}
 
 	public Page<OrderDTO> findAllPageable(Pageable pageable) {

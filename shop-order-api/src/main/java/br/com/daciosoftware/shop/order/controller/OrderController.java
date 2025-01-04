@@ -24,12 +24,23 @@ public class OrderController {
 	public List<OrderDTO> findAll() {
 		return orderService.findAll();
 	}
-	
+
+	@GetMapping("/my-orders")
+	@ResponseStatus(HttpStatus.OK)
+	public List<OrderDTO> findOrdersCustomerAuthenticated(@RequestHeader("Authorization") String token) {
+		return orderService.findOrdersCustomerAuthenticated(token);
+	}
+
 	@GetMapping("/{id}")
 	public OrderDTO findById(@PathVariable Long id) {
 		return orderService.findById(id);
 	}
-	
+
+	@GetMapping("/{id}/my-order")
+	public OrderDTO findById(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+		return orderService.findById(id, token);
+	}
+
 	@GetMapping("/pageable")
 	public Page<OrderDTO> findAllPageable(Pageable pageable) {
 		return orderService.findAllPageable(pageable);
@@ -41,10 +52,16 @@ public class OrderController {
 		return orderService.save(orderDTO, token);
 	}
 
-	@PatchMapping
+	@PatchMapping("/{id}/my-order")
 	@ResponseStatus(HttpStatus.OK)
 	public OrderDTO update(@PathVariable Long id, @Valid @RequestBody OrderDTO orderDTO, @RequestHeader("Authorization") String token) {
 		return orderService.update(id, orderDTO, token);
+	}
+
+	@PatchMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public OrderDTO update(@PathVariable Long id, @Valid @RequestBody OrderDTO orderDTO) {
+		return orderService.update(id, orderDTO);
 	}
 
 	@DeleteMapping("/{id}")
@@ -53,10 +70,10 @@ public class OrderController {
 		orderService.delete(id);
 	}
 
-	@GetMapping("/my-orders")
-	@ResponseStatus(HttpStatus.OK)
-	public List<OrderDTO> findOrdersCustomerAuthenticated(@RequestHeader("Authorization") String token) {
-		return orderService.findOrdersCustomerAuthenticated(token);
+	@DeleteMapping("/{id}/my-order")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+		orderService.delete(id, token);
 	}
 
 	@GetMapping("/customer/{customerId}")

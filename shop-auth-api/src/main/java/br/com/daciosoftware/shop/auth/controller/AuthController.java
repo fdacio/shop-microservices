@@ -74,6 +74,11 @@ public class AuthController {
         return authService.findByUsername(username);
     }
 
+    @GetMapping("/user/rule/{ruleId}")
+    public List<AuthUserDTO> findByRule(@PathVariable Long ruleId) {
+        return authService.findByRule(ruleId);
+    }
+
     @DeleteMapping("/user/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
@@ -97,8 +102,6 @@ public class AuthController {
     public CustomerDTO createCustomerFromAuthUser(@PathVariable Long id, @Valid @RequestBody CustomerDTO customerDTO) {
         return authService.createCustomerFromAuthUser(id, customerDTO);
     }
-
-
 
     @GetMapping("/healthcheck")
     public String healthcheck () {

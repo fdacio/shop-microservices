@@ -69,9 +69,9 @@ public class CustomerService {
 				.map(CustomerDTO::convert)
 				.orElseThrow(CustomerInvalidKeyException::new);
 	}
-	public boolean hasKeyAuth(String keyAuth) {
-		return customerRepository.findByKeyAuth(keyAuth)
-				.map(CustomerDTO::convert).isPresent();
+
+	public List<CustomerDTO> findHasKeyAuth() {
+		return customerRepository.findHasKeyAuth().stream().map(CustomerDTO::convert).toList();
 	}
 
 	private void validCpfUnique(String cpf) {
@@ -192,8 +192,8 @@ public class CustomerService {
 		CustomerDTO customerDTO = findById(customerId);
 
 		if (customerDTO.getKeyAuth() != null && !customerDTO.getKeyAuth().isEmpty()) {
-			AuthUserDTO authUserDTO = authService.findAuthUserByKeyToken(customerDTO.getKeyAuth());
-			if (authUserDTO != null) {
+			Optional<AuthUserDTO> authUserDTO = authService.findAuthUserByKeyToken(customerDTO.getKeyAuth());
+			if (authUserDTO.isPresent()) {
 				throw new CustomerAuthUserConflictException();
 			}
 		}
@@ -201,7 +201,6 @@ public class CustomerService {
 		if (!password.getPassword().equals(password.getRePassword())) {
 			throw new AuthPasswordNotMatchException();
 		}
-
 
 		CreateAuthUserDTO createAuthUserDTO = new CreateAuthUserDTO();
 		createAuthUserDTO.setNome(customerDTO.getNome());

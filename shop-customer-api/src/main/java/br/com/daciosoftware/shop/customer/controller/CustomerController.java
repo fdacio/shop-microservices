@@ -86,9 +86,9 @@ public class CustomerController {
 		return customerService.findByKeyAuth(customerKeyAuth);
 	}
 
-	@GetMapping("/{customerKeyAuth}/key-token")
-	public Boolean hasKeyAuth(@PathVariable String customerKeyAuth) {
-		return customerService.hasKeyAuth(customerKeyAuth);
+	@GetMapping("/has-key-auth")
+	public List<CustomerDTO> hasKeyAuth() {
+		return customerService.findHasKeyAuth();
 	}
 
 	@PatchMapping("/update-key-all")

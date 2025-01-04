@@ -50,7 +50,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://auth:8081/auth/healthcheck" ]
-      interval: 80s
+      interval: 40s
       timeout: 10s
       retries: 1
 
@@ -70,7 +70,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://product:8082/product/healthcheck" ]
-      interval: 80s
+      interval: 40s
       timeout: 10s
       retries: 1
 
@@ -90,7 +90,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://customer:8083/customer/healthcheck" ]
-      interval: 80s
+      interval: 40s
       timeout: 10s
       retries: 1
 
@@ -111,6 +111,6 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://order:8084/order/healthcheck" ]
-      interval: 80s
+      interval: 40s
       timeout: 10s
       retries: 1

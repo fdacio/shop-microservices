@@ -10,11 +10,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name="itens")
 @Table(name = "itens", schema = "orders")
-@Embeddable
 public class Item {
 	
 	@Id

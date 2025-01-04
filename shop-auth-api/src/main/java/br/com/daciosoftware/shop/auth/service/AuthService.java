@@ -88,7 +88,6 @@ public class AuthService {
         authUser.setRules(Set.of(Rule.convert(ruleDTO)));
         authUser.setDataCadastro(LocalDateTime.now());
         return AuthUserDTO.convert(authRepository.save(authUser));
-
     }
 
     public List<AuthUserDTO> findAll() {
@@ -106,6 +105,12 @@ public class AuthService {
 
     public AuthUserDTO findByKeyToken(String keyToken) {
         return authRepository.findByKeyToken(keyToken).map(AuthUserDTO::convert).orElseThrow(AuthUserNotFoundException::new);
+    }
+
+    public List<AuthUserDTO> findByRule(Long ruleId) {
+        RuleDTO rule = ruleService.findById(ruleId);
+        List<AuthUserDTO> allUsers = authRepository.findAll().stream().map(AuthUserDTO::convert).toList();
+        return allUsers.stream().filter(u -> u.getRules().contains(rule)).toList();
     }
 
     public AuthUserDTO findByUsername(String userName) {

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity(name = "orders")
