@@ -86,9 +86,9 @@ public class AuthController {
     }
 
     @PutMapping("/update-password")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public AuthUserDTO updatePassword(@RequestBody PasswordDTO newPassword, @RequestHeader("Authorization") String token) {
-        return  authService.updatePassword(newPassword, token);
+        return authService.updatePassword(newPassword, token);
     }
 
     @PatchMapping("/user/{id}")

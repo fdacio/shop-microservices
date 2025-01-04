@@ -20,164 +20,162 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
 
-	@Autowired
-	private OrderRepository orderRepository;
-	@Autowired
-	private CustomerService customerService;
-	@Autowired
-	private ProductService productService;
-	@Autowired
-	private AuthService authService;
-	@PersistenceContext
-	private EntityManager entityManager;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private AuthService authService;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-	private CustomerDTO getCustomerAuthenticated(String token) {
-		AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
-		String customerKeyAuth = authUserDTO.getKeyToken();
-		return customerService.validCustomerKeyAuth(customerKeyAuth);
-	}
+    private CustomerDTO getCustomerAuthenticated(String token) {
+        AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
+        String customerKeyAuth = authUserDTO.getKeyToken();
+        return customerService.validCustomerKeyAuth(customerKeyAuth);
+    }
 
-	public List<OrderDTO> findAll() {
-		
-		List<Order> orders = orderRepository.findAll();
-		
-		return orders
-				.stream()
-				.map(OrderDTO::convert)
-				.collect(Collectors.toList());
-	}
+    public List<OrderDTO> findAll() {
 
-	public OrderDTO findById(Long id) {
-		return orderRepository.findById(id).map(OrderDTO::convert).orElseThrow(OrderNotFoundException::new);
-	}
+        List<Order> orders = orderRepository.findAll();
 
-	public OrderDTO findById(Long id, String token) {
+        return orders
+                .stream()
+                .map(OrderDTO::convert)
+                .collect(Collectors.toList());
+    }
 
-		OrderDTO orderDTO = findById(id);
+    public OrderDTO findById(Long id) {
+        return orderRepository.findById(id).map(OrderDTO::convert).orElseThrow(OrderNotFoundException::new);
+    }
 
-		CustomerDTO customerDTO = getCustomerAuthenticated(token);
-		if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
-			throw new CustomerInvalidKeyException();
-		}
-		return findById(id);
-	}
+    public OrderDTO findById(Long id, String token) {
 
-	public List<OrderDTO> findByCustomerIndentifier(Long userId) {
-		List<Order> orders = orderRepository.findByCustomerIdentifier(userId);
-		return orders
-				.stream()
-				.map(OrderDTO::convert)
-				.collect(Collectors.toList());
-	}
+        OrderDTO orderDTO = findById(id);
 
-	@Transactional
-	public OrderDTO save(OrderDTO orderDTO, String token) {
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
+            throw new CustomerInvalidKeyException();
+        }
+        return findById(id);
+    }
 
-		CustomerDTO customerDTO = getCustomerAuthenticated(token);
+    public List<OrderDTO> findByCustomerIndentifier(Long userId) {
+        List<Order> orders = orderRepository.findByCustomerIdentifier(userId);
+        return orders
+                .stream()
+                .map(OrderDTO::convert)
+                .collect(Collectors.toList());
+    }
 
-		List<ItemDTO> itensDTO = productService.findItens(orderDTO);
-		Float total = itensDTO.stream().map(i -> (i.getPreco()*i.getQuantidade()) ).reduce((float)0, Float::sum);
-		
-		orderDTO.setData(LocalDateTime.now());
-		orderDTO.setTotal(total);
-		orderDTO.setCustomer(customerDTO);
-		orderDTO.setItens(itensDTO);
-		
-		Order order = Order.convert(orderDTO);
-		order = orderRepository.save(order);
-		
-		return OrderDTO.convert(order);
-	}
+    @Transactional
+    public OrderDTO save(OrderDTO orderDTO, String token) {
 
-	public OrderDTO update(Long id, OrderDTO orderDTO, String token) {
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
 
-		OrderDTO orderUpdateDTO = findById(id);
+        List<ItemDTO> itensDTO = productService.findItens(orderDTO);
+        Float total = itensDTO.stream().map(i -> (i.getPreco() * i.getQuantidade())).reduce((float) 0, Float::sum);
 
-		CustomerDTO customerDTO = getCustomerAuthenticated(token);
-		if (!orderUpdateDTO.getCustomer().getId().equals(customerDTO.getId())) {
-			throw new CustomerInvalidKeyException();
-		}
+        orderDTO.setData(LocalDateTime.now());
+        orderDTO.setTotal(total);
+        orderDTO.setCustomer(customerDTO);
+        orderDTO.setItens(itensDTO);
 
-		return update(id, orderDTO);
-	}
+        Order order = Order.convert(orderDTO);
+        order = orderRepository.save(order);
 
-	public OrderDTO update(Long id, OrderDTO orderDTO) {
+        return OrderDTO.convert(order);
+    }
 
-		OrderDTO orderUpdateDTO = findById(id);
+    public OrderDTO update(Long id, OrderDTO orderDTO, String token) {
 
-		List<ItemDTO> itensDTO = productService.findItens(orderDTO);
-		Float total = itensDTO.stream().map(i -> (i.getPreco()*i.getQuantidade()) ).reduce((float)0, Float::sum);
-		orderUpdateDTO.setTotal(total);
-		orderUpdateDTO.setItens(itensDTO);
+        OrderDTO orderUpdateDTO = findById(id);
 
-		Order order = Order.convert(orderUpdateDTO);
-		order = orderRepository.save(order);
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        if (!orderUpdateDTO.getCustomer().getId().equals(customerDTO.getId())) {
+            throw new CustomerInvalidKeyException();
+        }
 
-		return OrderDTO.convert(order);
-	}
+        return update(id, orderDTO);
+    }
 
-	public void delete (Long id, String token) {
+    public OrderDTO update(Long id, OrderDTO orderDTO) {
 
-		OrderDTO orderDeleteDTO = findById(id);
-		CustomerDTO customerDTO = getCustomerAuthenticated(token);
-		if (!orderDeleteDTO.getCustomer().getId().equals(customerDTO.getId())) {
-			throw new CustomerInvalidKeyException();
-		}
+        OrderDTO orderUpdateDTO = findById(id);
 
-		delete(id);
-	}
+        List<ItemDTO> itensDTO = productService.findItens(orderDTO);
+        Float total = itensDTO.stream().map(i -> (i.getPreco() * i.getQuantidade())).reduce((float) 0, Float::sum);
+        orderUpdateDTO.setTotal(total);
+        orderUpdateDTO.setItens(itensDTO);
 
-	public void delete (Long id) {
-		OrderDTO orderDTO = findById(id);
-		orderRepository.delete(Order.convert(orderDTO));
-	}
+        orderRepository.save(Order.convert(orderUpdateDTO));
 
-	public Page<OrderDTO> findAllPageable(Pageable pageable) {
-		return orderRepository.findAll(pageable).map(OrderDTO::convert);
-	}
+        return findById(id);
+    }
 
-	public List<OrderDTO> findOrdersByFilters(LocalDate dataInicio, LocalDate dataFim, Float valorMinimo) {
+    public void delete(Long id, String token) {
 
-		StringBuilder sbSql = new StringBuilder();
-		sbSql.append("select o from orders o \n");
-		sbSql.append("where o.data >= :dataInicio \n");
+        OrderDTO orderDeleteDTO = findById(id);
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        if (!orderDeleteDTO.getCustomer().getId().equals(customerDTO.getId())) {
+            throw new CustomerInvalidKeyException();
+        }
 
-		if (dataFim != null) {
-			sbSql.append("and o.data <= :dataFim \n");
-		}
+        delete(id);
+    }
 
-		if (valorMinimo != null) {
-			sbSql.append("and o.total <= :valorMinimo \n");
-		}
+    public void delete(Long id) {
+        OrderDTO orderDTO = findById(id);
+        orderRepository.delete(Order.convert(orderDTO));
+    }
 
-		sbSql.append("order by o.data");
+    public Page<OrderDTO> findAllPageable(Pageable pageable) {
+        return orderRepository.findAll(pageable).map(OrderDTO::convert);
+    }
 
-		TypedQuery<Order> query = entityManager.createQuery(sbSql.toString(), Order.class);
+    public List<OrderDTO> findOrdersByFilters(LocalDate dataInicio, LocalDate dataFim, Float valorMinimo) {
 
-		query.setParameter("dataInicio", dataInicio.atTime(0, 0));
+        StringBuilder sbSql = new StringBuilder();
+        sbSql.append("select o from orders o \n");
+        sbSql.append("where o.data >= :dataInicio \n");
 
-		if (dataFim != null) {
-			query.setParameter("dataFim", dataFim.atTime(23, 59));
-		}
+        if (dataFim != null) {
+            sbSql.append("and o.data <= :dataFim \n");
+        }
 
-		if (valorMinimo != null) {
-			query.setParameter("valorMinimo", valorMinimo);
-		}
+        if (valorMinimo != null) {
+            sbSql.append("and o.total <= :valorMinimo \n");
+        }
 
-		List<Order> vendas = query.getResultList();
+        sbSql.append("order by o.data");
 
-		return vendas.stream().map(OrderDTO::convert).toList();
+        TypedQuery<Order> query = entityManager.createQuery(sbSql.toString(), Order.class);
 
-	}
+        query.setParameter("dataInicio", dataInicio.atTime(0, 0));
 
-	public List<OrderDTO> findOrdersCustomerAuthenticated(String token) {
-		CustomerDTO customerDTO = getCustomerAuthenticated(token);
-		return findByCustomerIndentifier(customerDTO.getId());
-	}
+        if (dataFim != null) {
+            query.setParameter("dataFim", dataFim.atTime(23, 59));
+        }
+
+        if (valorMinimo != null) {
+            query.setParameter("valorMinimo", valorMinimo);
+        }
+
+        List<Order> vendas = query.getResultList();
+
+        return vendas.stream().map(OrderDTO::convert).toList();
+
+    }
+
+    public List<OrderDTO> findOrdersCustomerAuthenticated(String token) {
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        return findByCustomerIndentifier(customerDTO.getId());
+    }
 }

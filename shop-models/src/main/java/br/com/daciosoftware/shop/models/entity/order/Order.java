@@ -34,7 +34,7 @@ public class Order {
 			mappedBy = "order",
 		    orphanRemoval = true,
 		    cascade = CascadeType.ALL,
-		    fetch = FetchType.EAGER)
+		    fetch = FetchType.LAZY)
 	private List<Item> itens = new ArrayList<>();
 
 	public static Order convert(OrderDTO orderDTO) {
