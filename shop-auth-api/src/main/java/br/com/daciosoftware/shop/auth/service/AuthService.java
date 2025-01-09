@@ -94,6 +94,7 @@ public class AuthService {
         return authRepository.findAll()
                 .stream()
                 .map(AuthUserDTO::convert)
+                .sorted(Comparator.comparing(AuthUserDTO::getNome))
                 .collect(Collectors.toList());
     }
 

@@ -27,8 +27,8 @@ public class ApplicationControllerAdvice {
 
 
     @ResponseBody
-    @ExceptionHandler(ShopGenericException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(ShopGenericException.class)
     public ErrorDTO handleShopGenericError(ShopGenericException ex) {
         return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage());
     }

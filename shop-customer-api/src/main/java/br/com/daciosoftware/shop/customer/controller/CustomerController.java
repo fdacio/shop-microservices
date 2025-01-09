@@ -5,6 +5,7 @@ import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerUserDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
+import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -96,9 +97,14 @@ public class CustomerController {
 		return customerService.updateKeyAll();
 	}
 
-	@GetMapping("/by-category")
-	public Map<String, List<CustomerDTO>> getCustomersGroupByCategory() {
-		return customerService.getCustomersGroupByCategory();
+	@GetMapping("/by-category/{categoryId}")
+	public List<CustomerDTO> getCustomersByCategory(@PathVariable Long categoryId) {
+		return customerService.findByCategory(categoryId);
+	}
+
+	@GetMapping("/grouping-by-category")
+	public Map<CategoryDTO, List<CustomerDTO>> getCustomersGroupingByCategory() {
+		return customerService.getCustomersGroupingByCategory();
 	}
 
 	@GetMapping("/healthcheck")
