@@ -17,10 +17,10 @@ public class CustomAccessDeniedHandler implements ServerAccessDeniedHandler {
     //Access Denied / unauthorized has handle method when failures occur
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException accessDeniedException){
-        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.FORBIDDEN.value(), "Acesso negado");
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatusCode(HttpStatus.FORBIDDEN);
+        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.FORBIDDEN.value(), "Acesso negado", exchange.getRequest());
         String responseBody = errorDTO.toString();
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);

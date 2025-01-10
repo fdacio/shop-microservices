@@ -6,6 +6,7 @@ import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatch
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,65 +19,65 @@ public class CustomerControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CustomerNotFoundException.class)
-    public ErrorDTO handleCustomerNotFound(CustomerNotFoundException userNotFoundException) {
-        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cliente não encontrado");
+    public ErrorDTO handleCustomerNotFound(HttpServletRequest request, CustomerNotFoundException userNotFoundException) {
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cliente não encontrado", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ErrorDTO handleCategoryNotFount(CategoryNotFoundException categoryNotFoundException) {
-        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Categoria dos interesses não encontrada");
+    public ErrorDTO handleCategoryNotFount(HttpServletRequest request, CategoryNotFoundException categoryNotFoundException) {
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Categoria dos interesses não encontrada", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerCpfExistsException.class)
-    public ErrorDTO handleCustomerCpfExistsException(CustomerCpfExistsException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "CPF já existe");
+    public ErrorDTO handleCustomerCpfExistsException(HttpServletRequest request, CustomerCpfExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "CPF já existe", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerEmailExistsException.class)
-    public ErrorDTO handleCustomerEmailExistsException(CustomerEmailExistsException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
+    public ErrorDTO handleCustomerEmailExistsException(HttpServletRequest request, CustomerEmailExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe", request);
     }
 
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthUserUsernameExistsException.class)
-    public ErrorDTO handleAuthUserUsernameExistsException(AuthUserUsernameExistsException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Username já existe");
+    public ErrorDTO handleAuthUserUsernameExistsException(HttpServletRequest request, AuthUserUsernameExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Username já existe", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthEmailExistsException.class)
-    public ErrorDTO handleAuthUserEmailExistsException(AuthEmailExistsException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe");
+    public ErrorDTO handleAuthUserEmailExistsException(HttpServletRequest request, AuthEmailExistsException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Email já existe", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthPasswordNotMatchException.class)
-    public ErrorDTO handlePasswordNotMatchException(AuthPasswordNotMatchException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Password do cliente não correspondem");
+    public ErrorDTO handlePasswordNotMatchException(HttpServletRequest request, AuthPasswordNotMatchException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Password do cliente não correspondem", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerInvalidKeyException.class)
-    public ErrorDTO handleCustomerInvalidKeyAuthException(CustomerInvalidKeyException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Chave de autenticação inválida");
+    public ErrorDTO handleCustomerInvalidKeyAuthException(HttpServletRequest request, CustomerInvalidKeyException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Chave de autenticação inválida", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerAuthUserConflictException.class)
-    public ErrorDTO handleCustomerAuthUserConflictException(CustomerAuthUserConflictException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Cliente já vinculado a um usuário");
+    public ErrorDTO handleCustomerAuthUserConflictException(HttpServletRequest request, CustomerAuthUserConflictException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Cliente já vinculado a um usuário", request);
     }
 
 

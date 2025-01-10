@@ -26,18 +26,18 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
         this.setMessageWriters(configure.getWriters());
     }
 
-    private static ErrorDTO getErrorDTO(Throwable throwable) {
+    private static ErrorDTO getErrorDTO(Throwable throwable, ServerRequest request) {
         ErrorDTO errorDTO;
         if (throwable instanceof ExpiredJwtException) {
-            errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Token expirado. Refaça o login");
+            errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Token expirado. Refaça o login", request);
         } else if (throwable instanceof SignatureException) {
-            errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Erro na assinatura do token");
+            errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Erro na assinatura do token", request);
         } else if (throwable instanceof UnsupportedJwtException
                 || throwable instanceof MalformedJwtException
                 || throwable instanceof IllegalArgumentException) {
-            errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Token inválido");
+            errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Token inválido", request);
         } else {
-            errorDTO = new ErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro interno do servidor");
+            errorDTO = new ErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro interno do servidor", request);
         }
         return errorDTO;
     }
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
     private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
         Throwable throwable = getError(request);
-        ErrorDTO errorDTO = getErrorDTO(throwable);
+        ErrorDTO errorDTO = getErrorDTO(throwable, request);
         return ServerResponse.status(errorDTO.getStatus())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(errorDTO.toString()));
