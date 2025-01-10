@@ -7,7 +7,7 @@ import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerEmailExi
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
-import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceCustomerUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCustomerUnavailableException;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -47,7 +47,7 @@ public class CustomerService {
                                     if (errorDTO.getMessage().toLowerCase().contains("email")) {
                                         return Mono.error(new CustomerEmailExistsException());
                                     }
-                                    return Mono.error(new ServiceCustomerUnavailableException());
+                                    return Mono.error(new MicroserviceCustomerUnavailableException());
                                 }
                             }
                             return Mono.empty();
@@ -86,7 +86,7 @@ public class CustomerService {
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
-                throw new ServiceCustomerUnavailableException();
+                throw new MicroserviceCustomerUnavailableException();
             } else {
                 throw exception;
             }

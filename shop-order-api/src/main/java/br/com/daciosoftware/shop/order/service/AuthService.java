@@ -3,7 +3,7 @@ package br.com.daciosoftware.shop.order.service;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
-import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceAuthUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthUnavailableException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -46,7 +46,7 @@ public class AuthService {
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
-                throw new ServiceAuthUnavailableException();
+                throw new MicroserviceAuthUnavailableException();
             } else {
                 throw exception;
             }

@@ -2,7 +2,7 @@ package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
-import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceProductUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceProductUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
@@ -53,7 +53,7 @@ public class ProductService {
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
-                throw new ServiceProductUnavailableException();
+                throw new MicroserviceProductUnavailableException();
             } else {
                 throw exception;
             }

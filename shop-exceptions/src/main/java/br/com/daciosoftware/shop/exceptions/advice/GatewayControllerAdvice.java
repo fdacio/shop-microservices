@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -19,30 +18,30 @@ public class GatewayControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    @ExceptionHandler(ServiceAuthUnavailableException.class)
-    public ErrorDTO handleServiceAuthUnavailableException(HttpServletRequest request, ServiceAuthUnavailableException exception) {
-        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço auth indisponível", request);
+    @ExceptionHandler(MicroserviceAuthUnavailableException.class)
+    public ErrorDTO handleServiceAuthUnavailableException(HttpServletRequest request, MicroserviceAuthUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Microservice Auth indisponível", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    @ExceptionHandler(ServiceCustomerUnavailableException.class)
-    public ErrorDTO handleServiceCustomerUnavailableException(HttpServletRequest request, ServiceCustomerUnavailableException exception) {
-        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço customer indisponível", request);
+    @ExceptionHandler(MicroserviceCustomerUnavailableException.class)
+    public ErrorDTO handleServiceCustomerUnavailableException(HttpServletRequest request, MicroserviceCustomerUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Microservice Customer indisponível", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    @ExceptionHandler(ServiceProductUnavailableException.class)
-    public ErrorDTO handleServiceProductUnavailableException(HttpServletRequest request, ServiceProductUnavailableException exception) {
-        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço product indisponível", request);
+    @ExceptionHandler(MicroserviceProductUnavailableException.class)
+    public ErrorDTO handleServiceProductUnavailableException(HttpServletRequest request, MicroserviceProductUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Microservice Product indisponível", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    @ExceptionHandler(ServiceCategoryUnavailableException.class)
-    public ErrorDTO handleServiceCategoryUnavailableException(HttpServletRequest request, ServiceCategoryUnavailableException exception) {
-        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço category indisponível", request);
+    @ExceptionHandler(MicroserviceCategoryUnavailableException.class)
+    public ErrorDTO handleServiceCategoryUnavailableException(HttpServletRequest request, MicroserviceCategoryUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Microservice Category indisponível", request);
     }
 
     @ResponseBody

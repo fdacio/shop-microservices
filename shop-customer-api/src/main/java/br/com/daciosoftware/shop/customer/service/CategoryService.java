@@ -2,7 +2,7 @@ package br.com.daciosoftware.shop.customer.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
-import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceAuthUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +51,7 @@ public class CategoryService {
 
             } catch (Exception exception) {
                 if (exception instanceof WebClientRequestException) {
-                    throw new ServiceAuthUnavailableException();
+                    throw new MicroserviceAuthUnavailableException();
                 } else {
                     throw exception;
                 }
@@ -85,7 +85,7 @@ public class CategoryService {
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
-                throw new ServiceAuthUnavailableException();
+                throw new MicroserviceAuthUnavailableException();
             } else {
                 throw exception;
             }
@@ -116,7 +116,7 @@ public class CategoryService {
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
-                throw new ServiceAuthUnavailableException();
+                throw new MicroserviceAuthUnavailableException();
             } else {
                 throw exception;
             }

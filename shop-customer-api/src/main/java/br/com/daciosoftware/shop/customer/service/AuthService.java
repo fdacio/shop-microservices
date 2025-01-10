@@ -4,7 +4,7 @@ import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserInvalidKeyTo
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
-import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceAuthUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthUnavailableException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +48,7 @@ public class AuthService {
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
-                throw new ServiceAuthUnavailableException();
+                throw new MicroserviceAuthUnavailableException();
             } else {
                 throw exception;
             }
@@ -83,7 +83,7 @@ public class AuthService {
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
-                throw new ServiceAuthUnavailableException();
+                throw new MicroserviceAuthUnavailableException();
             } else {
                 throw exception;
             }
