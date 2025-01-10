@@ -12,7 +12,7 @@ import lombok.*;
 public class PasswordDTO {
 
     @NotBlank(message="Informe a senha")
-    @Size(message="Senha tem que ter no máximo 80 caracteres", max = 255)
+    @Size(message="Senha tem que ter no máximo 255 caracteres", max = 255)
     private String password;
     @NotBlank(message="Confirme a senha")
     private String rePassword;
