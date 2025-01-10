@@ -71,7 +71,7 @@ public class AuthService {
     @Transactional
     public CustomerDTO createCustomerFromAuthUser(Long userId, CustomerDTO customerDTO) {
         AuthUser authUser = authRepository.findById(userId).orElseThrow(AuthUserNotFoundException::new);
-        validCreateCustomerFromAuthUser(authUser.getKeyToken());
+        validKeyTokenExists(authUser.getKeyToken());
         RuleDTO ruleCustomer = ruleService.findByNome(RuleEnum.CUSTOMER.getName());
         authUser.getRules().add(Rule.convert(ruleCustomer));
         authRepository.save(authUser);
@@ -219,9 +219,9 @@ public class AuthService {
         }
     }
 
-    private void validCreateCustomerFromAuthUser(String keyToken) {
-        Boolean customerHasKeyToken = customerService.customerHasKeyToken(keyToken);
-        if (customerHasKeyToken) {
+    private void validKeyTokenExists(String keyToken) {
+        Optional<CustomerDTO> customerOptional = customerService.findByKeyAuth(keyToken);
+        if (customerOptional.isPresent()) {
             throw new AuthUserCustomerConflictException();
         }
     }

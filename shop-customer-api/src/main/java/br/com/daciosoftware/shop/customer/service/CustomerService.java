@@ -101,7 +101,10 @@ public class CustomerService {
         validCpfUnique(customerDTO.getCpf());
         validEmailUnique(customerDTO.getEmail(), null);
         customerDTO.setDataCadastro(LocalDateTime.now());
-        customerDTO.setInteresses(categoryService.findCategorysByUser(customerDTO));
+        if (!customerDTO.getInteresses().isEmpty()) {
+            Set<CategoryDTO> interesses = categoryService.validCategorys(customerDTO.getInteresses());
+            customerDTO.setInteresses(interesses);
+        }
         return CustomerDTO.convert(customerRepository.save(Customer.convert(customerDTO)));
     }
 
@@ -109,45 +112,42 @@ public class CustomerService {
         customerRepository.delete(Customer.convert(findById(userId)));
     }
 
-    public CustomerDTO update(Long userId, CustomerDTO userDTO) {
+    public CustomerDTO update(Long customerId, CustomerDTO customerDTO) {
 
-        Customer user = Customer.convert(findById(userId));
+        Customer customer = Customer.convert(findById(customerId));
 
-        if (userDTO.getEndereco() != null) {
-            boolean isEnderecoAlterado = !(user.getEndereco().equals(userDTO.getEndereco()));
+        if (customerDTO.getEndereco() != null) {
+            boolean isEnderecoAlterado = !(customer.getEndereco().equals(customerDTO.getEndereco()));
             if (isEnderecoAlterado) {
-                user.setEndereco(userDTO.getEndereco());
+                customer.setEndereco(customerDTO.getEndereco());
             }
         }
 
-        if (userDTO.getEmail() != null) {
-            boolean isEmailAlterado = !(user.getEmail().equals(userDTO.getEmail()));
+        if (customerDTO.getEmail() != null) {
+            boolean isEmailAlterado = !(customer.getEmail().equals(customerDTO.getEmail()));
             if (isEmailAlterado) {
-                validEmailUnique(userDTO.getEmail(), userId);
-                user.setEmail(userDTO.getEmail());
+                validEmailUnique(customerDTO.getEmail(), customerId);
+                customer.setEmail(customerDTO.getEmail());
             }
         }
 
-        if (userDTO.getTelefone() != null) {
-            boolean isTelefoneAlterado = !(user.getTelefone().equals(userDTO.getTelefone()));
+        if (customerDTO.getTelefone() != null) {
+            boolean isTelefoneAlterado = !(customer.getTelefone().equals(customerDTO.getTelefone()));
             if (isTelefoneAlterado) {
-                user.setTelefone(userDTO.getTelefone());
+                customer.setTelefone(customerDTO.getTelefone());
             }
         }
 
-        if ((userDTO.getInteresses() != null)) {
-
-            userDTO.setInteresses(categoryService.findCategorysByUser(userDTO));
-
-            Set<Category> interesses = userDTO.getInteresses()
-                    .stream()
-                    .map(Category::convert)
-                    .collect(Collectors.toSet());
-
-            user.setInteresses(interesses);
+        if ((customerDTO.getInteresses() != null)) {
+                Set<CategoryDTO> interesses = categoryService.validCategorys(customerDTO.getInteresses());
+                customer.setInteresses(interesses
+                        .stream()
+                        .map(Category::convert)
+                        .collect(Collectors.toSet())
+                );
         }
 
-        return CustomerDTO.convert(customerRepository.save(user));
+        return CustomerDTO.convert(customerRepository.save(customer));
     }
 
     public Page<CustomerDTO> getAllPage(Pageable page) {
@@ -191,9 +191,9 @@ public class CustomerService {
 
             if (!customersByCategory.isEmpty()) {
                 List<CustomerDTO> customersSorted = customersByCategory
-                                                    .stream()
-                                                    .sorted(Comparator.comparing(CustomerDTO::getNome))
-                                                    .toList();
+                        .stream()
+                        .sorted(Comparator.comparing(CustomerDTO::getNome))
+                        .toList();
                 groupByCategory.put(category, customersSorted);
             }
         });

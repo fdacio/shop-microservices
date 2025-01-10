@@ -80,7 +80,7 @@ public class OrderService {
 
         CustomerDTO customerDTO = getCustomerAuthenticated(token);
 
-        List<ItemDTO> itensDTO = productService.findItens(orderDTO);
+        List<ItemDTO> itensDTO = productService.findItens(orderDTO.getItens());
         Float total = itensDTO.stream().map(i -> (i.getPreco() * i.getQuantidade())).reduce((float) 0, Float::sum);
 
         orderDTO.setData(LocalDateTime.now());
@@ -110,7 +110,7 @@ public class OrderService {
 
         OrderDTO orderUpdateDTO = findById(id);
 
-        List<ItemDTO> itensDTO = productService.findItens(orderDTO);
+        List<ItemDTO> itensDTO = productService.findItens(orderDTO.getItens());
         Float total = itensDTO.stream().map(i -> (i.getPreco() * i.getQuantidade())).reduce((float) 0, Float::sum);
         orderUpdateDTO.setTotal(total);
         orderUpdateDTO.setItens(itensDTO);

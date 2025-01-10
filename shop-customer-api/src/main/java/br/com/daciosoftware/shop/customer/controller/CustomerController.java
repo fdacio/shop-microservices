@@ -60,6 +60,11 @@ public class CustomerController {
 	public CustomerDTO findByEmail(@PathVariable String email) {
 		return customerService.findByEmail(email);
 	}
+
+	@GetMapping("/{keyAuth}/key-auth")
+	public CustomerDTO findByKeyAuth(@PathVariable String keyAuth) {
+		return customerService.findByKeyAuth(keyAuth);
+	}
 	
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
@@ -83,12 +88,12 @@ public class CustomerController {
 	}
 
 	@PostMapping("/valid-key-auth")
-	public CustomerDTO validaKeyAuth(@RequestHeader(name = "customerKeyAuth") String customerKeyAuth) {
+	public CustomerDTO validKeyAuth(@RequestHeader(name = "customerKeyAuth") String customerKeyAuth) {
 		return customerService.findByKeyAuth(customerKeyAuth);
 	}
 
 	@GetMapping("/has-key-auth")
-	public List<CustomerDTO> hasKeyAuth() {
+	public List<CustomerDTO> findCustomersWithKeyAuth() {
 		return customerService.findHasKeyAuth();
 	}
 

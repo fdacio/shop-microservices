@@ -1,17 +1,18 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceAuthUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
-import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,16 +22,14 @@ public class CategoryService {
     @Value("${product.api.url}")
     private String productApiURL;
 
-    public Set<CategoryDTO> findCategorysByUser(CustomerDTO userDTO) throws CategoryNotFoundException, ShopGenericException {
+    public Set<CategoryDTO> validCategorys(Set<CategoryDTO> categorysDTO) {
 
-        Set<CategoryDTO> categorysDTO = new HashSet<>();
-
-        if (userDTO.getInteresses() != null) {
+        if (categorysDTO != null) {
 
             try {
                 WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
-                for (CategoryDTO c : userDTO.getInteresses()) {
+                for (CategoryDTO c : categorysDTO) {
                     Long categoryId = c.getId();
                     Mono<CategoryDTO> category = webClient
                             .get()
@@ -39,17 +38,23 @@ public class CategoryService {
                             .onStatus(
                                     HttpStatusCode::isError,
                                     response -> switch (response.statusCode().value()) {
-                                        case 401, 403 -> Mono.error(new ShopGenericException("Recurso não autorizado"));
                                         case 404 -> Mono.error(new CategoryNotFoundException());
-                                        default -> Mono.error(new ShopGenericException("Erro no microsserviço product"));
+                                        case 401 -> Mono.error(new AuthUnauthorizedException());
+                                        case 403 -> Mono.error(new AuthForbiddenException());
+                                        default -> Mono.error(new RuntimeException());
                                     })
                             .bodyToMono(CategoryDTO.class);
 
                     categorysDTO.add(category.block());
 
                 }
-            } catch (RuntimeException e) {
-                throw new ShopGenericException("Microsserviço product não disponível");
+
+            } catch (Exception exception) {
+                if (exception instanceof WebClientRequestException) {
+                    throw new ServiceAuthUnavailableException();
+                } else {
+                    throw exception;
+                }
             }
 
         }
@@ -57,7 +62,8 @@ public class CategoryService {
         return categorysDTO;
     }
 
-    public List<CategoryDTO> findAll() throws ShopGenericException {
+    public List<CategoryDTO> findAll() {
+
         try {
             WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
@@ -68,44 +74,52 @@ public class CategoryService {
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> switch (response.statusCode().value()) {
-                                case 401, 403 -> Mono.error(new ShopGenericException("Recurso não autorizado"));
-                                default -> Mono.error(new ShopGenericException("Erro no microsserviço product"));
+                                case 401 -> Mono.error(new AuthUnauthorizedException());
+                                case 403 -> Mono.error(new AuthForbiddenException());
+                                default -> Mono.error(new RuntimeException());
                             })
                     .bodyToMono(new ParameterizedTypeReference<>() {
                     });
 
             return categorys.block();
-        } catch (RuntimeException e) {
-            throw new ShopGenericException("Microsserviço product não disponível");
+
+        } catch (Exception exception) {
+            if (exception instanceof WebClientRequestException) {
+                throw new ServiceAuthUnavailableException();
+            } else {
+                throw exception;
+            }
         }
+
     }
 
-    public CategoryDTO findById(Long id) throws CategoryNotFoundException, ShopGenericException {
+    public CategoryDTO findById(Long id) {
 
         try {
-
             WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
             Mono<CategoryDTO> category = webClient
                     .get()
-                    .uri("/category/" + id.toString())
+                    .uri("/category/" + id)
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> switch (response.statusCode().value()) {
-                                case 401, 403 -> Mono.error(new ShopGenericException("Recurso não autorizado"));
                                 case 404 -> Mono.error(new CategoryNotFoundException());
-                                default -> Mono.error(new ShopGenericException("Erro no microsserviço product"));
+                                case 401 -> Mono.error(new AuthUnauthorizedException());
+                                case 403 -> Mono.error(new AuthForbiddenException());
+                                default -> Mono.error(new RuntimeException());
                             })
                     .bodyToMono(CategoryDTO.class);
 
             return category.block();
 
-        } catch (RuntimeException e) {
-            if (e instanceof CategoryNotFoundException) {
-                throw new CategoryNotFoundException();
+        } catch (Exception exception) {
+            if (exception instanceof WebClientRequestException) {
+                throw new ServiceAuthUnavailableException();
+            } else {
+                throw exception;
             }
-            throw new ShopGenericException(e.getMessage());
         }
 
     }

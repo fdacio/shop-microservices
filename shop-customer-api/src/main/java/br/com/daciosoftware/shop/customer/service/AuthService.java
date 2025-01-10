@@ -1,15 +1,17 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserInvalidKeyTokenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceAuthUnavailableException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -22,10 +24,12 @@ public class AuthService {
 
     public Optional<AuthUserDTO> findAuthUserByKeyToken(String keyToken) {
 
-        WebClient webClient = WebClient.builder()
-                .baseUrl(authApiURL)
-                .build();
         try {
+
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(authApiURL)
+                    .build();
+
             Mono<AuthUserDTO> authUser = webClient
                     .get()
                     .uri("/auth/user/" + keyToken + "/key-token")
@@ -33,49 +37,57 @@ public class AuthService {
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> switch (response.statusCode().value()) {
-                                case 401, 403 -> Mono.error(new ShopGenericException("Recurso não autorizado"));
-                                case 404 -> Mono.error(new AuthUserInvalidKeyTokenException());
-                                default -> Mono.error(new ShopGenericException("Erro no microsserviço auth"));
+                                case 409 -> Mono.error(new AuthUserInvalidKeyTokenException());
+                                case 401 -> Mono.error(new AuthUnauthorizedException());
+                                case 403 -> Mono.error(new AuthForbiddenException());
+                                default -> Mono.error(new RuntimeException());
                             })
                     .bodyToMono(AuthUserDTO.class);
 
             return Optional.ofNullable(authUser.block());
-        } catch (Exception e) {
-            if (e instanceof AuthUserInvalidKeyTokenException ) {
-                return Optional.empty();
-            }
-            throw e;
-        }
 
+        } catch (Exception exception) {
+            if (exception instanceof WebClientRequestException) {
+                throw new ServiceAuthUnavailableException();
+            } else {
+                throw exception;
+            }
+        }
     }
 
-    @Transactional
     public AuthUserDTO createAuthUser(CreateAuthUserDTO createAuthUserDTO) {
+        try {
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(authApiURL)
+                    .build();
 
-        WebClient webClient = WebClient.builder()
-                .baseUrl(authApiURL)
-                .build();
+            Mono<AuthUserDTO> user = webClient
+                    .post()
+                    .uri("/auth/user/customer")
+                    .bodyValue(createAuthUserDTO)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> {
+                                switch (response.statusCode().value()) {
+                                    case 409 -> Mono.error(new AuthUserUsernameExistsException());
+                                    case 401 -> Mono.error(new AuthUnauthorizedException());
+                                    case 403 -> Mono.error(new AuthForbiddenException());
+                                    default -> Mono.error(new RuntimeException());
+                                }
+                                return Mono.empty();
+                            })
+                    .bodyToMono(AuthUserDTO.class);
 
-        Mono<AuthUserDTO> user = webClient
-                .post()
-                .uri("/auth/user/customer")
-                .bodyValue(createAuthUserDTO)
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::isError,
-                        response -> {
-                            System.err.println(response.statusCode().value());
-                            switch (response.statusCode().value()) {
-                                case 401, 403 -> Mono.error(new ShopGenericException("Recurso não autorizado"));
-                                case 409 -> Mono.error(new AuthUserUsernameExistsException());
-                                default -> Mono.error(new ShopGenericException("Erro no microsserviço auth"));
-                            }
-                            return Mono.empty();
-                        })
-                .bodyToMono(AuthUserDTO.class);
+            return user.block();
 
-        return user.block();
-
+        } catch (Exception exception) {
+            if (exception instanceof WebClientRequestException) {
+                throw new ServiceAuthUnavailableException();
+            } else {
+                throw exception;
+            }
+        }
 
     }
 }

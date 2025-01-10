@@ -2,7 +2,10 @@ package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.dto.ValidErrorDTO;
-import br.com.daciosoftware.shop.exceptions.exceptions.ShopGenericException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceAuthUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceCategoryUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceCustomerUnavailableException;
+import br.com.daciosoftware.shop.exceptions.exceptions.gateway.ServiceProductUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
@@ -25,12 +28,32 @@ import java.util.Map;
         "br.com.daciosoftware.shop.auth.controller"})
 public class ApplicationControllerAdvice {
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(ServiceAuthUnavailableException.class)
+    public ErrorDTO handleServiceAuthUnavailableException(ServiceAuthUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço auth indisponível");
+    }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    @ExceptionHandler(ShopGenericException.class)
-    public ErrorDTO handleShopGenericError(ShopGenericException ex) {
-        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage());
+    @ExceptionHandler(ServiceCustomerUnavailableException.class)
+    public ErrorDTO handleServiceCustomerUnavailableException(ServiceCustomerUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço customer indisponível");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(ServiceProductUnavailableException.class)
+    public ErrorDTO handleServiceProductUnavailableException(ServiceProductUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço product indisponível");
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler(ServiceCategoryUnavailableException.class)
+    public ErrorDTO handleServiceCategoryUnavailableException(ServiceCategoryUnavailableException exception) {
+        return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço category indisponível");
     }
 
     @ResponseBody

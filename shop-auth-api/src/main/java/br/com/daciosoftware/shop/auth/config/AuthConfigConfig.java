@@ -18,19 +18,14 @@ public class AuthConfigConfig implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        configRepository.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave()).ifPresentOrElse(
-                (config) -> {
-                    System.out.printf("Configuração Auth %s já existe\n", config.getChave());
-                },
-                () -> {
-                    Config config = new Config();
-                    config.setChave(ConfigEnum.EXPIRE_TOKEN.getChave());
-                    config.setValor("300");
-                    configRepository.save(config);
-                }
-        );
+        Optional<Config> configOptional = configRepository.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
+        if (configOptional.isEmpty()) {
+            Config config = new Config();
+            config.setChave(ConfigEnum.EXPIRE_TOKEN.getChave());
+            config.setValor("300");
+            configRepository.save(config);
+            System.out.println("Configuração de EXPIRE_TOKEN criada como sucesso!");
 
-
-
+        }
     }
 }
