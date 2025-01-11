@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.exceptions.advice;
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.dto.ValidErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerIntegrityViolationException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCategoryUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCustomerUnavailableException;
@@ -104,8 +105,18 @@ public class ApplicationControllerAdvice {
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. O recurso está relacionado a outro", request);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CustomerIntegrityViolationException.class)
+    public ErrorDTO handleCustomerIntegrityViolationException(HttpServletRequest request, CustomerIntegrityViolationException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. Cliente está relacionado a outro recurso", request);
+    }
 
-
-    //org.springframework.dao.DataIntegrityViolationException
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AuthUserIntegrityViolationException.class)
+    public ErrorDTO handleAuthUserIntegrityViolationException(HttpServletRequest request, AuthUserIntegrityViolationException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. Usuário está relacionado a outro recurso", request);
+    }
 
 }
