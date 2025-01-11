@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CreateCustomerUserDTO {
+public class CreateCustomerAndAuthUserDTO {
     @Valid
     private CustomerDTO customer;
     @Valid

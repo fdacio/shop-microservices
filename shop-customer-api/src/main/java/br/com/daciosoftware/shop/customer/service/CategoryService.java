@@ -6,14 +6,13 @@ import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthU
 import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -31,7 +30,7 @@ public class CategoryService {
 
                 for (CategoryDTO c : categorysDTO) {
                     Long categoryId = c.getId();
-                    Mono<CategoryDTO> category = webClient
+                    CategoryDTO category = webClient
                             .get()
                             .uri("/category/" + categoryId)
                             .retrieve()
@@ -43,9 +42,10 @@ public class CategoryService {
                                         case 403 -> Mono.error(new AuthForbiddenException());
                                         default -> Mono.error(new RuntimeException());
                                     })
-                            .bodyToMono(CategoryDTO.class);
+                            .bodyToMono(CategoryDTO.class)
+                            .block();
 
-                    categorysDTO.add(category.block());
+                    categorysDTO.add(category);
 
                 }
 
@@ -62,12 +62,13 @@ public class CategoryService {
         return categorysDTO;
     }
 
-    public List<CategoryDTO> findAll() {
+    public Flux<CategoryDTO> findAll() {
 
         try {
+
             WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
-            Mono<List<CategoryDTO>> categorys = webClient
+            return webClient
                     .get()
                     .uri("/category")
                     .retrieve()
@@ -78,10 +79,7 @@ public class CategoryService {
                                 case 403 -> Mono.error(new AuthForbiddenException());
                                 default -> Mono.error(new RuntimeException());
                             })
-                    .bodyToMono(new ParameterizedTypeReference<>() {
-                    });
-
-            return categorys.block();
+                    .bodyToFlux(CategoryDTO.class);
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {
@@ -96,9 +94,10 @@ public class CategoryService {
     public CategoryDTO findById(Long id) {
 
         try {
+
             WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
-            Mono<CategoryDTO> category = webClient
+            return webClient
                     .get()
                     .uri("/category/" + id)
                     .retrieve()
@@ -110,9 +109,8 @@ public class CategoryService {
                                 case 403 -> Mono.error(new AuthForbiddenException());
                                 default -> Mono.error(new RuntimeException());
                             })
-                    .bodyToMono(CategoryDTO.class);
-
-            return category.block();
+                    .bodyToMono(CategoryDTO.class)
+                    .block();
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {

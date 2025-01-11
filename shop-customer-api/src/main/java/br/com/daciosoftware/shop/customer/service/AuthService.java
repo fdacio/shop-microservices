@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserInvalidKeyTokenException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
@@ -30,38 +31,40 @@ public class AuthService {
                     .baseUrl(authApiURL)
                     .build();
 
-            Mono<AuthUserDTO> authUser = webClient
+            AuthUserDTO authUser = webClient
                     .get()
                     .uri("/auth/user/" + keyToken + "/key-token")
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> switch (response.statusCode().value()) {
-                                case 409 -> Mono.error(new AuthUserInvalidKeyTokenException());
+                                case 404 -> Mono.error(new AuthUserNotFoundException());
                                 case 401 -> Mono.error(new AuthUnauthorizedException());
                                 case 403 -> Mono.error(new AuthForbiddenException());
                                 default -> Mono.error(new RuntimeException());
                             })
-                    .bodyToMono(AuthUserDTO.class);
+                    .bodyToMono(AuthUserDTO.class)
+                    .block();
 
-            return Optional.ofNullable(authUser.block());
+            return Optional.ofNullable(authUser);
 
-        } catch (Exception exception) {
+        } catch (RuntimeException exception) {
             if (exception instanceof WebClientRequestException) {
                 throw new MicroserviceAuthUnavailableException();
-            } else {
-                throw exception;
             }
+            return Optional.empty();
         }
     }
 
     public AuthUserDTO createAuthUser(CreateAuthUserDTO createAuthUserDTO) {
+
         try {
+
             WebClient webClient = WebClient.builder()
                     .baseUrl(authApiURL)
                     .build();
 
-            Mono<AuthUserDTO> user = webClient
+            return webClient
                     .post()
                     .uri("/auth/user/customer")
                     .bodyValue(createAuthUserDTO)
@@ -77,9 +80,50 @@ public class AuthService {
                                 }
                                 return Mono.empty();
                             })
-                    .bodyToMono(AuthUserDTO.class);
+                    .bodyToMono(AuthUserDTO.class)
+                    .block();
 
-            return user.block();
+        } catch (Exception exception) {
+            if (exception instanceof WebClientRequestException) {
+                throw new MicroserviceAuthUnavailableException();
+            } else {
+                throw exception;
+            }
+        }
+
+    }
+
+    public void deleteAuthUser(AuthUserDTO authUserDTO) {
+        try {
+            Long id = authUserDTO.getId();
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(authApiURL)
+                    .build();
+
+            webClient
+                    .delete()
+                    .uri("/auth/user/" + id)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> {
+                                switch (response.statusCode().value()) {
+                                    case 409 -> Mono.error(new AuthUserIntegrityViolationException());
+                                    case 401 -> Mono.error(new AuthUnauthorizedException());
+                                    case 403 -> Mono.error(new AuthForbiddenException());
+                                    default -> Mono.error(new RuntimeException());
+                                }
+                                System.out.println("**** Removing de user fail: " + response.statusCode());
+                                return Mono.empty();
+                            })
+                    .onStatus(
+                            HttpStatusCode::is2xxSuccessful,
+                            response -> {
+                                System.out.println("**** Removing de user success: " + response.statusCode());
+                                return Mono.empty();
+                            })
+                    .bodyToMono(Void.class)
+                    .block();
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {

@@ -2,11 +2,13 @@ package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.dto.ValidErrorDTO;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCategoryUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCustomerUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceProductUnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
@@ -95,5 +97,15 @@ public class ApplicationControllerAdvice {
         return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Requisição inválida", request);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ErrorDTO handleDataIntegrityViolationException(HttpServletRequest request, DataIntegrityViolationException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. O recurso está relacionado a outro", request);
+    }
+
+
+
+    //org.springframework.dao.DataIntegrityViolationException
 
 }

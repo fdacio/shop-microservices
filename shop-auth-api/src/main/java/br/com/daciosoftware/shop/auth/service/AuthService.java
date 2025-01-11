@@ -120,6 +120,7 @@ public class AuthService {
                 .orElseThrow(AuthUserNotFoundException::new);
     }
 
+    @Transactional
     public void delete(Long userId) {
         authRepository.delete(AuthUser.convert(findById(userId)));
     }

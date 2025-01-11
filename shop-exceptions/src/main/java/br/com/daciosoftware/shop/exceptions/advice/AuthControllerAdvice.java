@@ -100,4 +100,10 @@ public class AuthControllerAdvice {
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Configuração não encontrada", request);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AuthUserIntegrityViolationException.class)
+    public ErrorDTO handleAuthUserIntegrityViolationException(HttpServletRequest request, AuthUserIntegrityViolationException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. Usuário está relacionado a outro recurso", request);
+    }
 }

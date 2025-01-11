@@ -2,11 +2,12 @@ package br.com.daciosoftware.shop.customer.service;
 
 import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerUserDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerAndAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Customer;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -78,38 +80,57 @@ public class CustomerService {
                 .toList();
     }
 
-    private void validCpfUnique(String cpf) {
-        Optional<CustomerDTO> userDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);
-        if (userDTO.isPresent()) {
-            throw new CustomerCpfExistsException();
-        }
-    }
-
-    private void validEmailUnique(String email, Long id) {
-        Optional<CustomerDTO> userDTO = customerRepository.findByEmail(email).map(CustomerDTO::convert);
-        if (userDTO.isPresent()) {
-            if (id == null) {
-                throw new CustomerEmailExistsException();
-            } else if (!id.equals(userDTO.get().getId())) {
-                throw new CustomerEmailExistsException();
-            }
-        }
-    }
-
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     public CustomerDTO save(CustomerDTO customerDTO) {
+
         validCpfUnique(customerDTO.getCpf());
         validEmailUnique(customerDTO.getEmail(), null);
+        validInteresses(customerDTO.getInteresses());
+
         customerDTO.setDataCadastro(LocalDateTime.now());
-        if (!customerDTO.getInteresses().isEmpty()) {
-            Set<CategoryDTO> interesses = categoryService.validCategorys(customerDTO.getInteresses());
-            customerDTO.setInteresses(interesses);
-        }
-        return CustomerDTO.convert(customerRepository.save(Customer.convert(customerDTO)));
+
+        Customer customer = Customer.convert(customerDTO);
+
+        return CustomerDTO.convert(customerRepository.save(customer));
     }
 
-    public void delete(Long userId) {
-        customerRepository.delete(Customer.convert(findById(userId)));
+    @Transactional(rollbackFor = RuntimeException.class)
+    public AuthUserDTO createAuthUserFromCustomer(Long customerId, PasswordDTO password) {
+
+        CustomerDTO customerDTO = findById(customerId);
+        validKeyAuth(customerDTO.getKeyAuth());
+
+        //Create AuthUser
+        AuthUserDTO authUserDTO = createAuthUser(customerDTO, password);
+
+        //Update KeyAuth in Customer
+        customerDTO.setKeyAuth(authUserDTO.getKeyToken());
+        Customer customer = Customer.convert(customerDTO);
+        customerRepository.save(customer);
+
+        return authUserDTO;
+
+    }
+
+    @Transactional(rollbackFor = RuntimeException.class)
+    public CreateCustomerAndAuthUserDTO createCustomerAndAuthUser(CreateCustomerAndAuthUserDTO createCustomerAndAuthUserDTO) {
+
+        //Create AuthUser
+        CustomerDTO customerDTO = createCustomerAndAuthUserDTO.getCustomer();
+        PasswordDTO passwordDTO = createCustomerAndAuthUserDTO.getPassword();
+
+        validPassword(passwordDTO);
+
+        AuthUserDTO authUserDTO = createAuthUser(customerDTO, passwordDTO);
+
+        //Create Customer and update KeyAuth
+        String keyAuth = authUserDTO.getKeyToken();
+        System.out.println("**** Auth Token: " + keyAuth);
+        customerDTO.setKeyAuth(keyAuth);
+        customerDTO = save(customerDTO);
+        createCustomerAndAuthUserDTO.setCustomer(customerDTO);
+
+        return createCustomerAndAuthUserDTO;
     }
 
     public CustomerDTO update(Long customerId, CustomerDTO customerDTO) {
@@ -139,15 +160,44 @@ public class CustomerService {
         }
 
         if ((customerDTO.getInteresses() != null)) {
-                Set<CategoryDTO> interesses = categoryService.validCategorys(customerDTO.getInteresses());
-                customer.setInteresses(interesses
-                        .stream()
-                        .map(Category::convert)
-                        .collect(Collectors.toSet())
-                );
+            Set<CategoryDTO> interesses = categoryService.validCategorys(customerDTO.getInteresses());
+            customer.setInteresses(interesses
+                    .stream()
+                    .map(Category::convert)
+                    .collect(Collectors.toSet())
+            );
         }
 
         return CustomerDTO.convert(customerRepository.save(customer));
+    }
+
+    public void delete(Long customerId) {
+        CustomerDTO customerDTO = findById(customerId);
+        Optional<String> keyAuthOptional = Optional.ofNullable(customerDTO.getKeyAuth());
+        keyAuthOptional.ifPresent(this::validKeyAuth);
+        customerRepository.delete(Customer.convert(customerDTO));
+    }
+
+    public void deleteCustomerAndAuthUser(Long customerId) {
+
+        CustomerDTO customerDTO = findById(customerId);
+        Optional<String> keyAuthOptional = Optional.ofNullable(customerDTO.getKeyAuth());
+
+        try {
+            //Delete Customer
+            customerRepository.delete(Customer.convert(customerDTO));
+
+            //Try delete AuthUser from Customer
+            keyAuthOptional.ifPresent((keyAuth) -> {
+                Optional<AuthUserDTO> authUserDTOOptional = authService.findAuthUserByKeyToken(keyAuth);
+                authUserDTOOptional.ifPresent((authUserDTO -> authService.deleteAuthUser(authUserDTO)));
+            });
+
+        } catch (RuntimeException exception) {
+            throw new CustomerIntegrityViolationException();
+        }
+
+
     }
 
     public Page<CustomerDTO> getAllPage(Pageable page) {
@@ -175,7 +225,7 @@ public class CustomerService {
         List<CustomerDTO> customers = findAll();
 
         List<CategoryDTO> categories = categoryService.findAll()
-                .stream()
+                .toStream()
                 .sorted(Comparator.comparing(CategoryDTO::getNome))
                 .toList();
 
@@ -202,44 +252,51 @@ public class CustomerService {
 
     }
 
-    @Transactional
-    public AuthUserDTO createAuthUser(Long customerId, PasswordDTO password) {
 
-        CustomerDTO customerDTO = findById(customerId);
+    /*** Private Methods */
 
-        if (customerDTO.getKeyAuth() != null && !customerDTO.getKeyAuth().isEmpty()) {
-            Optional<AuthUserDTO> authUserDTO = authService.findAuthUserByKeyToken(customerDTO.getKeyAuth());
-            if (authUserDTO.isPresent()) {
-                throw new CustomerAuthUserConflictException();
+    private void validCpfUnique(String cpf) {
+        Optional<CustomerDTO> userDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);
+        if (userDTO.isPresent()) {
+            throw new CustomerCpfExistsException();
+        }
+    }
+
+    private void validEmailUnique(String email, Long id) {
+        Optional<CustomerDTO> userDTO = customerRepository.findByEmail(email).map(CustomerDTO::convert);
+        if (userDTO.isPresent()) {
+            if (id == null) {
+                throw new CustomerEmailExistsException();
+            } else if (!id.equals(userDTO.get().getId())) {
+                throw new CustomerEmailExistsException();
             }
         }
+    }
 
+    private void validInteresses(Set<CategoryDTO> interesses) {
+        categoryService.validCategorys(interesses);
+    }
+
+    private void validPassword(PasswordDTO password) {
         if (!password.getPassword().equals(password.getRePassword())) {
             throw new AuthPasswordNotMatchException();
         }
+    }
 
+    private void validKeyAuth(String keyAuth) {
+        Optional<AuthUserDTO> authUserDTOOptional = authService.findAuthUserByKeyToken(keyAuth);
+        if (authUserDTOOptional.isPresent()) throw new AuthUserIntegrityViolationException();
+    }
+
+    private AuthUserDTO createAuthUser(CustomerDTO customerDTO, PasswordDTO password) {
+        validPassword(password);
         CreateAuthUserDTO createAuthUserDTO = new CreateAuthUserDTO();
         createAuthUserDTO.setNome(customerDTO.getNome());
         createAuthUserDTO.setPassword(password.getPassword());
         createAuthUserDTO.setUsername(customerDTO.getEmail());
         createAuthUserDTO.setEmail(customerDTO.getEmail());
-
-        AuthUserDTO authUserDTO = authService.createAuthUser(createAuthUserDTO);
-
-        customerDTO.setKeyAuth(authUserDTO.getKeyToken());
-        Customer customer = Customer.convert(customerDTO);
-
-        customerRepository.save(customer);
-
-        return authUserDTO;
-
+        return authService.createAuthUser(createAuthUserDTO);
     }
 
-    @Transactional
-    public CreateCustomerUserDTO createCustomerAndAuthUser(CreateCustomerUserDTO createCustomerUserDTO) {
-        CustomerDTO customerDTO = save(createCustomerUserDTO.getCustomer());
-        createAuthUser(customerDTO.getId(), createCustomerUserDTO.getPassword());
-        return createCustomerUserDTO;
-    }
 
 }

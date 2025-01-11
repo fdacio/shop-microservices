@@ -3,7 +3,7 @@ package br.com.daciosoftware.shop.customer.controller;
 import br.com.daciosoftware.shop.customer.service.CustomerService;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerUserDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerAndAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import jakarta.validation.Valid;
@@ -41,14 +41,14 @@ public class CustomerController {
 
 	@PostMapping("/user")
 	@ResponseStatus(HttpStatus.CREATED)
-	public CreateCustomerUserDTO createCustomerAndAuthUser(@RequestBody @Valid CreateCustomerUserDTO createCustomerUserDTO) {
-		return customerService.createCustomerAndAuthUser(createCustomerUserDTO);
+	public CreateCustomerAndAuthUserDTO createCustomerAndAuthUser(@RequestBody @Valid CreateCustomerAndAuthUserDTO createCustomerAndAuthUserDTO) {
+		return customerService.createCustomerAndAuthUser(createCustomerAndAuthUserDTO);
 	}
 
-	@PostMapping("/{id}/user")
+	@PostMapping("/{customerId}/user")
 	@ResponseStatus(HttpStatus.CREATED)
-	public AuthUserDTO createAuthUser(@PathVariable Long id, @RequestBody PasswordDTO password) {
-		return customerService.createAuthUser(id, password);
+	public AuthUserDTO createAuthUserFromCustomer(@PathVariable Long customerId, @RequestBody PasswordDTO password) {
+		return customerService.createAuthUserFromCustomer(customerId, password);
 	}
 
 	@GetMapping("/{cpf}/cpf")
@@ -71,7 +71,12 @@ public class CustomerController {
 	public void delete(@PathVariable Long id) {
 		customerService.delete(id);
 	}
-	
+
+	@DeleteMapping("/{customerId}/user")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteCustomerAndAuthUser(@PathVariable Long customerId) {
+		customerService.deleteCustomerAndAuthUser(customerId);
+	}
 	@GetMapping("/search")
 	public List<CustomerDTO> findByNone(@RequestParam(name = "nome") String nome) {
 		return customerService.findByNome(nome);

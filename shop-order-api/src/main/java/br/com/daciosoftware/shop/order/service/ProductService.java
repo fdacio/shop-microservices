@@ -13,7 +13,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -24,6 +26,7 @@ public class ProductService {
     public List<ItemDTO> findItens(List<ItemDTO> itensDTO) {
 
         try {
+            List<ItemDTO> itens = new ArrayList<>();
 
             WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
@@ -31,7 +34,7 @@ public class ProductService {
 
                 Long productId = item.getProduct().getId();
 
-                Mono<ProductDTO> product = webClient.get()
+                ProductDTO productDTO = webClient.get()
                         .uri("/product/" + productId)
                         .retrieve()
                         .onStatus(
@@ -42,14 +45,18 @@ public class ProductService {
                                     case 403 -> Mono.error(new AuthForbiddenException());
                                     default -> Mono.error(new RuntimeException());
                                 })
-                        .bodyToMono(ProductDTO.class);
+                        .bodyToMono(ProductDTO.class)
+                        .block();
 
-                ProductDTO productDTO = product.block();
-                item.setProduct(productDTO);
-                item.setPreco(productDTO != null ? productDTO.getPreco() : 0);
-                itensDTO.add(item);
+                Optional<ProductDTO> productDTOOptional = Optional.ofNullable(productDTO);
+                productDTOOptional.ifPresent((product) -> {
+                    item.setProduct(product);
+                    item.setPreco(product.getPreco());
+                    itens.add(item);
+                });
+
             }
-            return itensDTO;
+            return itens;
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {

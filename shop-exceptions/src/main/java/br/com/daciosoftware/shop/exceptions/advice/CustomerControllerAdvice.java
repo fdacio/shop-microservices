@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.exceptions.advice;
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthEmailExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
@@ -80,5 +81,11 @@ public class CustomerControllerAdvice {
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Cliente já vinculado a um usuário", request);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CustomerIntegrityViolationException.class)
+    public ErrorDTO handleCustomerIntegrityViolationException(HttpServletRequest request, CustomerIntegrityViolationException ex) {
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. Cliente está relacionado a outro recurso", request);
+    }
 
 }
