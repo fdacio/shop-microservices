@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.customer.service;
 import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserInvalidKeyTokenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
@@ -285,7 +286,7 @@ public class CustomerService {
 
     private void validKeyAuth(String keyAuth) {
         Optional<AuthUserDTO> authUserDTOOptional = authService.findAuthUserByKeyToken(keyAuth);
-        if (authUserDTOOptional.isPresent()) throw new AuthUserIntegrityViolationException();
+        if (authUserDTOOptional.isPresent()) throw new CustomerAuthUserConflictException();
     }
 
     private AuthUserDTO createAuthUser(CustomerDTO customerDTO, PasswordDTO password) {
