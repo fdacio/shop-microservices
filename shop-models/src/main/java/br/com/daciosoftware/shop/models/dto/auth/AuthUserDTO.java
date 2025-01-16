@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.models.dto.auth;
 
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.Set;

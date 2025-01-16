@@ -29,7 +29,7 @@ import java.util.List;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableWebFluxSecurity
+@EnableWebFluxSecurity //reactive stack - Non Blocking Code
 public class SecurityConfig {
 
     @Autowired

@@ -32,7 +32,7 @@ public class ProductServiceTest {
 
 	@Test
 	void testFindAll() {
-		Mockito.when(productRepository.findAll()).thenReturn(ProductReposytoryMock.getListProducts());
+		Mockito.when(productRepository.findAll()).thenReturn(ProductRepositoryMock.getListProducts());
 		Assertions.assertEquals(3, productService.findAll().size());
 	}
 
@@ -41,7 +41,7 @@ public class ProductServiceTest {
 
 		Long id = 1L;
 
-		Optional<Product> product = ProductReposytoryMock.getProductFilterById(id);
+		Optional<Product> product = ProductRepositoryMock.getProductFilterById(id);
 
 		Mockito.when(productRepository.findById(id)).thenReturn(product);
 
@@ -53,9 +53,9 @@ public class ProductServiceTest {
 	@Test
 	void testFindById_Throw_ProductNotFoundException() {
 
-		Long id = 8L;//id não existente
+		Long id = 8L;//id not found
 
-		Optional<Product> product = ProductReposytoryMock.getProductFilterById(id);
+		Optional<Product> product = ProductRepositoryMock.getProductFilterById(id);
 
 		Mockito.when(productRepository.findById(id)).thenReturn(product);
 
@@ -66,7 +66,7 @@ public class ProductServiceTest {
 	public void testFindByCategory() {
 
 		Long categoryId = 1L;
-		List<Product> products = ProductReposytoryMock.getProductsFilterByCategory(categoryId);
+		List<Product> products = ProductRepositoryMock.getProductsFilterByCategory(categoryId);
 
 		Mockito.when(productRepository.findByCategory(categoryId)).thenReturn(products);
 
@@ -78,7 +78,7 @@ public class ProductServiceTest {
 
 		String productIdentifier = "321123";
 
-		Optional<Product> product = ProductReposytoryMock.getProductFilterByIdentifie(productIdentifier);
+		Optional<Product> product = ProductRepositoryMock.getProductFilterByIdentifie(productIdentifier);
 
 		Mockito.when(productRepository.findByIdentifier(productIdentifier)).thenReturn(product);
 
@@ -92,7 +92,7 @@ public class ProductServiceTest {
 
 		String productIdentifier = "identifier_not_found";//identificador não existente
 
-		Optional<Product> product = ProductReposytoryMock.getProductFilterByIdentifie(productIdentifier);
+		Optional<Product> product = ProductRepositoryMock.getProductFilterByIdentifie(productIdentifier);
 
 		Mockito.when(productRepository.findByIdentifier(productIdentifier)).thenReturn(product);
 
@@ -104,7 +104,7 @@ public class ProductServiceTest {
 
 		String name = "Produto";
 
-		List<Product> products = ProductReposytoryMock.getProductsFilterByName(name);
+		List<Product> products = ProductRepositoryMock.getProductsFilterByName(name);
 
 		Mockito.when(productRepository.findByNomeContainingIgnoreCaseOrderById(name)).thenReturn(products);
 

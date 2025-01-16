@@ -49,9 +49,9 @@ public class ProductControllerTest {
 	public void testFindAll() throws Exception {
 		
 		ObjectMapper mapper = new ObjectMapper();
-		String responseJson = mapper.writeValueAsString(ProductReposytoryMock.getListProductsDTO());
+		String responseJson = mapper.writeValueAsString(ProductRepositoryMock.getListProductsDTO());
 		
-		Mockito.when(productService.findAll()).thenReturn(ProductReposytoryMock.getListProductsDTO());
+		Mockito.when(productService.findAll()).thenReturn(ProductRepositoryMock.getListProductsDTO());
 		
 		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/product");
 		
@@ -69,7 +69,7 @@ public class ProductControllerTest {
 		
 		Long productId = 1L;
 		
-		ProductDTO productDTO = ProductReposytoryMock.getProductDTOFilterById(productId);
+		ProductDTO productDTO = ProductRepositoryMock.getProductDTOFilterById(productId);
 
 		ObjectMapper mapper = new ObjectMapper();
 		String responseJson = mapper.writeValueAsString(productDTO);
@@ -90,7 +90,7 @@ public class ProductControllerTest {
 	public void testFindByIdentifier() throws Exception {
 		String identifier = "312346";
 		
-		ProductDTO productDTO = ProductReposytoryMock.getProductDTOFilterByIdentifie(identifier);
+		ProductDTO productDTO = ProductRepositoryMock.getProductDTOFilterByIdentifie(identifier);
 
 		ObjectMapper mapper = new ObjectMapper();
 		String responseJson = mapper.writeValueAsString(productDTO);

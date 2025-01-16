@@ -30,8 +30,7 @@ public class AuthService {
     private CustomerService customerService;
 
     public TokenDTO login(LoginDTO loginDTO) {
-        AuthUser user = authRepository.findByUsername(loginDTO.getUsername())
-                .orElseThrow(AuthUserNotFoundException::new);
+        AuthUser user = authRepository.findByUsername(loginDTO.getUsername()).orElseThrow(AuthUserNotFoundException::new);
 
         boolean loginValid = bCryptPasswordEncoder().matches(loginDTO.getPassword(), user.getPassword());
         if (!loginValid) throw new AuthInvalidLoginException();

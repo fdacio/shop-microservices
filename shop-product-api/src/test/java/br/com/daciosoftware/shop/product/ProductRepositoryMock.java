@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class ProductReposytoryMock {
+public class ProductRepositoryMock {
 
-	// Construtores
-	public class ProductMock {
+	// Constructors
+	public static class ProductMock {
 
-		public static class PruductBuilder {
+		public static class ProductBuilder {
 			
 			private Long id;
 			private String nome;
@@ -24,32 +24,32 @@ public class ProductReposytoryMock {
 			private String identifier;
 			private Category category;
 
-			public PruductBuilder setId(Long id) {
+			public ProductBuilder setId(Long id) {
 				this.id = id;
 				return this;
 			}
 
-			public PruductBuilder setNome(String nome) {
+			public ProductBuilder setNome(String nome) {
 				this.nome = nome;
 				return this;
 			}
 
-			public PruductBuilder setDescricao(String descricao) {
+			public ProductBuilder setDescricao(String descricao) {
 				this.descricao = descricao;
 				return this;
 			}
 
-			public PruductBuilder setPreco(Float preco) {
+			public ProductBuilder setPreco(Float preco) {
 				this.preco = preco;
 				return this;
 			}
 
-			public PruductBuilder setIdentifier(String identifier) {
+			public ProductBuilder setIdentifier(String identifier) {
 				this.identifier = identifier;
 				return this;
 			}
 
-			public PruductBuilder setCategory(Category category) {
+			public ProductBuilder setCategory(Category category) {
 				this.category = category;
 				return this;
 			}
@@ -78,7 +78,7 @@ public class ProductReposytoryMock {
 	// Para testes dos Services
 	public static List<Product> getListProducts() {
 
-		Product product1 = new ProductMock.PruductBuilder()
+		Product product1 = new ProductMock.ProductBuilder()
 				.setId(1L)
 				.setNome("Produto 1")
 				.setDescricao("Descrição produto1")
@@ -87,7 +87,7 @@ public class ProductReposytoryMock {
 				.setCategory(getCategory(1L, "Category 1"))
 				.build();
 
-		Product product2 = new ProductMock.PruductBuilder()
+		Product product2 = new ProductMock.ProductBuilder()
 				.setId(2L)
 				.setNome("Produto 2")
 				.setDescricao("Descrição produto2")
@@ -96,7 +96,7 @@ public class ProductReposytoryMock {
 				.setCategory(getCategory(2L, "Category 2"))
 				.build();
 
-		Product product3 = new ProductMock.PruductBuilder()
+		Product product3 = new ProductMock.ProductBuilder()
 				.setId(3L)
 				.setNome("Produto 3")
 				.setDescricao("Descrição produto3")
