@@ -106,7 +106,7 @@ public class ProductServiceTest {
 
 		List<Product> products = ProductRepositoryMock.getProductsFilterByName(name);
 
-		Mockito.when(productRepository.findByNomeContainingIgnoreCaseOrderById(name)).thenReturn(products);
+		Mockito.when(productRepository.findByNomeContainingIgnoreCaseOrderByNome(name)).thenReturn(products);
 
 		List<ProductDTO> productsResult = productService.findByNome(name);
 

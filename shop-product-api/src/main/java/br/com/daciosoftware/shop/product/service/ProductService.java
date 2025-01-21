@@ -23,9 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -56,7 +54,7 @@ public class ProductService {
     }
 
     public List<ProductDTO> findByNome(String name) {
-        return productRepository.findByNomeContainingIgnoreCaseOrderById(name)
+        return productRepository.findByNomeContainingIgnoreCaseOrderByNome(name)
                 .stream()
                 .map(ProductDTO::convert)
                 .collect(Collectors.toList());
@@ -96,6 +94,10 @@ public class ProductService {
         return productRepository.findAll(pageable).map(ProductDTO::convert);
     }
 
+    public Page<ProductDTO> findAllPageableByName(String name, Pageable pageable) {
+        return productRepository.findByNomeContainingIgnoreCaseOrderByNome(name, pageable).map(ProductDTO::convert);
+    }
+
     public ProductDTO save(ProductDTO productDTO) {
 
         validIdentifierIsUnique(productDTO.getIdentifier(), null);
@@ -109,11 +111,6 @@ public class ProductService {
 
     public void delete(Long productId) {
         productRepository.delete(Product.convert(findById(productId)));
-    }
-
-    public void deleteMaiorQue(Long productId) {
-        List<Product> productsDelete = productRepository.findByIdGreaterThan(productId);
-        productRepository.deleteAllInBatch(productsDelete);
     }
 
     public ProductDTO update(Long productId, ProductDTO productDTO) {
@@ -156,7 +153,7 @@ public class ProductService {
         return ProductDTO.convert(product);
     }
 
-    public ProductDTO uploadFoto(Long productId, MultipartFile file) {
+    public ProductDTO uploadPhoto(Long productId, MultipartFile file) {
         try {
             String fileId = UUID.randomUUID() + "." + Objects.requireNonNull(file.getOriginalFilename()).split("\\.")[1];
             String nameFile = destinationFile + "/" + fileId;
@@ -170,6 +167,18 @@ public class ProductService {
         }
     }
 
+    public Optional<InputStream> getPhoto(Long id) throws IOException {
+        ProductDTO productDTO = findById(id);
+        String pathPhoto = productDTO.getFoto();
+        if (pathPhoto != null) {
+            File initialFile = new File(pathPhoto);
+            InputStream inputStream = new FileInputStream(initialFile);
+            return Optional.of(inputStream);
+        }
+        return Optional.empty();
+    }
+
+    /*** Seção de serviços para geração de relatórios PDF ***/
     public List<ProductDTO> findProductsReportPdf(ProductReportRequestDTO productDTO) {
 
         List<Product> products = productRepository.findAll(Sort.by("nome")).stream().toList();

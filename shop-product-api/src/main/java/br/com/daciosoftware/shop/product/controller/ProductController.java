@@ -4,6 +4,7 @@ import br.com.daciosoftware.shop.models.dto.product.ProductDTO;
 import br.com.daciosoftware.shop.models.dto.product.ProductReportRequestDTO;
 import br.com.daciosoftware.shop.product.service.ProductService;
 import jakarta.validation.Valid;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
@@ -68,7 +72,7 @@ public class ProductController {
 
     @PatchMapping("/upload-photo/{id}")
     public ProductDTO uploadPhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile file) {
-        return productService.uploadFoto(id, file);
+        return productService.uploadPhoto(id, file);
     }
 
     @GetMapping("/pageable")
@@ -77,7 +81,10 @@ public class ProductController {
     }
 
     @GetMapping("/all/home")
-    public Page<ProductDTO> findAllPageableForHomePage(Pageable pageable) {
+    public Page<ProductDTO> findAllPageableForHomePage(@RequestParam(name = "nome") String nome, Pageable pageable) {
+        if (nome != null && !nome.isEmpty()) {
+            return productService.findAllPageableByName(nome, pageable);
+        }
         return productService.findAllPageable(pageable);
     }
 
@@ -91,8 +98,21 @@ public class ProductController {
         return new ResponseEntity<>(pdfStream.toByteArray(), headers, HttpStatus.OK);
     }
 
+    @GetMapping("/photo/{id}")
+    public ResponseEntity<?> getPhoto(@PathVariable Long id) throws IOException {
+        Optional<InputStream> optionalInputStream = productService.getPhoto(id);
+        HttpHeaders headers = new HttpHeaders();
+        if (optionalInputStream.isPresent()) {
+            InputStream photoStream = optionalInputStream.get();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=products-photo-" + id);
+            return new ResponseEntity<>(IOUtils.toByteArray(photoStream), headers, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new byte[0], headers, HttpStatus.NOT_FOUND);
+    }
+
     @GetMapping("/healthcheck")
-    public String healthcheck () {
+    public String healthcheck() {
         return "Product service is health !!!";
     }
 

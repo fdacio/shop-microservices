@@ -51,14 +51,17 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // configurações para teste de localhost:3000
                 //.cors(ServerHttpSecurity.CorsSpec::disable) // descomentar para ambiente de produção, quando o frontend no mesmo servidor do backend
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-                        //Routes no authenticated - permitAll()
+
+                        // **** Routes no authenticated - permitAll() ****
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .pathMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
                         .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
                         .pathMatchers(HttpMethod.GET, "/product/all/home", "/product/all/home/*").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/product/photo/*").permitAll()
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
 
                         //**** Routes authenticated ****
+
                         //Route authenticated for all scopes
                         .pathMatchers(HttpMethod.POST, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
 
@@ -113,7 +116,7 @@ public class SecurityConfig {
         System.err.println("**** Setting Config CORS **** ");
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
         configuration.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept", "Authorization"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
