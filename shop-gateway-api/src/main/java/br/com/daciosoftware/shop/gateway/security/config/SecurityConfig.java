@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
                         .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
                         .pathMatchers(HttpMethod.GET, "/product/all/home", "/product/all/home/*").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/product/photo/*").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/product/*/photo").permitAll()
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
 
                         //**** Routes authenticated ****
