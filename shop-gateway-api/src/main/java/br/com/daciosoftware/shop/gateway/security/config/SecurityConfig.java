@@ -15,6 +15,8 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -37,10 +39,22 @@ public class SecurityConfig {
     @Autowired
     private RsaKey rsaKey;
 
+
+    public static final String[]  END_POINTS_WITHOUT_TOKEN = {
+            "/auth/login",
+            "/auth/refresh-token",
+            "/customer/user",
+            "/customer/user",
+            "/product/all/home", "/product/all/home**",
+            "/product/*/photo",
+            "/gateway/healthcheck"
+    };
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         System.err.println("**** Setting SecurityWebFilterChain **** ");
-        String SCOPE_PREFIX = "SCOPE_";
+
+        final String SCOPE_PREFIX = "SCOPE_";
         final String[] ALL_SCOPES = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).toArray(String[]::new);
         final String SCOPE_ADMIN = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("admin")).findFirst().orElse("");
         final String SCOPE_OPERATOR = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("operator")).findFirst().orElse("");
@@ -50,18 +64,17 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // configurações para teste de localhost:3000
                 //.cors(ServerHttpSecurity.CorsSpec::disable) // descomentar para ambiente de produção, quando o frontend no mesmo servidor do backend
+                .httpBasic((ServerHttpSecurity.HttpBasicSpec::disable))
+
+                // **** Routes no authenticated - permitAll() ****
+                .securityMatcher(new NegatedServerWebExchangeMatcher(
+                        ServerWebExchangeMatchers.pathMatchers(END_POINTS_WITHOUT_TOKEN)))
+
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
 
-                        // **** Routes no authenticated - permitAll() ****
-                        .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
-                        .pathMatchers(HttpMethod.GET, "/product/all/home", "/product/all/home**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/product/*/photo").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
+                        //.pathMatchers(END_POINTS_WITHOUT_TOKEN).permitAll()
 
                         //**** Routes authenticated ****
-
                         //Route authenticated for all scopes
                         .pathMatchers(HttpMethod.POST, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
 
@@ -88,6 +101,8 @@ public class SecurityConfig {
                         .pathMatchers("/order/report/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         .anyExchange().authenticated()
+
+
                 )
 
                 .exceptionHandling(exception -> exception
@@ -97,7 +112,7 @@ public class SecurityConfig {
 
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
 
-                .addFilterAfter(new ValidTokenFilter(), SecurityWebFiltersOrder.FIRST)
+                .addFilterBefore(new ValidTokenFilter(), SecurityWebFiltersOrder.FIRST)
 
                 .build();
     }

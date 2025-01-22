@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.gateway.security.filter;
 
 import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
+import br.com.daciosoftware.shop.gateway.security.config.SecurityConfig;
 import br.com.daciosoftware.shop.gateway.security.exception.AuthExpiredTokenException;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 
 @Component
 public class ValidTokenFilter implements WebFilter {
@@ -21,6 +23,17 @@ public class ValidTokenFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+
+        String pathRequest = exchange.getRequest().getPath().toString();
+
+        boolean contains = Arrays.asList(SecurityConfig.END_POINTS_WITHOUT_TOKEN).contains(pathRequest);
+
+        System.out.printf("End Point %s%n", pathRequest);
+
+        if (contains) return chain.filter(exchange);
+
+        System.out.printf("End Point %s valida o token%n", pathRequest);
+
 
         String authorization = exchange.getRequest().getHeaders().getFirst("Authorization");
 
