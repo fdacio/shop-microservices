@@ -30,10 +30,10 @@ public class ValidTokenFilter implements WebFilter {
 
         System.out.printf("End Point %s%n", pathRequest);
 
+        //Se for um end point public no check token
         if (contains) return chain.filter(exchange);
 
         System.out.printf("End Point %s valida o token%n", pathRequest);
-
 
         String authorization = exchange.getRequest().getHeaders().getFirst("Authorization");
 
