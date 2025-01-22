@@ -2,7 +2,7 @@ package br.com.daciosoftware.shop.gateway.security.filter;
 
 import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.gateway.security.config.SecurityConfig;
-import br.com.daciosoftware.shop.gateway.security.exception.AuthExpiredTokenException;
+
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
