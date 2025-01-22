@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .pathMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
                         .pathMatchers(HttpMethod.POST, "/customer/user").permitAll() //for create customer and user(auth)
-                        .pathMatchers(HttpMethod.GET, "/product/all/home", "/product/all/home/*").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/product/all/home", "/product/all/home**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/product/*/photo").permitAll()
                         .pathMatchers(HttpMethod.GET, "/gateway/healthcheck").permitAll()
 
@@ -87,13 +87,18 @@ public class SecurityConfig {
                         .pathMatchers("/order/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .pathMatchers("/order/report/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
-                        .anyExchange().authenticated())
-                //.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .anyExchange().authenticated()
+                )
+
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(new CustomAccessDeniedHandler())
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                )
+
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
-                .addFilterBefore(new ValidTokenFilter(), SecurityWebFiltersOrder.FIRST)
+
+                .addFilterAfter(new ValidTokenFilter(), SecurityWebFiltersOrder.FIRST)
+
                 .build();
     }
 
