@@ -78,10 +78,7 @@ public class ProductController {
 
     @GetMapping("/all/home")
     public Page<ProductDTO> findAllPageableForHomePage(@RequestParam(required = false, name = "nome") String nome, Pageable pageable) {
-        if (nome != null && !nome.isEmpty()) {
-            return productService.findAllPageableByName(nome, pageable);
-        }
-        return productService.findAllPageable(pageable);
+        return productService.findAllPageableByName(nome, pageable);
     }
 
     @PatchMapping("/{id}/upload-photo")

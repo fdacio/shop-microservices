@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.gateway.security.exception;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,11 +13,12 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
+@Configuration
 public class CustomAccessDeniedHandler implements ServerAccessDeniedHandler {
 
     //Access Denied / unauthorized has handle method when failures occur
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException accessDeniedException){
+    public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException ex){
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatusCode(HttpStatus.FORBIDDEN);

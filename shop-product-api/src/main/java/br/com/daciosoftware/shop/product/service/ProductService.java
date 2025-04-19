@@ -18,6 +18,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -95,7 +96,12 @@ public class ProductService {
     }
 
     public Page<ProductDTO> findAllPageableByName(String name, Pageable pageable) {
-        return productRepository.findByNomeContainingIgnoreCaseOrderByNome(name, pageable).map(ProductDTO::convert);
+        Page<ProductDTO> productDTOS = productRepository.findAll(pageable).map(ProductDTO::convert);
+        if (name !=null && !name.isBlank()) {
+            List<ProductDTO>  filteredList = productDTOS.stream().filter(p -> p.getNome().toLowerCase().contains(name.toLowerCase())).toList();
+            return new PageImpl<>(filteredList, pageable, filteredList.size());
+        }
+        return productDTOS;
     }
 
     public ProductDTO save(ProductDTO productDTO) {

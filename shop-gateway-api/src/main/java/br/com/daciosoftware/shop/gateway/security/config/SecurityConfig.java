@@ -3,20 +3,18 @@ package br.com.daciosoftware.shop.gateway.security.config;
 import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAccessDeniedHandler;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAuthenticationEntryPoint;
-import br.com.daciosoftware.shop.gateway.security.filter.ValidTokenFilter;
 import br.com.daciosoftware.shop.gateway.security.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -33,18 +31,19 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebFluxSecurity //reactive stack - Non Blocking Code
+@EnableReactiveMethodSecurity()
 public class SecurityConfig {
 
     public static final String[] END_POINTS_WITHOUT_TOKEN = {
             "/auth/login",
             "/auth/refresh-token",
             "/customer/user",
-            "/customer/user",
             "/product/all/home",
             "/product/all/home**",
             "/product/*/photo",
             "/gateway/healthcheck"
     };
+
     @Autowired
     private AuthService authService;
     @Autowired
@@ -52,7 +51,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(0)
-    SecurityWebFilterChain actuatorFilterChain(final ServerHttpSecurity http) {
+    SecurityWebFilterChain actuatorFilterChain(final ServerHttpSecurity http, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
 
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
@@ -69,7 +68,7 @@ public class SecurityConfig {
 
     @Order(1)
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         System.err.println("**** Setting SecurityWebFilterChain **** ");
 
         final String SCOPE_PREFIX = "SCOPE_";
@@ -78,16 +77,11 @@ public class SecurityConfig {
         final String SCOPE_OPERATOR = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("operator")).findFirst().orElse("");
         final String SCOPE_CUSTOMER = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("customer")).findFirst().orElse("");
 
-
-        http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+        http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // configurações para teste de localhost:3000
                 //.cors(ServerHttpSecurity.CorsSpec::disable) // descomentar para ambiente de produção, quando o frontend no mesmo servidor do backend
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
 
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-
-                        //.pathMatchers(END_POINTS_WITHOUT_TOKEN).permitAll()
 
                         //**** Routes authenticated ****
                         //Route authenticated for all scopes
@@ -117,13 +111,13 @@ public class SecurityConfig {
 
                         .anyExchange().authenticated()
 
-
                 )
                 .exceptionHandling(exception -> exception
-                        .accessDeniedHandler(new CustomAccessDeniedHandler())
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
-                .addFilterBefore(new ValidTokenFilter(), SecurityWebFiltersOrder.FIRST);
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+
 
         return http.build();
     }

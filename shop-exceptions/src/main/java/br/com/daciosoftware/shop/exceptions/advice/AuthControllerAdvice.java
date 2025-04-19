@@ -82,7 +82,7 @@ public class AuthControllerAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthUserInvalidKeyTokenException.class)
     public ErrorDTO handleAuthUserInvalidKeyTokenException(HttpServletRequest request, AuthUserInvalidKeyTokenException ex) {
-        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Chave de autenticação inválida", request);
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Token inválido", request);
     }
 
     @ResponseBody

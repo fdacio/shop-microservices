@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.gateway.security.exception;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,26 +13,15 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
-public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint  {
+@Configuration
+public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
-    //Authentication entry point has commenced method when failures occur
     @Override
-    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex){
+    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Recurso não autorizado", exchange.getRequest());
-        String responseBody = errorDTO.toString();
-        byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
-        DataBuffer buffer = response.bufferFactory().wrap(bytes);
-        return response.writeWith(Mono.just(buffer));
-    }
-
-    public Mono<Void> commence(ServerWebExchange exchange, AuthExpiredTokenException ex) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Token expirado. Refaça o login", exchange.getRequest());
         String responseBody = errorDTO.toString();
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
