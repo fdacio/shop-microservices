@@ -40,3 +40,7 @@ docker-shop/postgres/data/
 !**/.mvn/wrapper/maven-wrapper.properties
 !**/mvnw
 !**/mvnw.cmd
+/shop-order-api/.mvn/wrapper/maven-wrapper.jar
+/shop-order-api/.mvn/wrapper/maven-wrapper.properties
+/shop-order-api/mvnw
+/shop-order-api/mvnw.cmd
