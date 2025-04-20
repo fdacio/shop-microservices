@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.gateway.security.config;
 import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAccessDeniedHandler;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAuthenticationEntryPoint;
+import br.com.daciosoftware.shop.gateway.security.filter.ValidTokenFilter;
 import br.com.daciosoftware.shop.gateway.security.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
@@ -35,8 +37,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableReactiveMethodSecurity()
 public class SecurityConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
-
     public static final String[] PUBLIC_END_POINTS = {
             "/home",
             "/auth/login",
@@ -55,7 +55,7 @@ public class SecurityConfig {
 
     @Order(0)
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler, ValidTokenFilter validTokenFilter) {
 
         final String SCOPE_PREFIX = "SCOPE_";
         final String[] ALL_SCOPES = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).toArray(String[]::new);
@@ -105,7 +105,8 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(customAccessDeniedHandler)
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
-                );
+                )
+                .addFilterAt(validTokenFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 
 
         return http.build();

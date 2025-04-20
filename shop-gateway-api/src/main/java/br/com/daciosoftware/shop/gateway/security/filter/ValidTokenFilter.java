@@ -5,9 +5,6 @@ import br.com.daciosoftware.shop.gateway.security.exception.ErrorDTO;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,6 +13,8 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
@@ -25,14 +24,12 @@ import java.security.spec.InvalidKeySpecException;
 import static br.com.daciosoftware.shop.gateway.security.config.SecurityConfig.PUBLIC_END_POINTS;
 
 @Component
-public class ValidTokenFilter implements GlobalFilter, Ordered {
+public class ValidTokenFilter implements WebFilter {
 
     private static final Logger log = LoggerFactory.getLogger(ValidTokenFilter.class);
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-
-        log.info("Order filter 2");
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String pathRequest = exchange.getRequest().getPath().toString();
@@ -50,9 +47,7 @@ public class ValidTokenFilter implements GlobalFilter, Ordered {
             String token = authorization.replace("Bearer ", "");
 
             try {
-                Jwts.parser()
-                        .setSigningKey(new RsaKey().getRsaPrivateKey())
-                        .parseClaimsJws(token);
+                Jwts.parser().setSigningKey(new RsaKey().getRsaPrivateKey()).parseClaimsJws(token);
             } catch (SignatureException ex) {
                 // Invalid signature/claims
                 log.error(ex.getMessage());
@@ -92,8 +87,4 @@ public class ValidTokenFilter implements GlobalFilter, Ordered {
     }
 
 
-    @Override
-    public int getOrder() {
-        return 1;
-    }
 }
