@@ -70,33 +70,14 @@ public class ProductController {
         return productService.update(id, productDTO);
     }
 
-
     @GetMapping("/pageable")
     public Page<ProductDTO> findAllPageable(Pageable pageable) {
         return productService.findAllPageable(pageable);
     }
 
-    @GetMapping("/all/home")
-    public Page<ProductDTO> findAllPageableForHomePage(@RequestParam(required = false, name = "nome") String nome, Pageable pageable) {
-        return productService.findAllPageableByName(nome, pageable);
-    }
-
     @PatchMapping("/{id}/upload-photo")
     public ProductDTO uploadPhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile file) {
         return productService.uploadPhoto(id, file);
-    }
-
-    @GetMapping("/{id}/photo")
-    public ResponseEntity<?> getPhoto(@PathVariable Long id) throws IOException {
-        Optional<InputStream> optionalInputStream = productService.getPhoto(id);
-        HttpHeaders headers = new HttpHeaders();
-        if (optionalInputStream.isPresent()) {
-            InputStream photoStream = optionalInputStream.get();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=products-photo-" + id);
-            return new ResponseEntity<>(IOUtils.toByteArray(photoStream), headers, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(new byte[0], headers, HttpStatus.OK);
     }
 
     @PostMapping("/report-pdf")
@@ -109,10 +90,29 @@ public class ProductController {
         return new ResponseEntity<>(pdfStream.toByteArray(), headers, HttpStatus.OK);
     }
 
-
-    @GetMapping("/healthcheck")
-    public String healthcheck() {
-        return "Product service is health !!!";
+    /* Public Route */
+    @RequestMapping(value = "/all/home", method = RequestMethod.GET)
+    public Page<ProductDTO> findAllPageableForHomePage(@RequestParam(required = false, name = "nome") String nome, Pageable pageable) {
+        return productService.findAllPageableByName(nome, pageable);
     }
 
+    /* Public Route */
+    @RequestMapping(value = "/{id}/photo", method = RequestMethod.GET)
+    public ResponseEntity<?> getPhoto(@PathVariable Long id) throws IOException {
+        Optional<InputStream> optionalInputStream = productService.getPhoto(id);
+        HttpHeaders headers = new HttpHeaders();
+        if (optionalInputStream.isPresent()) {
+            InputStream photoStream = optionalInputStream.get();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=products-photo-" + id);
+            return new ResponseEntity<>(IOUtils.toByteArray(photoStream), headers, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new byte[0], headers, HttpStatus.OK);
+    }
+
+    /* Public Route */
+    @GetMapping("/healthcheck")
+    public String healthcheck() {
+        return "Product service is health";
+    }
 }

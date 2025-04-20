@@ -1,5 +1,7 @@
 package br.com.daciosoftware.shop.gateway.security.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -16,12 +18,15 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
+    private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
+
     @Override
-    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
-        return handle(exchange, ex);
+    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException exception) {
+        return handle(exchange, exception);
     }
 
-    private Mono<Void> handle(ServerWebExchange exchange, AuthenticationException ex) {
+    private Mono<Void> handle(ServerWebExchange exchange, AuthenticationException exception) {
+        log.info(exception.getMessage());
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatusCode(HttpStatus.UNAUTHORIZED);

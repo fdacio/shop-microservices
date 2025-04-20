@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -28,8 +29,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebFluxSecurity //reactive stack - Non Blocking Code
 @EnableReactiveMethodSecurity()
@@ -41,7 +40,7 @@ public class SecurityConfig {
             "/auth/refresh-token",
             "/customer/user",
             "/product/all/home",
-            "/product/all/home**",
+            "/product/all/home*",
             "/product/*/photo",
             "/gateway/healthcheck"
     };
@@ -62,7 +61,6 @@ public class SecurityConfig {
         final String SCOPE_CUSTOMER = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("customer")).findFirst().orElse("");
 
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
-
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
 
@@ -73,16 +71,19 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/auth/user/authenticated").hasAnyAuthority(ALL_SCOPES)
 
                         //Route for resources user (auth) - only rule SCOPE_Admin
-                        .pathMatchers("/auth/user/**").hasAuthority(SCOPE_ADMIN)
-                        .pathMatchers("/auth/config/**").hasAuthority(SCOPE_ADMIN)
+                        .pathMatchers("/auth/user").hasAuthority(SCOPE_ADMIN)
+                        .pathMatchers("/auth/user/*").hasAuthority(SCOPE_ADMIN)
+                        .pathMatchers("/auth/config/*").hasAuthority(SCOPE_ADMIN)
 
                         //Route for resources customer
-                        .pathMatchers("/customer/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/customer").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/customer/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         //Route for resources product
-                        .pathMatchers(HttpMethod.GET, "/product/pageable").hasAnyAuthority(ALL_SCOPES)
-                        .pathMatchers("/product/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
-                        .pathMatchers("/category/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/product").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/product/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/category").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/category/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         //Route for resources orders
                         .pathMatchers(HttpMethod.POST, "/order").hasAuthority(SCOPE_CUSTOMER)
@@ -91,23 +92,23 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PATCH, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
                         .pathMatchers(HttpMethod.DELETE, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
 
-                        .pathMatchers("/order/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
-                        .pathMatchers("/order/report/**").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/order/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/order/report/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         .anyExchange().authenticated()
 
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .jwt(withDefaults()))
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(customAccessDeniedHandler)
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
-                .addFilterAt(validTokenFilter, SecurityWebFiltersOrder.AUTHENTICATION);
-
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .jwt(Customizer.withDefaults()))
+                .addFilterAt(validTokenFilter, SecurityWebFiltersOrder.AUTHORIZATION);
 
         return http.build();
+
     }
 
 
@@ -136,43 +137,42 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-//
-//    private ServerAuthenticationEntryPoint authenticationEntryPoint() {
-//        return (exchange, ex) -> unauthorized(exchange);
-//    }
-//
-//    private ServerAccessDeniedHandler accessDeniedHandler() {
-//        return (exchange, denied) -> forbidden(exchange);
-//    }
-//
-//    private Mono<Void> unauthorized(ServerWebExchange exchange) {
-//        log.info("unauthorized method call");
-//        String message = "Você precisa estar autenticado para acessar esse recurso.";
-//        return writeError(exchange, HttpStatus.UNAUTHORIZED, message);
-//
-//    }
-//
-//    private Mono<Void> forbidden(ServerWebExchange exchange) {
-//        String message = "Você não tem permissão para acessar esse recurso.";
-//        return writeError(exchange, HttpStatus.FORBIDDEN, message);
-//    }
-//
-//    private Mono<Void> writeError(ServerWebExchange exchange, HttpStatus status, String message) {
-//        if (exchange.getResponse().isCommitted()) {
-//            return Mono.empty();
-//        }
-//        log.info("writeError");
-//        exchange.getResponse().setStatusCode(status);
-//        exchange.getResponse().getHeaders().add("Content-Type", "application/json; charset=UTF-8");
-//
-//        String body = String.format("{\"status\":%d,\"error\":\"%s\"}", status.value(), message);
-//        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-//
-//        return exchange.getResponse()
-//                .writeWith(Mono.fromSupplier(() ->
-//                        exchange.getResponse().bufferFactory().wrap(bytes)
-//                ));
-//    }
 
+/*
+    private ServerAuthenticationEntryPoint authenticationEntryPoint() {
+        return (exchange, ex) -> unauthorized(exchange);
+    }
+
+    private ServerAccessDeniedHandler accessDeniedHandler() {
+        return (exchange, denied) -> forbidden(exchange);
+    }
+
+    private Mono<Void> unauthorized(ServerWebExchange exchange) {
+        String message = "Você precisa estar autenticado para acessar esse recurso.";
+        return writeError(exchange, HttpStatus.UNAUTHORIZED, message);
+
+    }
+
+    private Mono<Void> forbidden(ServerWebExchange exchange) {
+        String message = "Você não tem permissão para acessar esse recurso.";
+        return writeError(exchange, HttpStatus.FORBIDDEN, message);
+    }
+
+    private Mono<Void> writeError(ServerWebExchange exchange, HttpStatus status, String message) {
+        if (exchange.getResponse().isCommitted()) {
+            return Mono.empty();
+        }
+        exchange.getResponse().setStatusCode(status);
+        exchange.getResponse().getHeaders().add("Content-Type", "application/json; charset=UTF-8");
+
+        String body = String.format("{\"status\":%d,\"error\":\"%s\"}", status.value(), message);
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+
+        return exchange.getResponse()
+                .writeWith(Mono.fromSupplier(() ->
+                        exchange.getResponse().bufferFactory().wrap(bytes)
+                ));
+    }
+*/
 }
 
