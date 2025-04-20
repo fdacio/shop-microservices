@@ -4,6 +4,8 @@ import br.com.daciosoftware.shop.auth.keys.component.RsaKey;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAccessDeniedHandler;
 import br.com.daciosoftware.shop.gateway.security.exception.CustomAuthenticationEntryPoint;
 import br.com.daciosoftware.shop.gateway.security.service.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +17,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -34,7 +35,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableReactiveMethodSecurity()
 public class SecurityConfig {
 
-    public static final String[] END_POINTS_WITHOUT_TOKEN = {
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
+    public static final String[] PUBLIC_END_POINTS = {
+            "/home",
             "/auth/login",
             "/auth/refresh-token",
             "/customer/user",
@@ -49,27 +53,9 @@ public class SecurityConfig {
     @Autowired
     private RsaKey rsaKey;
 
-    @Bean
     @Order(0)
-    SecurityWebFilterChain actuatorFilterChain(final ServerHttpSecurity http, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
-
-        http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // configurações para teste de localhost:3000
-                .securityMatcher(ServerWebExchangeMatchers.pathMatchers(END_POINTS_WITHOUT_TOKEN))
-                //.securityMatcher(new NegatedServerWebExchangeMatcher(ServerWebExchangeMatchers.pathMatchers(END_POINTS_WITHOUT_TOKEN)))
-                .authorizeExchange(authorize -> authorize
-                        .pathMatchers(END_POINTS_WITHOUT_TOKEN).permitAll()
-                        .anyExchange().denyAll()
-                );
-
-        return http.build();
-    }
-
-    @Order(1)
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CustomAccessDeniedHandler customAccessDeniedHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
-        System.err.println("**** Setting SecurityWebFilterChain **** ");
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
 
         final String SCOPE_PREFIX = "SCOPE_";
         final String[] ALL_SCOPES = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).toArray(String[]::new);
@@ -78,10 +64,11 @@ public class SecurityConfig {
         final String SCOPE_CUSTOMER = Arrays.stream(authService.getRules()).map(SCOPE_PREFIX::concat).filter(rule -> rule.toLowerCase().contains("customer")).findFirst().orElse("");
 
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // configurações para teste de localhost:3000
-                //.cors(ServerHttpSecurity.CorsSpec::disable) // descomentar para ambiente de produção, quando o frontend no mesmo servidor do backend
 
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
+
+                        .pathMatchers(PUBLIC_END_POINTS).permitAll()
 
                         //**** Routes authenticated ****
                         //Route authenticated for all scopes
@@ -112,11 +99,13 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
 
                 )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .jwt(withDefaults()))
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(customAccessDeniedHandler)
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+                );
 
 
         return http.build();
@@ -139,7 +128,6 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        System.err.println("**** Setting Config CORS **** ");
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
@@ -149,7 +137,43 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
+//
+//    private ServerAuthenticationEntryPoint authenticationEntryPoint() {
+//        return (exchange, ex) -> unauthorized(exchange);
+//    }
+//
+//    private ServerAccessDeniedHandler accessDeniedHandler() {
+//        return (exchange, denied) -> forbidden(exchange);
+//    }
+//
+//    private Mono<Void> unauthorized(ServerWebExchange exchange) {
+//        log.info("unauthorized method call");
+//        String message = "Você precisa estar autenticado para acessar esse recurso.";
+//        return writeError(exchange, HttpStatus.UNAUTHORIZED, message);
+//
+//    }
+//
+//    private Mono<Void> forbidden(ServerWebExchange exchange) {
+//        String message = "Você não tem permissão para acessar esse recurso.";
+//        return writeError(exchange, HttpStatus.FORBIDDEN, message);
+//    }
+//
+//    private Mono<Void> writeError(ServerWebExchange exchange, HttpStatus status, String message) {
+//        if (exchange.getResponse().isCommitted()) {
+//            return Mono.empty();
+//        }
+//        log.info("writeError");
+//        exchange.getResponse().setStatusCode(status);
+//        exchange.getResponse().getHeaders().add("Content-Type", "application/json; charset=UTF-8");
+//
+//        String body = String.format("{\"status\":%d,\"error\":\"%s\"}", status.value(), message);
+//        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+//
+//        return exchange.getResponse()
+//                .writeWith(Mono.fromSupplier(() ->
+//                        exchange.getResponse().bufferFactory().wrap(bytes)
+//                ));
+//    }
 
 }
 

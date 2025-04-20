@@ -16,15 +16,20 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
-    @Override
-    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
+
+    public Mono<Void> handle(ServerWebExchange exchange, AuthenticationException ex) {
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Recurso não autorizado", exchange.getRequest());
+        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Usuário não autenticado", exchange.getRequest());
         String responseBody = errorDTO.toString();
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
+    }
+
+    @Override
+    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
+        return handle(exchange, ex);
     }
 }

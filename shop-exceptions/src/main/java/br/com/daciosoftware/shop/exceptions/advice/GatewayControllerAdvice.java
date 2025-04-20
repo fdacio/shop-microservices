@@ -44,17 +44,4 @@ public class GatewayControllerAdvice {
         return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Microservice Category indisponível", request);
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AuthUnauthorizedException.class)
-    public ErrorDTO handleAuthUnauthorizedException(HttpServletRequest request, AuthUnauthorizedException exception) {
-        return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Recurso não autorizado", request);
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(AuthForbiddenException.class)
-    public ErrorDTO handleAuthForbiddenException(HttpServletRequest request, AuthForbiddenException exception) {
-        return new ErrorDTO(HttpStatus.FORBIDDEN.value(), "Acesso ao recurso negado", request);
-    }
-
 }

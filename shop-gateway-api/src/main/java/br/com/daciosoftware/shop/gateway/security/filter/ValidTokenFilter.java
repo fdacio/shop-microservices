@@ -14,37 +14,34 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
-import static br.com.daciosoftware.shop.gateway.security.config.SecurityConfig.END_POINTS_WITHOUT_TOKEN;
+import static br.com.daciosoftware.shop.gateway.security.config.SecurityConfig.PUBLIC_END_POINTS;
 
 @Component
 public class ValidTokenFilter implements GlobalFilter, Ordered {
-
-    public ValidTokenFilter() {
-        log.info("**** ValidaTokenFilter Constructor **** ");
-
-    }
 
     private static final Logger log = LoggerFactory.getLogger(ValidTokenFilter.class);
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
+        log.info("Order filter 2");
+
+        AntPathMatcher pathMatcher = new AntPathMatcher();
         String pathRequest = exchange.getRequest().getPath().toString();
-        boolean contains = Arrays.asList(END_POINTS_WITHOUT_TOKEN).contains(pathRequest);
-        log.info("End Point: {}", pathRequest);
 
-        //Se for um end point public no check token
-        if (contains) return chain.filter(exchange);
-
-        log.info("End Point: {} valida o token", pathRequest);
+        for (String pattern : PUBLIC_END_POINTS) {
+            if (pathMatcher.match(pattern, pathRequest)) {
+                return chain.filter(exchange);
+            }
+        }
 
         String authorization = exchange.getRequest().getHeaders().getFirst("Authorization");
 
@@ -97,6 +94,6 @@ public class ValidTokenFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -1;
+        return 1;
     }
 }
