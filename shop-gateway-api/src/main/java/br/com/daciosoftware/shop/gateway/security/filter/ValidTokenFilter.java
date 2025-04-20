@@ -49,25 +49,14 @@ public class ValidTokenFilter implements WebFilter {
             try {
                 Jwts.parser().setSigningKey(new RsaKey().getRsaPrivateKey()).parseClaimsJws(token);
             } catch (SignatureException ex) {
-                // Invalid signature/claims
                 log.error(ex.getMessage());
                 return onError(exchange, "Assinatura inválida");
             } catch (ExpiredJwtException ex) {
                 log.error(ex.getMessage());
                 return onError(exchange, "Token expirado");
-            } catch (UnsupportedJwtException ex) {
-                // Unsupported JWT token
-                return onError(exchange, "Token inválido");
-            } catch (MalformedJwtException ex) {
-                // Malformed JWT token
+            } catch (UnsupportedJwtException | MalformedJwtException | NoSuchAlgorithmException |
+                     InvalidKeySpecException | IllegalArgumentException ex) {
                 log.error(ex.getMessage());
-                return onError(exchange, "Token inválido");
-            } catch (IllegalArgumentException ex) {
-                // JWT token is empty
-                log.error(ex.getMessage());
-                return onError(exchange, "Token inválido");
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                log.error(e.getMessage());
                 return onError(exchange, "Token inválido");
             }
         }
