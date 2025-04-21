@@ -104,7 +104,8 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .jwt(Customizer.withDefaults()))
+                        .jwt(Customizer.withDefaults())
+                )
                 .addFilterAt(validTokenFilter, SecurityWebFiltersOrder.AUTHORIZATION);
 
         return http.build();
