@@ -40,6 +40,8 @@ public class ValidTokenFilter implements WebFilter {
             }
         }
 
+        log.warn("Filter Valid Token");
+
         String authorization = exchange.getRequest().getHeaders().getFirst("Authorization");
 
         if (authorization != null) {
@@ -74,6 +76,5 @@ public class ValidTokenFilter implements WebFilter {
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
     }
-
 
 }

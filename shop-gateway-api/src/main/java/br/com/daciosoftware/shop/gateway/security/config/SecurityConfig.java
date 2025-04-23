@@ -18,6 +18,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -35,7 +36,6 @@ import java.util.List;
 public class SecurityConfig {
 
     public static final String[] PUBLIC_END_POINTS = {
-            "/home",
             "/auth/login",
             "/auth/refresh-token",
             "/customer/user",
@@ -52,6 +52,17 @@ public class SecurityConfig {
 
     @Order(0)
     @Bean
+    public SecurityWebFilterChain publicChain(ServerHttpSecurity http) {
+        return http
+                .securityMatcher(ServerWebExchangeMatchers.pathMatchers(PUBLIC_END_POINTS))
+                .authorizeExchange(exchange -> exchange.anyExchange().permitAll())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .build();
+    }
+
+
+    @Order(1)
+    @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler, ValidTokenFilter validTokenFilter) {
 
         final String SCOPE_PREFIX = "SCOPE_";
@@ -63,8 +74,6 @@ public class SecurityConfig {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-
-                        .pathMatchers(PUBLIC_END_POINTS).permitAll()
 
                         //**** Routes authenticated ****
                         //Route authenticated for all scopes
@@ -106,7 +115,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .jwt(Customizer.withDefaults())
                 )
-                .addFilterAt(validTokenFilter, SecurityWebFiltersOrder.AUTHORIZATION);
+                .addFilterBefore(validTokenFilter, SecurityWebFiltersOrder.FIRST);
 
         return http.build();
 
@@ -139,41 +148,42 @@ public class SecurityConfig {
         return source;
     }
 
-/*
-    private ServerAuthenticationEntryPoint authenticationEntryPoint() {
-        return (exchange, ex) -> unauthorized(exchange);
-    }
 
-    private ServerAccessDeniedHandler accessDeniedHandler() {
-        return (exchange, denied) -> forbidden(exchange);
-    }
+//    private ServerAuthenticationEntryPoint authenticationEntryPoint(ValidTokenFilter validTokenFilter) {
+//        return (exchange, ex) -> unauthorized(exchange, validTokenFilter);
+//    }
+//
+//    private ServerAccessDeniedHandler accessDeniedHandler() {
+//        return (exchange, denied) -> forbidden(exchange);
+//    }
+//
+//    private Mono<Void> unauthorized(ServerWebExchange exchange, ValidTokenFilter validTokenFilter) {
+//
+//        String message = "Você precisa estar autenticado para acessar esse recurso.";
+//        return writeError(exchange, HttpStatus.UNAUTHORIZED, message);
+//
+//    }
+//
+//    private Mono<Void> forbidden(ServerWebExchange exchange) {
+//        String message = "Você não tem permissão para acessar esse recurso.";
+//        return writeError(exchange, HttpStatus.FORBIDDEN, message);
+//    }
+//
+//    private Mono<Void> writeError(ServerWebExchange exchange, HttpStatus status, String message) {
+//        if (exchange.getResponse().isCommitted()) {
+//            return Mono.empty();
+//        }
+//        exchange.getResponse().setStatusCode(status);
+//        exchange.getResponse().getHeaders().add("Content-Type", "application/json; charset=UTF-8");
+//
+//        String body = String.format("{\"status\":%d,\"error\":\"%s\"}", status.value(), message);
+//        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+//
+//        return exchange.getResponse()
+//                .writeWith(Mono.fromSupplier(() ->
+//                        exchange.getResponse().bufferFactory().wrap(bytes)
+//                ));
+//    }
 
-    private Mono<Void> unauthorized(ServerWebExchange exchange) {
-        String message = "Você precisa estar autenticado para acessar esse recurso.";
-        return writeError(exchange, HttpStatus.UNAUTHORIZED, message);
-
-    }
-
-    private Mono<Void> forbidden(ServerWebExchange exchange) {
-        String message = "Você não tem permissão para acessar esse recurso.";
-        return writeError(exchange, HttpStatus.FORBIDDEN, message);
-    }
-
-    private Mono<Void> writeError(ServerWebExchange exchange, HttpStatus status, String message) {
-        if (exchange.getResponse().isCommitted()) {
-            return Mono.empty();
-        }
-        exchange.getResponse().setStatusCode(status);
-        exchange.getResponse().getHeaders().add("Content-Type", "application/json; charset=UTF-8");
-
-        String body = String.format("{\"status\":%d,\"error\":\"%s\"}", status.value(), message);
-        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-
-        return exchange.getResponse()
-                .writeWith(Mono.fromSupplier(() ->
-                        exchange.getResponse().bufferFactory().wrap(bytes)
-                ));
-    }
-*/
 }
 

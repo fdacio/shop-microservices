@@ -22,18 +22,17 @@ public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntry
 
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException exception) {
-        return handle(exchange, exception);
-    }
-
-    private Mono<Void> handle(ServerWebExchange exchange, AuthenticationException exception) {
-        log.info(exception.getMessage());
+        log.info("erro handle {} : {}", exception.getMessage(), exception.getCause().getMessage());
+        //String message = (exception instanceof InvalidBearerTokenException) ? "Token expirado" : "Não autenticado";
+        String message = exception.getMessage();
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Usuário não autenticado", exchange.getRequest());
+        ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), message, exchange.getRequest());
         String responseBody = errorDTO.toString();
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
     }
+
 }
