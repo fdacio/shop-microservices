@@ -121,7 +121,6 @@ public class SecurityConfig {
 
     }
 
-
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         try {
