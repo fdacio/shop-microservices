@@ -5,6 +5,8 @@ import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +53,11 @@ public class AuthController {
     public List<AuthUserDTO> findAll() {
         return authService.findAll();
     }
+    @GetMapping("/user/pageable")
+    public Page<AuthUserDTO> findAllPageable(Pageable page) {
+        return authService.findAllPageable(page);
+    }
+
 
     @GetMapping("/rule")
     public String[] rules() {

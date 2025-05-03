@@ -56,15 +56,15 @@ public class OrderService {
         return orderRepository.findById(id).map(OrderDTO::convert).orElseThrow(OrderNotFoundException::new);
     }
 
-    public OrderDTO findById(Long id, String token) {
+    public OrderDTO findByIdAndToken(Long id, String token) {
 
         OrderDTO orderDTO = findById(id);
 
         CustomerDTO customerDTO = getCustomerAuthenticated(token);
         if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
-            throw new CustomerInvalidKeyException();
+            throw new OrderNotFoundException();
         }
-        return findById(id);
+        return orderDTO;
     }
 
     public List<OrderDTO> findByCustomerIndentifier(Long userId) {

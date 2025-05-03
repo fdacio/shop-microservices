@@ -27,6 +27,5 @@ public class CustomAccessDeniedHandler implements ServerAccessDeniedHandler {
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
-
     }
 }

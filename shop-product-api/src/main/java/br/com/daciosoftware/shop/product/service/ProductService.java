@@ -15,6 +15,8 @@ import com.itextpdf.text.Font.FontStyle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -36,6 +38,7 @@ import java.util.stream.Stream;
 public class ProductService {
 
     private static final int SCALE_PERC_LOGO = 50;
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private ProductRepository productRepository;
@@ -49,8 +52,8 @@ public class ProductService {
     public List<ProductDTO> findAll() {
         return productRepository.findAll()
                 .stream()
-                .sorted(Comparator.comparing(Product::getId))
                 .map(ProductDTO::convert)
+                .sorted(Comparator.comparing(ProductDTO::getId))
                 .collect(Collectors.toList());
     }
 
@@ -96,12 +99,15 @@ public class ProductService {
     }
 
     public Page<ProductDTO> findAllPageableByName(String name, Pageable pageable) {
-        Page<ProductDTO> productDTOS = productRepository.findAll(pageable).map(ProductDTO::convert);
-        if (name !=null && !name.isBlank()) {
-            List<ProductDTO>  filteredList = productDTOS.stream().filter(p -> p.getNome().toLowerCase().contains(name.toLowerCase())).toList();
-            return new PageImpl<>(filteredList, pageable, filteredList.size());
+        Stream<ProductDTO> stream = productRepository
+                .findAll(pageable)
+                .stream()
+                .map(ProductDTO::convert);
+        if (name != null && !name.isBlank()) {
+            stream = stream.filter(p -> p.getNome().toLowerCase().contains(name.toLowerCase()));
         }
-        return productDTOS;
+        List<ProductDTO> products = stream.collect(Collectors.toList());
+        return new PageImpl<>(products, pageable, products.size());
     }
 
     public ProductDTO save(ProductDTO productDTO) {

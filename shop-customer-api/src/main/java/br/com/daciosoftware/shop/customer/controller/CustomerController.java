@@ -88,8 +88,8 @@ public class CustomerController {
 	}
 	
 	@GetMapping("/pageable")
-	public Page<CustomerDTO> getcustomerPage(Pageable page) {
-		return customerService.getAllPage(page);
+	public Page<CustomerDTO> findAllPageable(Pageable page) {
+		return customerService.findAllPageable(page);
 	}
 
 	@PostMapping("/valid-key-auth")

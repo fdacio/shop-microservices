@@ -29,7 +29,7 @@ public class ValidTokenFilter implements WebFilter {
     private static final Logger log = LoggerFactory.getLogger(ValidTokenFilter.class);
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    public Mono<Void>  filter(ServerWebExchange exchange, WebFilterChain chain) {
 
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String pathRequest = exchange.getRequest().getPath().toString();

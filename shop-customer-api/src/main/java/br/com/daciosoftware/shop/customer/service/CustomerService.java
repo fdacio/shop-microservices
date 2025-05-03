@@ -2,8 +2,6 @@ package br.com.daciosoftware.shop.customer.service;
 
 import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
-import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
-import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserInvalidKeyTokenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -197,11 +194,9 @@ public class CustomerService {
         } catch (RuntimeException exception) {
             throw new CustomerIntegrityViolationException();
         }
-
-
     }
 
-    public Page<CustomerDTO> getAllPage(Pageable page) {
+    public Page<CustomerDTO> findAllPageable(Pageable page) {
         return customerRepository.findAll(page).map(CustomerDTO::convert);
     }
 

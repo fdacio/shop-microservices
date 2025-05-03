@@ -19,7 +19,7 @@ public class OrderControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(OrderNotFoundException.class)
     public ErrorDTO handleUserNotFound(HttpServletRequest request, OrderNotFoundException shopNotFoundException) {
-        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Venda não encontrado", request);
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Ordem não encontrado", request);
 
     }
 

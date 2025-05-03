@@ -38,7 +38,7 @@ public class OrderController {
 
     @GetMapping("/{id}/my-order")
     public OrderDTO findById(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        return orderService.findById(id, token);
+        return orderService.findByIdAndToken(id, token);
     }
 
     @GetMapping("/pageable")
