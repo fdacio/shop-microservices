@@ -103,7 +103,9 @@ public class ProductController {
         HttpHeaders headers = new HttpHeaders();
         if (optionalInputStream.isPresent()) {
             InputStream photoStream = optionalInputStream.get();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//            headers.setContentType(MediaType.TEXT_PLAIN);
+//            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.set("Product Photo", "Image/PNG/JPG/JPEG");
             headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=products-photo-" + id);
             return new ResponseEntity<>(IOUtils.toByteArray(photoStream), headers, HttpStatus.OK);
         }
@@ -111,8 +113,11 @@ public class ProductController {
     }
 
     /* Public Route */
-    @GetMapping("/healthcheck")
-    public String healthcheck() {
-        return "Product service is health";
+    @GetMapping("/health")
+    public ResponseEntity<Object> healthcheck() {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{\"service\" : \"product_service\", \"status\" : \"OK\" }");
     }
 }

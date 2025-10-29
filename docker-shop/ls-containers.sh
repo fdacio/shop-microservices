@@ -1,2 +1,2 @@
 #!/bin/sh
-docker ps | tail -n+2 | cut -c16-40,85-110
+docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}"

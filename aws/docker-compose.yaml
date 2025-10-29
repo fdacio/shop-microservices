@@ -16,8 +16,8 @@ services:
 
 
   auth:
-    image: loja/shop-auth-api
-    #build: "./auth"
+    #image: loja/shop-auth-api
+    build: "./auth"
     ports:
       - "8881:8081"
     environment:
@@ -32,8 +32,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://auth:8081/auth/health" ]
 
   product:
-    image: loja/shop-product-api
-    #build: "./product"
+    #image: loja/shop-product-api
+    build: "./product"
     ports:
       - "8882:8082"
     volumes:
@@ -49,8 +49,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://product:8082/product/health" ]
 
   customer:
-    image: loja/shop-customer-api
-    #build: "./customer"
+    #image: loja/shop-customer-api
+    build: "./customer"
     ports:
       - "8883:8083"
     environment:
@@ -66,8 +66,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://customer:8083/customer/health" ]
 
   order:
-    image: loja/shop-order-api
-    #build: "./order"
+    #image: loja/shop-order-api
+    build: "./order"
     ports:
       - "8884:8084"
     environment:
@@ -84,8 +84,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://order:8084/order/health" ]
 
   gateway:
-    image: loja/shop-gateway-api
-    #build: "./gateway"
+    #image: loja/shop-gateway-api
+    build: "./gateway"
     ports:
       - "8880:8080"
     environment:

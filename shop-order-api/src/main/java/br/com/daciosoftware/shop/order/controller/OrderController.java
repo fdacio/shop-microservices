@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -94,8 +95,11 @@ public class OrderController {
         return orderService.findOrdersByFilters(dataInicio, dataFim, valorMinimo);
     }
 
-    @GetMapping("/healthcheck")
-    public String healthcheck() {
-        return "ok";
+    @GetMapping("/health")
+    public ResponseEntity<Object> healthcheck() {
+        return ResponseEntity
+                .ok()
+                .header("Content-Type: application/json")
+                .body("{\"service\" : \"order_service\", \"status\" : \"OK\" }");
     }
 }

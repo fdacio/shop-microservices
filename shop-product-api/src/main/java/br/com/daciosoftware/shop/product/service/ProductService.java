@@ -15,8 +15,6 @@ import com.itextpdf.text.Font.FontStyle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -31,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,13 +37,12 @@ import java.util.stream.Stream;
 public class ProductService {
 
     private static final int SCALE_PERC_LOGO = 50;
-    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private ProductRepository productRepository;
 
     @Value("${product.api.dir.photos}")
-    private String destinationFile;
+    private String destinationPhotoFile;
 
     @Autowired
     private CategoryService categoryService;
@@ -77,7 +75,6 @@ public class ProductService {
     }
 
     public void validIdentifierIsUnique(String productIdentifie, Long id) {
-
         Optional<ProductDTO> productDTO = productRepository.findByIdentifier(productIdentifie).map(ProductDTO::convert);
         if (productDTO.isPresent()) {
             if (id == null) {
@@ -111,13 +108,10 @@ public class ProductService {
     }
 
     public ProductDTO save(ProductDTO productDTO) {
-
         validIdentifierIsUnique(productDTO.getIdentifier(), null);
         CategoryDTO categoryDTO = categoryService.findById(productDTO.getCategory().getId());
         productDTO.setCategory(categoryDTO);
-
         Product product = Product.convert(productDTO);
-
         return ProductDTO.convert(productRepository.save(product));
     }
 
@@ -126,24 +120,19 @@ public class ProductService {
     }
 
     public ProductDTO update(Long productId, ProductDTO productDTO) {
-
         Product product = Product.convert(findById(productId));
-
         if (productDTO.getNome() != null) {
             boolean isNomeAlterado = !(productDTO.getNome().equals(product.getNome()));
             if (isNomeAlterado) product.setNome(productDTO.getNome());
         }
-
         if (productDTO.getDescricao() != null) {
             boolean isDescricaoAlterado = !(productDTO.getDescricao().equals(product.getDescricao()));
             if (isDescricaoAlterado) product.setDescricao(productDTO.getDescricao());
         }
-
         if (productDTO.getPreco() != null) {
             boolean isPrecoAlterado = !(productDTO.getPreco().equals(product.getPreco()));
             if (isPrecoAlterado) product.setPreco(productDTO.getPreco());
         }
-
         if (productDTO.getIdentifier() != null) {
             boolean isProductIdentifierAlterado = !(productDTO.getIdentifier().equals(product.getIdentifier()));
             if (isProductIdentifierAlterado) {
@@ -151,7 +140,6 @@ public class ProductService {
                 product.setIdentifier(productDTO.getIdentifier());
             }
         }
-
         if (productDTO.getCategory() != null) {
             boolean isCategoryAlterada = !(productDTO.getCategory().getId().equals(product.getCategory().getId()));
             if (isCategoryAlterada) {
@@ -159,16 +147,14 @@ public class ProductService {
                 product.setCategory(Category.convert(categoryDTO));
             }
         }
-
         product = productRepository.save(product);
-
         return ProductDTO.convert(product);
     }
 
     public ProductDTO uploadPhoto(Long productId, MultipartFile file) {
         try {
             String fileId = UUID.randomUUID() + "." + Objects.requireNonNull(file.getOriginalFilename()).split("\\.")[1];
-            String nameFile = destinationFile + "/" + fileId;
+            String nameFile = destinationPhotoFile + "/" + fileId;
             file.transferTo(new File(nameFile));
             Product product = Product.convert(findById(productId));
             product.setFoto(nameFile);
@@ -191,34 +177,22 @@ public class ProductService {
     }
 
     /*** Seção de serviços para geração de relatórios PDF ***/
-    public List<ProductDTO> findProductsReportPdf(ProductReportRequestDTO productDTO) {
-
-        List<Product> products = productRepository.findAll(Sort.by("nome")).stream().toList();
-
-        if (productDTO.getCategory() != null) {
-            products = products
-                    .stream()
-                    .filter(p -> p.getCategory().getId().equals(productDTO.getCategory().getId()))
-                    .toList();
+    public List<ProductDTO> findProductsReportPdf(ProductReportRequestDTO requestDTO) {
+        Stream<ProductDTO> productsStream = productRepository.findAll(Sort.by("nome")).stream().map(ProductDTO::convert);
+        Predicate<ProductDTO> predicate = p -> p.getId() > 0;
+        if (requestDTO.getCategory() != null) {
+            predicate = predicate.and( p -> p.getCategory().getId().equals(requestDTO.getCategory().getId()));
+            //productsStream = productsStream.filter(p -> p.getCategory().getId().equals(requestDTO.getCategory().getId()));
         }
-
-        if (productDTO.getPrecoInicial() != null) {
-            products = products
-                    .stream()
-                    .filter(p -> p.getPreco() >= productDTO.getPrecoInicial())
-                    .toList();
-
+        if (requestDTO.getPrecoInicial() != null) {
+            predicate = predicate.and(p -> p.getPreco() >= requestDTO.getPrecoInicial());
+            //productsStream = productsStream.filter(p -> p.getPreco() >= requestDTO.getPrecoInicial());
         }
-
-        if (productDTO.getPrecoFinal() != null) {
-            products = products
-                    .stream()
-                    .filter(p -> p.getPreco() <= productDTO.getPrecoFinal())
-                    .toList();
-
+        if (requestDTO.getPrecoFinal() != null) {
+            predicate = predicate.and(p -> p.getPreco() <= requestDTO.getPrecoFinal());
+            //productsStream = productsStream.filter(p -> p.getPreco() <= requestDTO.getPrecoFinal());
         }
-
-        return products.stream().map(ProductDTO::convert).collect(Collectors.toList());
+        return productsStream.filter(predicate).collect(Collectors.toList());
     }
 
     public ByteArrayOutputStream geraReportPdf(ProductReportRequestDTO productDTO) {

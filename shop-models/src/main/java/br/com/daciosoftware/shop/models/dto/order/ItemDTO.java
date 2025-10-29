@@ -24,7 +24,10 @@ public class ItemDTO {
 	
 	@NotNull(message="Informe o produto")
 	private ProductDTO product;
-	
+
+	public ItemDTO(long l, int i, float v) {
+	}
+
 	public static ItemDTO convert(Item item) {
 		ItemDTO itemDTO = new ItemDTO();
 		itemDTO.setId(item.getId());

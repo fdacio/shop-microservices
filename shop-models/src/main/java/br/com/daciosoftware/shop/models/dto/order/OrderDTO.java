@@ -4,10 +4,7 @@ import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.order.Order;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +15,7 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class OrderDTO {
 
 	private Long id;
@@ -41,11 +39,4 @@ public class OrderDTO {
 		orderDTO.setItens(itensDTO);
 		return orderDTO;
 	}
-
-	@Override
-	public String toString() {
-		return "OrderDTO [id=" + id + ", data=" + data + ", total=" + total + ", user=" + customer + ", itens=" + itens
-				+ "]";
-	}
-	
 }

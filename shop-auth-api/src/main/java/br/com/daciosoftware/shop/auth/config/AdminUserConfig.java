@@ -4,6 +4,7 @@ import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
+import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,7 @@ public class AdminUserConfig implements CommandLineRunner {
         String userName = "admin@daciosoftware.com.br";
         String password = "123456";
         String email = "admin@daciosoftware.com.br";
-        Optional<AuthUserDTO> optional = Optional.ofNullable(authService.findByUsername(userName));
+        Optional<AuthUser> optional = authRepository.findByUsername(userName);
         if (optional.isEmpty()) {
             CreateAuthUserDTO admin = new CreateAuthUserDTO();
             admin.setId(1L);

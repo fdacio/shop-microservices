@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.auth.service;
 
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
+import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
@@ -27,19 +28,18 @@ public class AuthService {
     @Autowired
     private RuleService ruleService;
     @Autowired
+    private RuleRepository ruleRepository;
+    @Autowired
     private TokenService tokenConfig;
     @Autowired
     private CustomerService customerService;
 
     public TokenDTO login(LoginDTO loginDTO) {
         AuthUser user = authRepository.findByUsername(loginDTO.getUsername()).orElseThrow(AuthInvalidLoginException::new);
-
         boolean loginValid = bCryptPasswordEncoder().matches(loginDTO.getPassword(), user.getPassword());
         if (!loginValid) throw new AuthInvalidLoginException();
-
         AuthUserDTO authUserDTO = AuthUserDTO.convert(user);
         return tokenConfig.getToken(authUserDTO);
-
     }
 
     public AuthUserDTO findAuthenticatedUser(String token) {

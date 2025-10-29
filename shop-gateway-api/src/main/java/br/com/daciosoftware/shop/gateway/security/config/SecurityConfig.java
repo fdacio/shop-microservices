@@ -40,9 +40,8 @@ public class SecurityConfig {
             "/auth/refresh-token",
             "/customer/user",
             "/product/all/home",
-            "/product/all/home*",
             "/product/*/photo",
-            "/gateway/healthcheck"
+            "/*/health"
     };
 
     @Autowired

@@ -3,11 +3,14 @@ package br.com.daciosoftware.shop.auth.controller;
 import br.com.daciosoftware.shop.auth.service.AuthService;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -34,7 +37,7 @@ public class AuthController {
     @PostMapping("/user/authenticated")
     @ResponseStatus(HttpStatus.OK)
     public AuthUserDTO userAuthenticated(@RequestHeader("Authorization") String token) {
-        return  authService.findAuthenticatedUser(token);
+        return authService.findAuthenticatedUser(token);
     }
 
     @PostMapping("/user")
@@ -53,11 +56,11 @@ public class AuthController {
     public List<AuthUserDTO> findAll() {
         return authService.findAll();
     }
+
     @GetMapping("/user/pageable")
     public Page<AuthUserDTO> findAllPageable(Pageable page) {
         return authService.findAllPageable(page);
     }
-
 
     @GetMapping("/rule")
     public String[] rules() {
@@ -71,7 +74,6 @@ public class AuthController {
     }
 
     @GetMapping("/user/{keyToken}/key-token")
-    @ResponseStatus(HttpStatus.OK)
     public AuthUserDTO findByKeyToken(@PathVariable String keyToken) {
         return authService.findByKeyToken(keyToken);
     }
@@ -110,9 +112,13 @@ public class AuthController {
         return authService.createCustomerFromAuthUser(id, customerDTO);
     }
 
-    @GetMapping("/healthcheck")
-    public String healthcheck () {
-        return "ok";
+    @GetMapping("/health")
+    public ResponseEntity<Object> healthcheck() {
+        return ResponseEntity
+                .ok()
+                .header("Content-Type", "application/json")
+                .header("Service Health", "Docker Composer")
+                .body("{\"service\" : \"auth_service\", \"status\" : \"OK\" }");
     }
 
 }

@@ -17,5 +17,5 @@ docker-compose build
 docker-compose up -d
 echo "Containers are UP. Wait for the deployment to end ...";
 sleep $SLEEP
-docker-compose ps | grep "java" | awk '{print $1, $5, $6}' | tr ' ' '\t'
+docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}"
 echo "Deploy finished!!!";

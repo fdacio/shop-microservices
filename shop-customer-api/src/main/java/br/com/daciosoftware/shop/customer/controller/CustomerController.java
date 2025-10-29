@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -117,9 +118,12 @@ public class CustomerController {
 		return customerService.getCustomersGroupingByCategory();
 	}
 
-	@GetMapping("/healthcheck")
-	public String healthcheck () {
-		return "ok";
+	@GetMapping("/health")
+	public ResponseEntity<Object> healthcheck() {
+		return ResponseEntity
+				.ok()
+				.header("Content-Type: application/json")
+				.body("{\"service\" : \"customer_service\", \"status\" : \"OK\" }");
 	}
 
 }
