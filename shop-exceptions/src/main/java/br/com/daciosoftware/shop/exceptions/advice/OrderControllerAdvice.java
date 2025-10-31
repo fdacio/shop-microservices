@@ -6,6 +6,8 @@ import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidK
 import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,10 +17,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice(basePackages = {"br.com.daciosoftware.shop.order.controller"})
 public class OrderControllerAdvice {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderControllerAdvice.class);
+
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(OrderNotFoundException.class)
-    public ErrorDTO handleUserNotFound(HttpServletRequest request, OrderNotFoundException shopNotFoundException) {
+    public ErrorDTO handleUserNotFound(HttpServletRequest request, OrderNotFoundException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Ordem não encontrado", request);
 
     }
@@ -26,14 +31,16 @@ public class OrderControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ProductNotFoundException.class)
-    public ErrorDTO handleProductNotFound(HttpServletRequest request, ProductNotFoundException productNotFoundException) {
+    public ErrorDTO handleProductNotFound(HttpServletRequest request, ProductNotFoundException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Produto não encontrado", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(CustomerInvalidKeyException.class)
-    public ErrorDTO handleInvalidKeyCustomer(HttpServletRequest request, CustomerInvalidKeyException invalidUserKeyException) {
+    public ErrorDTO handleInvalidKeyCustomer(HttpServletRequest request, CustomerInvalidKeyException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Order - Chave de autenticação inválida", request);
 
     }
@@ -41,7 +48,8 @@ public class OrderControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(AuthUserNotFoundException.class)
-    public ErrorDTO handleAuthUserNotFound(HttpServletRequest request, AuthUserNotFoundException authUserNotFoundException) {
+    public ErrorDTO handleAuthUserNotFound(HttpServletRequest request, AuthUserNotFoundException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Cliente não identificado", request);
     }
 

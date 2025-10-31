@@ -11,6 +11,8 @@ import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Customer;
 import br.com.daciosoftware.shop.models.entity.product.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerService {
 
+    private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
+
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
@@ -34,7 +38,7 @@ public class CustomerService {
     public List<CustomerDTO> findAll() {
         return customerRepository.findAll()
                 .stream()
-                .sorted(Comparator.comparing(Customer::getNome))
+                .sorted(Comparator.comparing(Customer::getId))
                 .map(CustomerDTO::convert)
                 .collect(Collectors.toList());
     }
@@ -92,10 +96,12 @@ public class CustomerService {
         return CustomerDTO.convert(customerRepository.save(customer));
     }
 
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(rollbackFor = Exception.class)
     public AuthUserDTO createAuthUserFromCustomer(Long customerId, PasswordDTO password) {
 
         CustomerDTO customerDTO = findById(customerId);
+
+        validPassword(password);
         validKeyAuth(customerDTO.getKeyAuth());
 
         //Create AuthUser
@@ -117,6 +123,7 @@ public class CustomerService {
         CustomerDTO customerDTO = createCustomerAndAuthUserDTO.getCustomer();
         PasswordDTO passwordDTO = createCustomerAndAuthUserDTO.getPassword();
 
+        //Verifica se senha e reSenha são iguais
         validPassword(passwordDTO);
 
         AuthUserDTO authUserDTO = createAuthUser(customerDTO, passwordDTO);
@@ -285,14 +292,12 @@ public class CustomerService {
     }
 
     private AuthUserDTO createAuthUser(CustomerDTO customerDTO, PasswordDTO password) {
-        validPassword(password);
         CreateAuthUserDTO createAuthUserDTO = new CreateAuthUserDTO();
         createAuthUserDTO.setNome(customerDTO.getNome());
-        createAuthUserDTO.setPassword(password.getPassword());
         createAuthUserDTO.setUsername(customerDTO.getEmail());
         createAuthUserDTO.setEmail(customerDTO.getEmail());
+        createAuthUserDTO.setPassword(password);
         return authService.createAuthUser(createAuthUserDTO);
     }
-
 
 }

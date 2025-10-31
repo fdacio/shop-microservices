@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
+import br.com.daciosoftware.shop.auth.repository.ConfigRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthConfigNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.ConfigDTO;
 import br.com.daciosoftware.shop.models.entity.auth.Config;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 public class ConfigService {
 
     @Autowired
-    private br.com.daciosoftware.shop.auth.repository.ConfigRepository configRepository;
+    private ConfigRepository configRepository;
 
     public List<ConfigDTO> findAll() {
         return configRepository.findAll().stream().map(ConfigDTO::convert).collect(Collectors.toList());

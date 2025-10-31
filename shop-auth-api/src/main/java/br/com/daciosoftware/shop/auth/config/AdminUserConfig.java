@@ -5,6 +5,7 @@ import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.auth.service.AuthService;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.auth.RuleEnum;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
@@ -47,7 +48,10 @@ public class AdminUserConfig implements CommandLineRunner {
             admin.setNome(nome);
             admin.setUsername(userName);
             admin.setEmail(email);
-            admin.setPassword(password);
+            PasswordDTO passwordDTO = new PasswordDTO();
+            passwordDTO.setPassword(password);
+            passwordDTO.setRePassword(password);
+            admin.setPassword(passwordDTO);
             AuthUserDTO authUserDTO = authService.createAdminUser(admin);
             System.err.printf("Usuário %s criado com sucesso%n", authUserDTO.getNome());
         }

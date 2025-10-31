@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
-import br.com.daciosoftware.shop.auth.repository.RuleRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
@@ -28,8 +27,6 @@ public class AuthService {
     @Autowired
     private RuleService ruleService;
     @Autowired
-    private RuleRepository ruleRepository;
-    @Autowired
     private TokenService tokenConfig;
     @Autowired
     private CustomerService customerService;
@@ -55,6 +52,7 @@ public class AuthService {
     }
 
     public AuthUserDTO createOperatorUser(CreateAuthUserDTO createAuthUserDTO) {
+        validPassword(createAuthUserDTO.getPassword());
         RuleDTO rule = ruleService.findByNome(RuleEnum.OPERATOR.getName());
         return createUser(createAuthUserDTO, rule);
     }
@@ -84,7 +82,7 @@ public class AuthService {
         validUsernameUnique(createAuthUserDTO.getUsername(), null);
         validEmailUnique(createAuthUserDTO.getEmail(), null);
         AuthUser authUser = AuthUser.convert(createAuthUserDTO);
-        authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword()));
+        authUser.setPassword(bCryptPasswordEncoder().encode(createAuthUserDTO.getPassword().getPassword()));
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
         authUser.setRules(Set.of(Rule.convert(ruleDTO)));
         authUser.setDataCadastro(LocalDateTime.now());
@@ -170,10 +168,12 @@ public class AuthService {
     }
 
     /* Private Methods */
+
     /**
      * Método utilizado para obter o KeyToken (campo identificador do AuthUser),
      * a partir do JWT Token
-     * */
+     *
+     */
     private String getKeyTokenIdUserByTokenJWT(String token) {
         try {
             String[] chunks = token.split("\\.");
@@ -198,7 +198,8 @@ public class AuthService {
      * Método utilizado para gerar o KeyToken(campo identificador do AuthUser)
      * através da classe UUID a partir de uma String, que no caso é o username
      * do AuthUser
-     * */
+     *
+     */
     private String geraKeyTokenForCreateUser(String username) {
         return UUID.nameUUIDFromBytes(username.getBytes()).toString();
     }
@@ -229,6 +230,12 @@ public class AuthService {
         Optional<CustomerDTO> customerOptional = customerService.findByKeyAuth(keyToken);
         if (customerOptional.isPresent()) {
             throw new AuthUserCustomerConflictException();
+        }
+    }
+
+    private void validPassword(PasswordDTO password) {
+        if (!password.getPassword().equals(password.getRePassword())) {
+            throw new AuthPasswordNotMatchException();
         }
     }
 

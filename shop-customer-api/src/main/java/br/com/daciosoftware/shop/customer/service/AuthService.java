@@ -1,6 +1,5 @@
 package br.com.daciosoftware.shop.customer.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserIntegrityViolationException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
@@ -8,9 +7,12 @@ import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedE
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthUnavailableException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
@@ -19,6 +21,8 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Value("${auth.api.url}")
     private String authApiURL;
@@ -58,6 +62,8 @@ public class AuthService {
 
     public AuthUserDTO createAuthUser(CreateAuthUserDTO createAuthUserDTO) {
 
+        log.info("CreateAuthUserDTO in AuthService: {}", createAuthUserDTO);
+
         try {
 
             WebClient webClient = WebClient.builder()
@@ -72,18 +78,24 @@ public class AuthService {
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> {
-                                switch (response.statusCode().value()) {
-                                    case 409 -> Mono.error(new AuthUserUsernameExistsException());
-                                    case 401 -> Mono.error(new AuthUnauthorizedException());
-                                    case 403 -> Mono.error(new AuthForbiddenException());
-                                    default -> Mono.error(new RuntimeException());
-                                }
-                                return Mono.empty();
-                            })
+                                int status = response.statusCode().value();
+                                return response.bodyToMono(String.class)
+                                        .doOnNext(body -> log.error("Erro do Auth API ({}): {}", status, body))
+                                        .then(Mono.error(
+                                                switch (status) {
+                                                    case 409 -> new AuthUserUsernameExistsException();
+                                                    case 401 -> new AuthUnauthorizedException();
+                                                    case 403 -> new AuthForbiddenException();
+                                                    default -> new RuntimeException("Erro inesperado do Auth API (status " + status + ")");
+                                                }
+                                        ));
+                            }
+                    )
                     .bodyToMono(AuthUserDTO.class)
-                    .block();
+                    .block(); //aguarda a resposta
 
         } catch (Exception exception) {
+
             if (exception instanceof WebClientRequestException) {
                 throw new MicroserviceAuthUnavailableException();
             } else {
@@ -107,21 +119,23 @@ public class AuthService {
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> {
-                                switch (response.statusCode().value()) {
-                                    case 409 -> Mono.error(new AuthUserIntegrityViolationException());
-                                    case 401 -> Mono.error(new AuthUnauthorizedException());
-                                    case 403 -> Mono.error(new AuthForbiddenException());
-                                    default -> Mono.error(new RuntimeException());
-                                }
-                                System.out.println("**** Removing de user fail: " + response.statusCode());
-                                return Mono.empty();
-                            })
+                                int status = response.statusCode().value();
+                                return response.bodyToMono(String.class)
+                                        .doOnNext(body -> log.error("Erro delete user {}: {}", status, body))
+                                        .then(Mono.error(
+                                                switch (status) {
+                                                    case 409 -> new AuthUserUsernameExistsException();
+                                                    case 401 -> new AuthUnauthorizedException();
+                                                    case 403 -> new AuthForbiddenException();
+                                                    default ->
+                                                            new RuntimeException("Erro inesperado do Auth API (status " + status + ")");
+                                                }
+                                        ));
+                            }
+                    )
                     .onStatus(
                             HttpStatusCode::is2xxSuccessful,
-                            response -> {
-                                System.out.println("**** Removing de user success: " + response.statusCode());
-                                return Mono.empty();
-                            })
+                            response -> Mono.empty())
                     .bodyToMono(Void.class)
                     .block();
 

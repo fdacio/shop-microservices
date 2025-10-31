@@ -9,6 +9,8 @@ import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCateg
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCustomerUnavailableException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceProductUnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -32,10 +34,13 @@ import java.util.Map;
         "br.com.daciosoftware.shop.auth.controller"})
 public class ApplicationControllerAdvice {
 
+    private static final Logger log = LoggerFactory.getLogger(ApplicationControllerAdvice.class);
+
     @ResponseBody
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     @ExceptionHandler(MicroserviceAuthUnavailableException.class)
     public ErrorDTO handleServiceAuthUnavailableException(HttpServletRequest request, MicroserviceAuthUnavailableException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço auth indisponível", request);
     }
 
@@ -43,6 +48,7 @@ public class ApplicationControllerAdvice {
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     @ExceptionHandler(MicroserviceCustomerUnavailableException.class)
     public ErrorDTO handleServiceCustomerUnavailableException(HttpServletRequest request, MicroserviceCustomerUnavailableException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço customer indisponível", request);
     }
 
@@ -50,6 +56,7 @@ public class ApplicationControllerAdvice {
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     @ExceptionHandler(MicroserviceProductUnavailableException.class)
     public ErrorDTO handleServiceProductUnavailableException(HttpServletRequest request, MicroserviceProductUnavailableException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço product indisponível", request);
     }
 
@@ -57,16 +64,18 @@ public class ApplicationControllerAdvice {
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     @ExceptionHandler(MicroserviceCategoryUnavailableException.class)
     public ErrorDTO handleServiceCategoryUnavailableException(HttpServletRequest request, MicroserviceCategoryUnavailableException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.SERVICE_UNAVAILABLE.value(), "Serviço category indisponível", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorDTO handleIllegalArgumentError(HttpServletRequest request, MethodArgumentNotValidException ex) {
+    public ErrorDTO handleIllegalArgumentError(HttpServletRequest request, MethodArgumentNotValidException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         ValidErrorDTO error = new ValidErrorDTO(HttpStatus.BAD_REQUEST.value(), "Erro de validação de campos", request);
         Map<String, String> fieldsValidation = new HashMap<>();
-        BindingResult result = ex.getBindingResult();
+        BindingResult result = exception.getBindingResult();
         List<FieldError> fieldsErrors = result.getFieldErrors();
         for (FieldError fieldError : fieldsErrors) {
             String name = fieldError.getField();
@@ -80,7 +89,8 @@ public class ApplicationControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ErrorDTO handleHttpMessageNotReadableError(HttpServletRequest request, HttpMessageNotReadableException ex) {
+    public ErrorDTO handleHttpMessageNotReadableError(HttpServletRequest request, HttpMessageNotReadableException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Erro no corpo da requisição", request);
     }
 
@@ -94,28 +104,32 @@ public class ApplicationControllerAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ErrorDTO handleMethodArgumentTypeMismatchError(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
+    public ErrorDTO handleMethodArgumentTypeMismatchError(HttpServletRequest request, MethodArgumentTypeMismatchException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Requisição inválida", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ErrorDTO handleDataIntegrityViolationException(HttpServletRequest request, DataIntegrityViolationException ex) {
+    public ErrorDTO handleDataIntegrityViolationException(HttpServletRequest request, DataIntegrityViolationException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. O recurso está relacionado a outro", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(CustomerIntegrityViolationException.class)
-    public ErrorDTO handleCustomerIntegrityViolationException(HttpServletRequest request, CustomerIntegrityViolationException ex) {
+    public ErrorDTO handleCustomerIntegrityViolationException(HttpServletRequest request, CustomerIntegrityViolationException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. Cliente está relacionado a outro recurso", request);
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AuthUserIntegrityViolationException.class)
-    public ErrorDTO handleAuthUserIntegrityViolationException(HttpServletRequest request, AuthUserIntegrityViolationException ex) {
+    public ErrorDTO handleAuthUserIntegrityViolationException(HttpServletRequest request, AuthUserIntegrityViolationException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.CONFLICT.value(), "Violação de integridade. Usuário está relacionado a outro recurso", request);
     }
 
