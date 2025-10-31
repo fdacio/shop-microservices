@@ -83,7 +83,7 @@ public class OrderService {
         List<ItemDTO> itensDTO = productService.findItens(orderDTO.getItens());
         Float total = itensDTO.stream().map(i -> (i.getPreco() * i.getQuantidade())).reduce((float) 0, Float::sum);
 
-        orderDTO.setData(LocalDateTime.now());
+        orderDTO.setDateOrder(LocalDateTime.now());
         orderDTO.setTotal(total);
         orderDTO.setCustomer(customerDTO);
         orderDTO.setItens(itensDTO);

@@ -21,7 +21,7 @@ public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private LocalDateTime data;
+	private LocalDateTime dateOrder;
 	private Float total;
 
 	@ManyToOne
@@ -40,7 +40,7 @@ public class Order {
 	public static Order convert(OrderDTO orderDTO) {
 		Order order = new Order();
 		order.setId(orderDTO.getId());
-		order.setData(orderDTO.getData());
+		order.setDateOrder(orderDTO.getDateOrder());
 		order.setTotal(orderDTO.getTotal());
 		order.setCustomer(Customer.convert(orderDTO.getCustomer()));
 		List<Item> itens = orderDTO.getItens().stream().map(Item::convert).collect(Collectors.toList());

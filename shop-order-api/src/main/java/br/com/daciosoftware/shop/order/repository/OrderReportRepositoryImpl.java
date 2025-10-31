@@ -5,15 +5,16 @@ import br.com.daciosoftware.shop.models.dto.order.OrderCustomerReportDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Repository
 public class OrderReportRepositoryImpl implements OrderReportRepository {
 
 	@PersistenceContext
 	private EntityManager entityManager;
-	
 
 	@Override
 	public OrderSummaryReportDTO getOrderByDate(LocalDate dataInicio, LocalDate dataFim) {
@@ -23,8 +24,8 @@ public class OrderReportRepositoryImpl implements OrderReportRepository {
                 "sum(o.total) as total, \n" +
                 "avg(o.total) as mean \n" +
                 "from orders o \n" +
-                "where o.data >= :dataInicio \n" +
-                "and o.data <= :dataFim \n";
+                "where o.dateOrder >= :dataInicio \n" +
+                "and o.dateOrder <= :dataFim \n";
 		
 		Query query = entityManager.createQuery(sbSql);
 		query.setParameter("dataInicio", dataInicio.atTime(0, 0));

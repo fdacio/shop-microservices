@@ -1,1 +1,0 @@
-alter table users.user add column password varchar(255);

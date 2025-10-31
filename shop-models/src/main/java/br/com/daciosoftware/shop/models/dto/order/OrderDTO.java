@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class OrderDTO {
 
 	private Long id;
-	private LocalDateTime data;
+	private LocalDateTime dateOrder;
 	private Float total;
 	private CustomerDTO customer;
 	@NotNull(message="Informe os itens")
@@ -29,7 +29,7 @@ public class OrderDTO {
 	public static OrderDTO convert(Order order) {
 		OrderDTO orderDTO = new OrderDTO();
 		orderDTO.setId(order.getId());
-		orderDTO.setData(order.getData());
+		orderDTO.setDateOrder(order.getDateOrder());
 		orderDTO.setTotal(order.getTotal());
 		orderDTO.setCustomer(CustomerDTO.convert(order.getCustomer()));
 		List<ItemDTO> itensDTO = order.getItens()

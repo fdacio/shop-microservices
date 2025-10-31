@@ -1,1 +1,0 @@
-alter table products.product drop column foto;

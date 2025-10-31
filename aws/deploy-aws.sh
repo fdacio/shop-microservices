@@ -1,24 +1,35 @@
 #!/bin/bash
-#ssh -i "key-rsa-ssh-shop-app-server.pem" ubuntu@ec2-18-215-149-125.compute-1.amazonaws.com
-#HOST="c2-18-215-149-125.compute-1.amazonaws.com"
-HOST="18.215.149.125"
+set -e
+
+HOST="44.220.192.227"
 USER="ubuntu"
-# shellcheck disable=SC2046
+PATH_APPS="/home/ubuntu/shop"
+SSH_KEY="/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem"
+APP="${1:-all}"
 
-ssh -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" $USER@$HOST "mkdir -p shop && cd /home/ubuntu/shop && mkdir -p auth/target gateway/target order/target product/target customer/target" &&
+# Cria estrutura de diretórios remota
+ssh -i "$SSH_KEY" $USER@$HOST "mkdir -p $PATH_APPS/{auth,gateway,order,product,customer}/target"
 
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-auth-api/Dockerfile $USER@$HOST:/home/ubuntu/shop/auth &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-customer-api/Dockerfile $USER@$HOST:/home/ubuntu/shop/customer &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-gateway-api/Dockerfile $USER@$HOST:/home/ubuntu/shop/gateway &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-order-api/Dockerfile $USER@$HOST:/home/ubuntu/shop/order &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-product-api/Dockerfile $USER@$HOST:/home/ubuntu/shop/product &&
+deploy_module() {
+  local module=$1
+  echo "🔹 Enviando módulo: $module"
+  scp -i "$SSH_KEY" "../shop-$module-api/Dockerfile" "$USER@$HOST:$PATH_APPS/$module/"
+  scp -i "$SSH_KEY" "../shop-$module-api/target/shop-$module-api-0.0.1-SNAPSHOT.jar" "$USER@$HOST:$PATH_APPS/$module/target/"
+}
 
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" docker-compose.yaml $USER@$HOST:/home/ubuntu/shop &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" remote-deploy-aws.sh $USER@$HOST:/home/ubuntu/shop &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-auth-api/target/shop-auth-api-0.0.1-SNAPSHOT.jar $USER@$HOST:/home/ubuntu/shop/auth/target &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-customer-api/target/shop-customer-api-0.0.1-SNAPSHOT.jar $USER@$HOST:/home/ubuntu/shop/customer/target &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-gateway-api/target/shop-gateway-api-0.0.1-SNAPSHOT.jar $USER@$HOST:/home/ubuntu/shop/gateway/target &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-order-api/target/shop-order-api-0.0.1-SNAPSHOT.jar $USER@$HOST:/home/ubuntu/shop/order/target &&
-scp -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" ../shop-product-api/target/shop-product-api-0.0.1-SNAPSHOT.jar $USER@$HOST:/home/ubuntu/shop/product/target &&
+if [ "$APP" = "all" ]; then
+  for m in auth customer product order gateway; do
+    deploy_module "$m"
+  done
+else
+  deploy_module "$APP"
+fi
 
-ssh -i "/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem" $USER@$HOST "chmod a+x /home/ubuntu/shop/remote-deploy-aws.sh && /home/ubuntu/shop/remote-deploy-aws.sh"
+# Envia docker-compose e script auxiliar
+scp -i "$SSH_KEY" docker-compose.yaml "$USER@$HOST:$PATH_APPS/"
+scp -i "$SSH_KEY" up-containers-in-aws.sh "$USER@$HOST:$PATH_APPS/"
+
+# Executa remotamente
+ssh -i "$SSH_KEY" $USER@$HOST "chmod +x $PATH_APPS/up-containers-in-aws.sh && $PATH_APPS/up-containers-in-aws.sh $1 $2"
+
+echo "✅ Deploy concluído com sucesso!"

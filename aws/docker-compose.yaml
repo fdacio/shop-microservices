@@ -1,19 +1,18 @@
 services:
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16
     ports:
       - "5435:5432"
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
-      - ./postgres/init-collation.sh:/docker-entrypoint-initdb.d/init-collation.sh
+      #- ./postgres/init-collation.sh:/docker-entrypoint-initdb.d/init-collation.sh
     environment:
       POSTGRES_USERNAME: postgres
       POSTGRES_DB: shop
       POSTGRES_PASSWORD: dacio@04
     healthcheck:
       test: [ "CMD", "psql", "--username=postgres",  "--command=SELECT 1 FROM pg_database WHERE datname='shop';"]
-
 
   auth:
     #image: loja/shop-auth-api

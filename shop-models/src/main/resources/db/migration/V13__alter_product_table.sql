@@ -1,1 +1,0 @@
-alter table products.product alter column descricao type varchar(240);

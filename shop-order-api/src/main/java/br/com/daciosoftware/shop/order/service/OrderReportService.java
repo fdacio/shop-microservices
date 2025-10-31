@@ -132,8 +132,8 @@ public class OrderReportService {
 
 
         String numero = String.valueOf(shopDTO.getId());
-        String data = shopDTO.getData().format(dtfData);
-        String hora = shopDTO.getData().format(dtfHora);
+        String data = shopDTO.getDateOrder().format(dtfData);
+        String hora = shopDTO.getDateOrder().format(dtfHora);
         String valorTotal = String.format("R$ %,.2f", shopDTO.getTotal());
 
         PdfPCell pdfPCellNum = new PdfPCell(new Phrase(numero, fontNormal));

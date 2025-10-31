@@ -103,10 +103,8 @@ public class ProductController {
         HttpHeaders headers = new HttpHeaders();
         if (optionalInputStream.isPresent()) {
             InputStream photoStream = optionalInputStream.get();
-//            headers.setContentType(MediaType.TEXT_PLAIN);
-//            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.set("Product Photo", "Image/PNG/JPG/JPEG");
             headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=products-photo-" + id);
+            headers.setContentType(MediaType.IMAGE_JPEG); // ou IMAGE_PNG conforme o arquivo
             return new ResponseEntity<>(IOUtils.toByteArray(photoStream), headers, HttpStatus.OK);
         }
         return new ResponseEntity<>(new byte[0], headers, HttpStatus.OK);

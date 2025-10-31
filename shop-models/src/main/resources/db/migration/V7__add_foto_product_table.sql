@@ -1,1 +1,0 @@
-alter table products.product add column foto varchar(255);

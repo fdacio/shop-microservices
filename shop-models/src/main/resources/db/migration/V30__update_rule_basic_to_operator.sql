@@ -1,1 +1,0 @@
-update auth.rule set nome = 'Operator' where nome = 'Basic';
