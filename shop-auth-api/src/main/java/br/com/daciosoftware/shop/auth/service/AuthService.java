@@ -62,7 +62,7 @@ public class AuthService {
         return createUser(createAuthUserDTO, rule);
     }
 
-    public AuthUserDTO createUserFromCustomer(CreateAuthUserDTO createAuthUserDTO) {
+    public AuthUserDTO createCustomerUser(CreateAuthUserDTO createAuthUserDTO) {
         RuleDTO rule = ruleService.findByNome(RuleEnum.CUSTOMER.getName());
         return createUser(createAuthUserDTO, rule);
     }
@@ -158,9 +158,7 @@ public class AuthService {
     }
 
     public AuthUserDTO updatePassword(PasswordDTO newPassword, String token) {
-        if (!newPassword.getPassword().equals(newPassword.getRePassword())) {
-            throw new AuthPasswordNotMatchException();
-        }
+        validPassword(newPassword);
         String keyToken = getKeyTokenIdUserByTokenJWT(token);
         AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
         authUser.setPassword(bCryptPasswordEncoder().encode(newPassword.getPassword()));

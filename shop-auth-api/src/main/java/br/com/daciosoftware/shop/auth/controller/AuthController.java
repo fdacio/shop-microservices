@@ -38,16 +38,22 @@ public class AuthController {
         return authService.findAuthenticatedUser(token);
     }
 
-    @PostMapping("/user")
+    @PostMapping("/user/admin")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthUserDTO createUser(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
+    public AuthUserDTO createAdminUser(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
+        return authService.createAdminUser(createAuthUserDTO);
+    }
+
+    @PostMapping("/user/operator")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthUserDTO createOperatorUser(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
         return authService.createOperatorUser(createAuthUserDTO);
     }
 
     @PostMapping("/user/customer")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthUserDTO createUserFromCustomer(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
-        return authService.createUserFromCustomer(createAuthUserDTO);
+        return authService.createCustomerUser(createAuthUserDTO);
     }
 
     @GetMapping("/user")
