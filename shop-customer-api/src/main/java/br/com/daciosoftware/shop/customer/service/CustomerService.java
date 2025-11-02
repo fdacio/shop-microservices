@@ -117,7 +117,7 @@ public class CustomerService {
     }
 
     @Transactional(rollbackFor = RuntimeException.class)
-    public CreateCustomerAndAuthUserDTO createCustomerAndAuthUser(CreateCustomerAndAuthUserDTO createCustomerAndAuthUserDTO) {
+    public CustomerDTO createCustomerAndAuthUser(CreateCustomerAndAuthUserDTO createCustomerAndAuthUserDTO) {
 
         //Create AuthUser
         CustomerDTO customerDTO = createCustomerAndAuthUserDTO.getCustomer();
@@ -130,12 +130,11 @@ public class CustomerService {
 
         //Create Customer and update KeyAuth
         String keyAuth = authUserDTO.getKeyToken();
-        System.out.println("**** Auth Token: " + keyAuth);
         customerDTO.setKeyAuth(keyAuth);
         customerDTO = save(customerDTO);
         createCustomerAndAuthUserDTO.setCustomer(customerDTO);
 
-        return createCustomerAndAuthUserDTO;
+        return customerDTO;
     }
 
     public CustomerDTO update(Long customerId, CustomerDTO customerDTO) {

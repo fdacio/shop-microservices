@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-HOST="54.198.63.131"
+HOST="98.93.41.176"
 USER="ubuntu"
 PATH_APPS="/home/ubuntu/shop"
 SSH_KEY="/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem"

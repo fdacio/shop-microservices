@@ -42,7 +42,7 @@ public class CustomerController {
 
     @PostMapping("/user")
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateCustomerAndAuthUserDTO createCustomerAndAuthUser(@RequestBody @Valid CreateCustomerAndAuthUserDTO createCustomerAndAuthUserDTO) {
+    public CustomerDTO createCustomerAndAuthUser(@RequestBody @Valid CreateCustomerAndAuthUserDTO createCustomerAndAuthUserDTO) {
         return customerService.createCustomerAndAuthUser(createCustomerAndAuthUserDTO);
     }
 
