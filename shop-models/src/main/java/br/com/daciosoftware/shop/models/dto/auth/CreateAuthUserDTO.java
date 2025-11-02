@@ -19,7 +19,9 @@ public class CreateAuthUserDTO {
     private String username;
     @NotEmpty(message = "Informe o email")
     private String email;
-    @NotNull(message = "Informe o password")
+
+    @Valid
+    @NotNull(message = "Informe a senha e a confirmação de senha")
     private PasswordDTO password;
 
 
