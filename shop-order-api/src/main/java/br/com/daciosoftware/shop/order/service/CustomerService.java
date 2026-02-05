@@ -27,6 +27,7 @@ public class CustomerService {
         log.info("validCustomerKeyAuth: {}", customerKeyAuth);
 
         try {
+
             WebClient webClient = WebClient.builder()
                     .baseUrl(customerApiURL)
                     .build();

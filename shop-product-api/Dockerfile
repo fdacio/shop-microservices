@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine
+FROM eclipse-temurin:17-jdk-alpine
 RUN apk add curl
 VOLUME /tmp
 RUN mkdir -p /app/photos

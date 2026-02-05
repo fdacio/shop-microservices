@@ -62,8 +62,6 @@ public class AuthService {
 
     public AuthUserDTO createAuthUser(CreateAuthUserDTO createAuthUserDTO) {
 
-        log.info("CreateAuthUserDTO in AuthService: {}", createAuthUserDTO);
-
         try {
 
             WebClient webClient = WebClient.builder()
@@ -79,14 +77,15 @@ public class AuthService {
                             HttpStatusCode::isError,
                             response -> {
                                 int status = response.statusCode().value();
+                                String message = "Erro ao criar usuário no Auth API - status: " + status;
                                 return response.bodyToMono(String.class)
-                                        .doOnNext(body -> log.error("Erro do Auth API ({}): {}", status, body))
+                                        .doOnNext(body -> log.error(message))
                                         .then(Mono.error(
                                                 switch (status) {
                                                     case 409 -> new AuthUserUsernameExistsException();
                                                     case 401 -> new AuthUnauthorizedException();
                                                     case 403 -> new AuthForbiddenException();
-                                                    default -> new RuntimeException("Erro inesperado do Auth API (status " + status + ")");
+                                                    default -> new IllegalArgumentException();
                                                 }
                                         ));
                             }
@@ -99,7 +98,7 @@ public class AuthService {
             if (exception instanceof WebClientRequestException) {
                 throw new MicroserviceAuthUnavailableException();
             } else {
-                throw exception;
+                throw new RuntimeException();
             }
         }
 
