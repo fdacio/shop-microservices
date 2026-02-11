@@ -3,72 +3,53 @@ package br.com.daciosoftware.shop.models.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+import java.util.regex.Pattern;
+
 public class CpfValidator implements ConstraintValidator<CPF, String> {
+
+    private static final Pattern ONLY_DIGITS = Pattern.compile("\\d{11}");
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return value == null || value.isEmpty() || isCpf(value);
-    }
+        if (value == null || value.isBlank()) {
+            return true; // deixa @NotNull / @NotBlank cuidar disso
+        }
 
-    private boolean isCpf(String cpf) {
+        String cpf = value.replaceAll("\\D", "");
 
-        cpf = cpf.replace(".", "");
-        cpf = cpf.replace("-", "");
-
-        try {
-            Long.parseLong(cpf);
-        } catch (NumberFormatException e) {
+        if (!ONLY_DIGITS.matcher(cpf).matches() || hasAllEqualDigits(cpf)) {
             return false;
         }
 
-        int d1, d2;
-        int digito1, digito2, resto;
-        int digitoCPF;
-        String nDigResult;
-
-        d1 = d2 = 0;
-        digito1 = digito2 = resto = 0;
-
-        for (int nCount = 1; nCount < cpf.length() - 1; nCount++) {
-            digitoCPF = Integer.parseInt(cpf.substring(nCount - 1, nCount));
-
-            // multiplique a ultima casa por 2 a seguinte por 3 a seguinte por 4
-            // e assim por diante.
-            d1 = d1 + (11 - nCount) * digitoCPF;
-
-            // para o segundo digito repita o procedimento incluindo o primeiro
-            // digito calculado no passo anterior.
-            d2 = d2 + (12 - nCount) * digitoCPF;
-        }
-        ;
-
-        // Primeiro resto da divisão por 11.
-        resto = (d1 % 11);
-
-        // Se o resultado for 0 ou 1 o digito é 0 caso contrário o digito é 11
-        // menos o resultado anterior.
-
-        digito1 = (resto < 2) ? 0 : 11 - resto;
-
-        d2 += 2 * digito1;
-
-        // Segundo resto da divisão por 11.
-        resto = (d2 % 11);
-
-        // Se o resultado for 0 ou 1 o digito é 0 caso contrário o digito é 11
-        // menos o resultado anterior.
-
-        digito2 = (resto < 2) ? 0 : 11 - resto;
-
-        // Digito verificador do CPF que está sendo validado.
-        String nDigVerific = cpf.substring(cpf.length() - 2);
-
-        // Concatenando o primeiro resto com o segundo.
-        nDigResult = String.valueOf(digito1) + String.valueOf(digito2);
-
-        // comparar o digito verificador do cpf com o primeiro resto + o segundo
-        // resto.
-        return nDigVerific.equals(nDigResult);
+        return isValidCpf(cpf);
     }
 
+    private boolean isValidCpf(String cpf) {
+        int digito1 = calcularDigito(cpf, 10);
+        int digito2 = calcularDigito(cpf, 11);
+
+        return cpf.endsWith("" + digito1 + digito2);
+    }
+
+    private int calcularDigito(String cpf, int pesoInicial) {
+        int soma = 0;
+
+        for (int i = 0; i < pesoInicial - 1; i++) {
+            int digito = Character.getNumericValue(cpf.charAt(i));
+            soma += digito * (pesoInicial - i);
+        }
+
+        int resto = soma % 11;
+        return (resto < 2) ? 0 : 11 - resto;
+    }
+
+    private boolean hasAllEqualDigits(String cpf) {
+        char first = cpf.charAt(0);
+        for (char c : cpf.toCharArray()) {
+            if (c != first) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
