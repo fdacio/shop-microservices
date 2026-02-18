@@ -2,6 +2,7 @@ package br.com.daciosoftware.shop.models.dto.order;
 
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.order.Order;
+import br.com.daciosoftware.shop.models.enums.OrderStatus;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -21,6 +22,7 @@ public class OrderDTO {
 	private Long id;
 	private LocalDateTime dateOrder;
 	private Float total;
+	private OrderStatus status;
 	private CustomerDTO customer;
 	@NotNull(message="Informe os itens")
 	@NotEmpty(message="Informe pelo menos um item")
@@ -31,6 +33,7 @@ public class OrderDTO {
 		orderDTO.setId(order.getId());
 		orderDTO.setDateOrder(order.getDateOrder());
 		orderDTO.setTotal(order.getTotal());
+		orderDTO.setStatus(order.getStatus());
 		orderDTO.setCustomer(CustomerDTO.convert(order.getCustomer()));
 		List<ItemDTO> itensDTO = order.getItens()
 				.stream()

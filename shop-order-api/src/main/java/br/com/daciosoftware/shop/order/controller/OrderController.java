@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.order.controller;
 
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
+import br.com.daciosoftware.shop.models.dto.order.OrderShotDTO;
 import br.com.daciosoftware.shop.order.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,13 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    @GetMapping(("/all"))
+    public List<OrderDTO> findAllOrders() {
+        return orderService.findAllComplete();
+    }
+
     @GetMapping
-    public List<OrderDTO> findAll() {
+    public List<OrderShotDTO> findAll() {
         return orderService.findAll();
     }
 

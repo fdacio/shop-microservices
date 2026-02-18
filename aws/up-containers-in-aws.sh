@@ -10,6 +10,8 @@ cd "$APP_PATH"
 if [ "$APP" = "all" ]; then
   echo "🧹 Stopping old containers..."
   docker compose down --remove-orphans
+  echo "✅ Prune system docker..."
+  docker system prune -a --volumes -f
   echo "⚙️ Building all images..."
   docker compose build
   echo "🚀 Starting all containers..."

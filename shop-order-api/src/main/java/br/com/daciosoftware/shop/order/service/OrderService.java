@@ -6,7 +6,9 @@ import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
+import br.com.daciosoftware.shop.models.dto.order.OrderShotDTO;
 import br.com.daciosoftware.shop.models.entity.order.Order;
+import br.com.daciosoftware.shop.models.enums.OrderStatus;
 import br.com.daciosoftware.shop.order.repository.OrderRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -42,13 +44,23 @@ public class OrderService {
         return customerService.validCustomerKeyAuth(customerKeyAuth);
     }
 
-    public List<OrderDTO> findAll() {
+    public List<OrderDTO> findAllComplete() {
 
         List<Order> orders = orderRepository.findAll();
 
         return orders
                 .stream()
                 .map(OrderDTO::convert)
+                .collect(Collectors.toList());
+    }
+
+    public List<OrderShotDTO> findAll() {
+
+        List<Order> orders = orderRepository.findAll();
+
+        return orders
+                .stream()
+                .map(OrderShotDTO::convert)
                 .collect(Collectors.toList());
     }
 
@@ -87,6 +99,7 @@ public class OrderService {
         orderDTO.setTotal(total);
         orderDTO.setCustomer(customerDTO);
         orderDTO.setItens(itensDTO);
+        orderDTO.setStatus(OrderStatus.PENDING);
 
         Order order = Order.convert(orderDTO);
         order = orderRepository.save(order);

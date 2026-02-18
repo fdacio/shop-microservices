@@ -2,6 +2,7 @@ package br.com.daciosoftware.shop.models.entity.order;
 
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Customer;
+import br.com.daciosoftware.shop.models.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class Order {
 	private Long id;
 	private LocalDateTime dateOrder;
 	private Float total;
+	private OrderStatus status;
 
 	@ManyToOne
 	@JoinColumn(name = "customer_id")
@@ -42,6 +44,7 @@ public class Order {
 		order.setId(orderDTO.getId());
 		order.setDateOrder(orderDTO.getDateOrder());
 		order.setTotal(orderDTO.getTotal());
+		order.setStatus(orderDTO.getStatus());
 		order.setCustomer(Customer.convert(orderDTO.getCustomer()));
 		List<Item> itens = orderDTO.getItens().stream().map(Item::convert).collect(Collectors.toList());
 		itens.forEach((i) -> i.setOrder(order));//Anexar o item ao order

@@ -1,14 +1,11 @@
 #!/bin/bash
 set -e
 
-<<<<<<< HEAD
-HOST="52.90.98.77"
-=======
-HOST="98.84.113.189"
->>>>>>> 27f2e65df940ad2ed29cf4ab91646360095ee6f4
+HOST="13.221.88.160"
 USER="ubuntu"
 PATH_APPS="/home/ubuntu/shop"
-SSH_KEY="C:\Users\dacio.braga\.ssh\key-rsa-ssh-shop-app-server-access-outdoor.pem"
+#SSH_KEY="C:\Users\dacio.braga\.ssh\key-rsa-ssh-shop-app-server-access-outdoor.pem"
+SSH_KEY="/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem"
 APP="${1:-all}"
 
 # Cria estrutura de diretórios remota
