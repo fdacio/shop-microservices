@@ -76,6 +76,7 @@ services:
       AUTH_API_URL: http://auth:8081
       PRODUCT_API_URL: http://product:8082
       CUSTOMER_API_URL: http://customer:8083
+      KAFKA_BOOTSTRAP_ADDRESS_SERVERS: kafka:9092
     depends_on:
       postgres:
         condition: service_healthy
@@ -112,3 +113,4 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"

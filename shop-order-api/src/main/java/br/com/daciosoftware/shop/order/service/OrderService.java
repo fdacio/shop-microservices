@@ -35,6 +35,8 @@ public class OrderService {
     private ProductService productService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private KafkaClientService kafkaClientService;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -101,10 +103,13 @@ public class OrderService {
         orderDTO.setItens(itensDTO);
         orderDTO.setStatus(OrderStatus.PENDING);
 
-        Order order = Order.convert(orderDTO);
-        order = orderRepository.save(order);
+        Order order = orderRepository.save(Order.convert(orderDTO));
 
-        return OrderDTO.convert(order);
+        orderDTO = OrderDTO.convert(order);
+
+        kafkaClientService.sendMessage(orderDTO);
+
+        return orderDTO;
     }
 
     public OrderDTO update(Long id, OrderDTO orderDTO, String token) {
