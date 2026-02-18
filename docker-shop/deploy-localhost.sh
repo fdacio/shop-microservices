@@ -1,4 +1,13 @@
 #!/bin/bash
+cd ../shop-auth-api && mvn jib:dockerBuild
+cd ../shop-customer-api && mvn jib:dockerBuild
+cd ../shop-gateway-api && mvn jib:dockerBuild
+cd ../shop-order-api && mvn jib:dockerBuild
+cd ../shop-product-api && mvn jib:dockerBuild
+
+# shellcheck disable=SC2164
+cd ../docker-shop
+
 SLEEP=40
 docker-compose down --remove-orphans
 docker-compose build
