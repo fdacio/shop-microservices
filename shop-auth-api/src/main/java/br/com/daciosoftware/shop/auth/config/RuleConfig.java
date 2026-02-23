@@ -1,10 +1,13 @@
 package br.com.daciosoftware.shop.auth.config;
 
 import br.com.daciosoftware.shop.auth.repository.RuleRepository;
+import br.com.daciosoftware.shop.auth.service.AuthService;
 import br.com.daciosoftware.shop.auth.service.RuleService;
 import br.com.daciosoftware.shop.models.dto.auth.RuleDTO;
 import br.com.daciosoftware.shop.models.dto.auth.RuleEnum;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +17,8 @@ import java.util.Optional;
 
 @Configuration
 public class RuleConfig implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(RuleConfig.class);
 
     @Autowired
     private RuleRepository ruleRepository;
@@ -28,10 +33,10 @@ public class RuleConfig implements CommandLineRunner {
             Optional<Rule> optional = ruleRepository.findByNome(rule.getName());
             if (optional.isEmpty()) {
                 RuleDTO newRule = new RuleDTO();
-                newRule.setId(rule.getCode());
+               // newRule.setId(rule.getCode());
                 newRule.setNome(rule.getName());
                 RuleDTO ruleDTO = ruleService.save(newRule);
-                System.err.printf("Rule %s criada com sucesso%n", ruleDTO.getNome());
+                log.info("Rule {} criada com sucesso", ruleDTO.getNome());
             }
         });
     }

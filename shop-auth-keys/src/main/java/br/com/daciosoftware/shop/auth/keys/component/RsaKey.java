@@ -38,7 +38,8 @@ public class RsaKey {
         return  key
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replaceAll(System.lineSeparator(), "")
-                .replace("-----END PRIVATE KEY-----", "");
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
     }
 
     private String getPublicKeyPEM () {
@@ -47,7 +48,8 @@ public class RsaKey {
         return  key
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replaceAll(System.lineSeparator(), "")
-                .replace("-----END PUBLIC KEY-----", "");
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
     }
 
     public PublicKeyDTO getPublicKeyDTO() {

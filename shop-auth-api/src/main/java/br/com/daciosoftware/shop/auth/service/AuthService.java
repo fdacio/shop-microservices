@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.auth.service;
 
+import br.com.daciosoftware.shop.auth.config.AdminUserConfig;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
@@ -8,6 +9,8 @@ import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Autowired
     private AuthRepository authRepository;
@@ -86,6 +91,7 @@ public class AuthService {
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
         authUser.setRules(Set.of(Rule.convert(ruleDTO)));
         authUser.setDataCadastro(LocalDateTime.now());
+        log.info("Usuário {}", createAuthUserDTO);
         return AuthUserDTO.convert(authRepository.save(authUser));
     }
 

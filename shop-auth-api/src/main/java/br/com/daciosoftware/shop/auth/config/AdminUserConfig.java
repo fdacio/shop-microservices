@@ -9,15 +9,18 @@ import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.auth.RuleEnum;
 import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Optional;
 
-
 @Configuration
 public class AdminUserConfig implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(AdminUserConfig.class);
 
     @Autowired
     private AuthRepository authRepository;
@@ -44,7 +47,7 @@ public class AdminUserConfig implements CommandLineRunner {
             }
 
             CreateAuthUserDTO admin = new CreateAuthUserDTO();
-            admin.setId(1L);
+            //admin.setId(1L);
             admin.setNome(nome);
             admin.setUsername(userName);
             admin.setEmail(email);
@@ -53,7 +56,8 @@ public class AdminUserConfig implements CommandLineRunner {
             passwordDTO.setRePassword(password);
             admin.setPassword(passwordDTO);
             AuthUserDTO authUserDTO = authService.createAdminUser(admin);
-            System.err.printf("Usuário %s criado com sucesso%n", authUserDTO.getNome());
+
+            log.info("Usuário {} criado com sucesso", authUserDTO.getNome());
         }
 
     }
