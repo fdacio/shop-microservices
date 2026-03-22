@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-HOST="3.90.247.194"
+HOST="3.88.69.234"
 USER="ubuntu"
 PATH_APPS="/home/ubuntu/shop"
 #SSH_KEY="C:\Users\dacio.braga\.ssh\key-rsa-ssh-shop-app-server-access-outdoor.pem"

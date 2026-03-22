@@ -1,6 +1,8 @@
 package br.com.daciosoftware.shop.order.config;
 
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -18,7 +21,7 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
-    @Value("${spring.kafka.bootstrap-address-servers}")
+    @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapAddressServers;
 
     public ProducerFactory<String, OrderDTO> producerFactory() {
@@ -37,8 +40,15 @@ public class KafkaConfig {
 
     public ConsumerFactory<String, OrderDTO> consumerFactory() {
         JsonDeserializer<OrderDTO> deserializer = new JsonDeserializer<>(OrderDTO.class);
+        deserializer.addTrustedPackages("*");
+
         Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddressServers);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-group");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+
     }
 
     @Bean
@@ -47,4 +57,20 @@ public class KafkaConfig {
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
+    @Bean
+    public NewTopic orderTopic() {
+        return TopicBuilder.name("ORDER_TOPIC")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic orderEventTopic() {
+        return TopicBuilder.name("ORDER_TOPIC_EVENT")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
 }

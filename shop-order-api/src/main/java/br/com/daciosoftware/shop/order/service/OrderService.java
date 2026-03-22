@@ -47,9 +47,7 @@ public class OrderService {
     }
 
     public List<OrderDTO> findAllComplete() {
-
         List<Order> orders = orderRepository.findAll();
-
         return orders
                 .stream()
                 .map(OrderDTO::convert)
@@ -57,9 +55,7 @@ public class OrderService {
     }
 
     public List<OrderShotDTO> findAll() {
-
         List<Order> orders = orderRepository.findAll();
-
         return orders
                 .stream()
                 .map(OrderShotDTO::convert)
@@ -136,6 +132,10 @@ public class OrderService {
         orderRepository.save(Order.convert(orderUpdateDTO));
 
         return findById(id);
+    }
+
+    public void updateStatus(OrderDTO order, OrderStatus status) {
+        orderRepository.updateStatus(order.getId(), status);
     }
 
     public void delete(Long id, String token) {
