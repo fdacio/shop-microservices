@@ -23,9 +23,6 @@ public class CustomerService {
     private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
 
     public CustomerDTO validCustomerKeyAuth(String customerKeyAuth) {
-
-        log.info("validCustomerKeyAuth: {}", customerKeyAuth);
-
         try {
 
             WebClient webClient = WebClient.builder()

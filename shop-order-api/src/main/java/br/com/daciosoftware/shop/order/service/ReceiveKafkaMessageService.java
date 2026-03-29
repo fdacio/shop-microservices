@@ -20,20 +20,20 @@ public class ReceiveKafkaMessageService {
     private final KafkaTemplate<String, OrderDTO> kafkaTemplate;
     private final OrderService orderService;
 
-    @KafkaListener(topics = ORDER_TOPIC_NAME, groupId = "order-group")
+    @KafkaListener(topics = ORDER_TOPIC_NAME, groupId = "order-group", containerFactory = "kafkaListenerContainerFactory")
     public void listenerOrderTopic(OrderDTO order) {
 
         CustomerDTO customer = order.getCustomer();
         Float valorTotalOrder = order.getTotal();
 
         try {
-            log.info("Order Kafka receive: {}", order.getId());
+            log.info("Order Kafka receive: {}", order);
             if (valorTotalOrder < 1000) {
-                log.info("Order processada com sucesso");
                 orderService.updateStatus(order, OrderStatus.APPROVED);
+                log.info("Order processada com sucesso");
             } else {
-                log.info("Order processada com erro");
                 orderService.updateStatus(order, OrderStatus.REJECTED);
+                log.info("Order processada com erro");
             }
             kafkaTemplate.send(ORDER_TOPIC_EVENT_NAME, order);
         } catch (Exception e) {

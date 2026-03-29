@@ -39,16 +39,18 @@ public class KafkaConfig {
     }
 
     public ConsumerFactory<String, OrderDTO> consumerFactory() {
+        // JSON deserializer que conhece a classe alvo
         JsonDeserializer<OrderDTO> deserializer = new JsonDeserializer<>(OrderDTO.class);
+        // Permitir desserializar classes do pacote do projeto (evita erro de "trusted packages")
         deserializer.addTrustedPackages("*");
 
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddressServers);
+        // garantir group id e comportamento de offset para consistência
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-group");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
-
     }
 
     @Bean

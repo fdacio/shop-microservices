@@ -13,6 +13,7 @@ import br.com.daciosoftware.shop.order.repository.OrderRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class OrderService {
 
@@ -103,6 +105,7 @@ public class OrderService {
 
         orderDTO = OrderDTO.convert(order);
 
+        log.info("Order created for kafka: {}", orderDTO);
         kafkaClientService.sendMessage(orderDTO);
 
         return orderDTO;
@@ -134,6 +137,7 @@ public class OrderService {
         return findById(id);
     }
 
+    @Transactional
     public void updateStatus(OrderDTO order, OrderStatus status) {
         orderRepository.updateStatus(order.getId(), status);
     }
