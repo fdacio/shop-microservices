@@ -1,10 +1,55 @@
 #!/bin/bash
 set -e
 
-HOST="98.87.156.199"
+# Função para compilar um módulo do repositório
+# Aceita nomes curtos: models, exceptions, auth-keys, auth, customer, order, product, gateway
+build_module() {
+    local module="$1"
+    local dir
+
+    case "$module" in
+        models)
+            dir="../shop-models" ;;
+        exceptions)
+            dir="../shop-exceptions" ;;
+        auth-keys)
+            dir="../shop-auth-keys" ;;
+        auth)
+            dir="../shop-auth-api" ;;
+        customer)
+            dir="../shop-customer-api" ;;
+        order)
+            dir="../shop-order-api" ;;
+        product)
+            dir="../shop-product-api" ;;
+        gateway)
+            dir="../shop-gateway-api" ;;
+        *)
+            # se foi fornecido um caminho/custom, usa direto
+            dir="$module" ;;
+    esac
+
+    echo "🔧 Building módulo: $module (dir: $dir)"
+    # roda mvn em um subshell para não alterar o diretório do script
+    (cd "$dir" && mvn --offline --update-snapshots -DskipTests=true clean install)
+}
+
+# Build os módulos necessários
+build_module models
+build_module exceptions
+build_module auth-keys
+build_module auth
+build_module customer
+build_module order
+build_module product
+build_module gateway
+
+cd ../aws
+
+HOST="100.27.189.94"
 USER="ubuntu"
 PATH_APPS="/home/ubuntu/shop"
-#SSH_KEY="C:\Users\dacio.braga\.ssh\key-rsa-ssh-shop-app-server-access-outdoor.pem"
+#SSH_KEY="C:\\Users\\dacio.braga\\.ssh\\key-rsa-ssh-shop-app-server-access-outdoor.pem"
 SSH_KEY="/home/fdacio/.ssh/key-rsa-ssh-shop-app-server.pem"
 APP="${1:-all}"
 

@@ -7,12 +7,12 @@ import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerAndAuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Customer;
 import br.com.daciosoftware.shop.models.entity.product.Category;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,14 +26,14 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerService {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
-
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
     private CategoryService categoryService;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private CredcardService credcardService;
 
     public List<CustomerDTO> findAll() {
         return customerRepository.findAll()
@@ -71,6 +71,10 @@ public class CustomerService {
     public CustomerDTO findByKeyAuth(String keyAuth) {
         return customerRepository.findByKeyAuth(keyAuth)
                 .map(CustomerDTO::convert)
+                .map(customerDTO -> {
+                    customerDTO.setCredcardPrincipal(getCredcardPrincipalFromCustomer(customerDTO.getId()).orElseThrow(CustomerCredcardPrincipalNotFoundException::new));
+                    return customerDTO;
+                })
                 .orElseThrow(CustomerInvalidKeyException::new);
     }
 
@@ -123,7 +127,7 @@ public class CustomerService {
         CustomerDTO customerDTO = createCustomerAndAuthUserDTO.getCustomer();
         PasswordDTO passwordDTO = createCustomerAndAuthUserDTO.getPassword();
 
-        //Verifica se senha e reSenha são iguais
+        //Verifica se senha e reSenha são iguanas
         validPassword(passwordDTO);
 
         AuthUserDTO authUserDTO = createAuthUser(customerDTO, passwordDTO);
@@ -254,6 +258,18 @@ public class CustomerService {
 
     }
 
+    public CredcardDTO createCredcardFromCustomer(Long customerId, CredcardDTO credcard) {
+        credcard.setCustomer(findById(customerId));
+        return credcardService.save(credcard);
+    }
+
+    public List<CredcardShotDTO> getCredcardsFromCustomer(Long customerId) {
+        return credcardService.findShotByCustomerId(customerId);
+    }
+
+    public Optional<CredcardDTO> getCredcardPrincipalFromCustomer(Long customerId) {
+        return credcardService.findByCustomerId(customerId).stream().filter(CredcardDTO::getPrincipal).findFirst();
+    }
 
     /*** Private Methods */
 

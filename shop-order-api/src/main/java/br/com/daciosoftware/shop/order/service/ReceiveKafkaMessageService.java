@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.order.service;
 
+import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.enums.OrderStatus;
@@ -24,6 +25,8 @@ public class ReceiveKafkaMessageService {
     public void listenerOrderTopic(OrderDTO order) {
 
         CustomerDTO customer = order.getCustomer();
+        CredcardDTO credcard = customer.getCredcardPrincipal();
+
         Float valorTotalOrder = order.getTotal();
 
         try {
@@ -37,9 +40,10 @@ public class ReceiveKafkaMessageService {
             }
             kafkaTemplate.send(ORDER_TOPIC_EVENT_NAME, order);
         } catch (Exception e) {
-            log.error("Erro ao processar Order Kafka: {}", order.getId(), e);
+            log.error("Erro ao processar Order Kafka: {}", order, e);
         }
-
     }
+
+
 
 }

@@ -4,6 +4,8 @@ import br.com.daciosoftware.shop.customer.service.CustomerService;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerAndAuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import jakarta.validation.Valid;
@@ -117,6 +119,17 @@ public class CustomerController {
     @GetMapping("/grouping-by-category")
     public Map<CategoryDTO, List<CustomerDTO>> getCustomersGroupingByCategory() {
         return customerService.getCustomersGroupingByCategory();
+    }
+
+    @PostMapping("/{customerId}/credcard")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CredcardDTO createCredcardFromCustomer(@PathVariable Long customerId, @RequestBody @Valid CredcardDTO credcard) {
+        return customerService.createCredcardFromCustomer(customerId, credcard);
+    }
+
+    @GetMapping("/{customerId}/credcards")
+    public List<CredcardShotDTO> getCredcardsFromCustomer(@PathVariable Long customerId) {
+        return customerService.getCredcardsFromCustomer(customerId);
     }
 
     @GetMapping("/health")
