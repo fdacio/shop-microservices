@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-SLEEP=${2:-60}
 APP="${1:-all}"
+SLEEP=${2:-60}
 APP_PATH="/home/$USER/shop"
 
 cd "$APP_PATH"
