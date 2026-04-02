@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -63,7 +62,7 @@ class OrderServiceTest {
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(new Order()));
         when(authService.getUserAuthenticated(token)).thenReturn(new AuthUserKeyTokenDTO());
-        when(customerService.validCustomerKeyAuth("keyToken")).thenReturn(customerDTO);
+        when(customerService.getCustomerByKeyAuth("keyToken")).thenReturn(customerDTO);
 
         OrderDTO result = orderService.findByIdAndToken(orderId, token);
 
@@ -84,7 +83,7 @@ class OrderServiceTest {
         when(authService.getUserAuthenticated(token)).thenReturn(new AuthUserKeyTokenDTO());
 		CustomerDTO clientDTO =  new CustomerDTO();
 		clientDTO.setId(3L);
-        when(customerService.validCustomerKeyAuth("keyToken")).thenReturn(clientDTO);
+        when(customerService.getCustomerByKeyAuth("keyToken")).thenReturn(clientDTO);
 
         assertThrows(OrderNotFoundException.class, () -> orderService.findByIdAndToken(orderId, token));
     }
@@ -98,7 +97,7 @@ class OrderServiceTest {
         customerDTO.setId(1L);
 
         when(authService.getUserAuthenticated(token)).thenReturn(new AuthUserKeyTokenDTO());
-        when(customerService.validCustomerKeyAuth("keyToken")).thenReturn(customerDTO);
+        when(customerService.getCustomerByKeyAuth("keyToken")).thenReturn(customerDTO);
         when(productService.findItens(orderDTO.getItens())).thenReturn(orderDTO.getItens());
         when(orderRepository.save(Order.convert(orderDTO))).thenReturn(Order.convert(orderDTO));
 
@@ -121,7 +120,7 @@ class OrderServiceTest {
         when(authService.getUserAuthenticated(token)).thenReturn(new AuthUserKeyTokenDTO());
 		CustomerDTO clientDTO =  new CustomerDTO();
 		clientDTO.setId(3L);
-		when(customerService.validCustomerKeyAuth("keyToken")).thenReturn(clientDTO);
+		when(customerService.getCustomerByKeyAuth("keyToken")).thenReturn(clientDTO);
 
         assertThrows(CustomerInvalidKeyException.class, () -> orderService.delete(orderId, token));
     }

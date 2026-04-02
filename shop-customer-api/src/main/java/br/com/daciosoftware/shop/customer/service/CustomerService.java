@@ -4,6 +4,7 @@ import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerAndAuthUserDTO;
@@ -72,7 +73,7 @@ public class CustomerService {
         return customerRepository.findByKeyAuth(keyAuth)
                 .map(CustomerDTO::convert)
                 .map(customerDTO -> {
-                    customerDTO.setCredcardPrincipal(getCredcardPrincipalFromCustomer(customerDTO.getId()).orElseThrow(CustomerCredcardPrincipalNotFoundException::new));
+                    customerDTO.setCredcardPrincipal(getCredcardPrincipal(customerDTO.getId()).orElseThrow(CredcardPrincipalNotFoundException::new));
                     return customerDTO;
                 })
                 .orElseThrow(CustomerInvalidKeyException::new);
@@ -258,17 +259,28 @@ public class CustomerService {
 
     }
 
-    public CredcardDTO createCredcardFromCustomer(Long customerId, CredcardDTO credcard) {
-        credcard.setCustomer(findById(customerId));
+    public CredcardDTO createCredcard(CredcardDTO credcard, String token) {
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        credcard.setCustomer(customerDTO);
         return credcardService.save(credcard);
     }
 
-    public List<CredcardShotDTO> getCredcardsFromCustomer(Long customerId) {
-        return credcardService.findShotByCustomerId(customerId);
+    public List<CredcardShotDTO> getMyCredcards(String token) {
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        return credcardService.findShotByCustomerId(customerDTO.getId());
     }
 
-    public Optional<CredcardDTO> getCredcardPrincipalFromCustomer(Long customerId) {
+    public Optional<CredcardDTO> getCredcardPrincipal(Long customerId) {
         return credcardService.findByCustomerId(customerId).stream().filter(CredcardDTO::getPrincipal).findFirst();
+    }
+
+    public void deleteMyCredcard(Long credcardId, String token) {
+        CredcardDTO credcardDTO = credcardService.findById(credcardId);
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        if (!credcardDTO.getCustomer().getId().equals(customerDTO.getId())) {
+            throw new CredcardNotFoundException();
+        }
+        credcardService.deleteById(credcardDTO.getId());
     }
 
     /*** Private Methods */
@@ -315,4 +327,9 @@ public class CustomerService {
         return authService.createAuthUser(createAuthUserDTO);
     }
 
+    private CustomerDTO getCustomerAuthenticated(String token) {
+        AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
+        String customerKeyAuth = authUserDTO.getKeyToken();
+        return findByKeyAuth(customerKeyAuth);
+    }
 }

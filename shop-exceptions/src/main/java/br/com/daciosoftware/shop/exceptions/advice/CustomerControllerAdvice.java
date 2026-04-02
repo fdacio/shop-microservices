@@ -96,9 +96,17 @@ public class CustomerControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(CustomerCredcardPrincipalNotFoundException.class)
-    public ErrorDTO handleCustomerCredcardPrincipalNotFoundException(HttpServletRequest request, CustomerCredcardPrincipalNotFoundException exception) {
+    @ExceptionHandler(CredcardPrincipalNotFoundException.class)
+    public ErrorDTO handleCredcardPrincipalNotFoundException(HttpServletRequest request, CredcardPrincipalNotFoundException exception) {
         log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cliente não tem um cartão de crédito principal", request);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CredcardNotFoundException.class)
+    public ErrorDTO handleCredcardNotFoundException(HttpServletRequest request, CredcardNotFoundException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cartão de crédito não encontrado", request);
     }
 }

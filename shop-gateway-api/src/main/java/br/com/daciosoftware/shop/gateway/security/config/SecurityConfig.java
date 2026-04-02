@@ -99,6 +99,9 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
                         .pathMatchers(HttpMethod.PATCH, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
                         .pathMatchers(HttpMethod.DELETE, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.POST, "/customer/credcard").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.GET, "/customer/my-credcards").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.DELETE, "/customer/my-credcard").hasAuthority(SCOPE_CUSTOMER)
 
                         .pathMatchers("/order/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .pathMatchers("/order/report/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)

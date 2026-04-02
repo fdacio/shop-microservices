@@ -8,7 +8,6 @@ import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
@@ -19,7 +18,6 @@ public class AuthService {
     @Value("${auth.api.url}")
     private String authApiURL;
 
-    @Transactional
     public AuthUserKeyTokenDTO getUserAuthenticated(String token) {
 
         try {
@@ -51,7 +49,5 @@ public class AuthService {
                 throw exception;
             }
         }
-
-
     }
 }

@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.customer.service;
 
 import br.com.daciosoftware.shop.customer.repository.CredcardRepository;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardNotFoundException;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Credcard;
@@ -14,6 +15,10 @@ public class CredcardService {
 
     @Autowired
     private CredcardRepository credcardRepository;
+
+    public CredcardDTO findById(Long id) {
+        return credcardRepository.findById(id).map(CredcardDTO::convert).orElseThrow(CredcardNotFoundException::new);
+    }
 
     public List<CredcardShotDTO> findShotByCustomerId(Long customerId) {
         return credcardRepository.findByCustomerId(customerId).stream().map(CredcardShotDTO::convert).toList();

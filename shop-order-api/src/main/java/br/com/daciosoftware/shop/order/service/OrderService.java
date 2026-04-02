@@ -42,12 +42,6 @@ public class OrderService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private CustomerDTO getCustomerAuthenticated(String token) {
-        AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
-        String customerKeyAuth = authUserDTO.getKeyToken();
-        return customerService.validCustomerKeyAuth(customerKeyAuth);
-    }
-
     public List<OrderDTO> findAllComplete() {
         List<Order> orders = orderRepository.findAll();
         return orders
@@ -199,5 +193,11 @@ public class OrderService {
     public List<OrderDTO> findOrdersCustomerAuthenticated(String token) {
         CustomerDTO customerDTO = getCustomerAuthenticated(token);
         return findByCustomerIndentifier(customerDTO.getId());
+    }
+
+    private CustomerDTO getCustomerAuthenticated(String token) {
+        AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
+        String customerKeyAuth = authUserDTO.getKeyToken();
+        return customerService.getCustomerByKeyAuth(customerKeyAuth);
     }
 }

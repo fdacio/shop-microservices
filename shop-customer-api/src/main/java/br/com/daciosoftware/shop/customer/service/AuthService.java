@@ -6,13 +6,13 @@ import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenExce
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthUnavailableException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
+import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
@@ -145,6 +145,38 @@ public class AuthService {
                 throw exception;
             }
         }
+    }
 
+    public AuthUserKeyTokenDTO getUserAuthenticated(String token) {
+
+        try {
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(authApiURL)
+                    .build();
+
+            Mono<AuthUserKeyTokenDTO> user = webClient
+                    .post()
+                    .uri("/auth/user/authenticated")
+                    .header("Authorization", token)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> switch (response.statusCode().value()) {
+                                case 404 -> Mono.error(new AuthUserNotFoundException());
+                                case 401 -> Mono.error(new AuthUnauthorizedException());
+                                case 403 -> Mono.error(new AuthForbiddenException());
+                                default -> Mono.error(new RuntimeException());
+                            })
+                    .bodyToMono(AuthUserKeyTokenDTO.class);
+
+            return user.block();
+
+        } catch (Exception exception) {
+            if (exception instanceof WebClientRequestException) {
+                throw new MicroserviceAuthUnavailableException();
+            } else {
+                throw exception;
+            }
+        }
     }
 }
