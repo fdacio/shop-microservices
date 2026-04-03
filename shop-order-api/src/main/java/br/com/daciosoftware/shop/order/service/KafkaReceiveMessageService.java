@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ReceiveKafkaMessageService {
+public class KafkaReceiveMessageService {
 
     private static final String ORDER_TOPIC_NAME = "ORDER_TOPIC";
     private static final String ORDER_TOPIC_EVENT_NAME = "ORDER_TOPIC_EVENT";

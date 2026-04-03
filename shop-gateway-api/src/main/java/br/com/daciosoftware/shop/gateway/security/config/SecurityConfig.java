@@ -82,9 +82,7 @@ public class SecurityConfig {
                         .pathMatchers("/auth/user/*").hasAuthority(SCOPE_ADMIN)
                         .pathMatchers("/auth/config/*").hasAuthority(SCOPE_ADMIN)
 
-                        //Route for resources customer
-                        .pathMatchers("/customer").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
-                        .pathMatchers("/customer/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+
 
                         //Route for resources product
                         .pathMatchers("/product").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
@@ -104,6 +102,10 @@ public class SecurityConfig {
 
                         .pathMatchers("/order/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .pathMatchers("/order/report/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+
+                        //Route for resources customer
+                        .pathMatchers("/customer").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
+                        .pathMatchers("/customer/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
 
                         .anyExchange().authenticated()
 
