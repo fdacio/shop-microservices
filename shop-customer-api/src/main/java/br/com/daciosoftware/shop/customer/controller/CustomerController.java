@@ -31,6 +31,11 @@ public class CustomerController {
         return customerService.findAll();
     }
 
+    @GetMapping("/pageable")
+    public Page<CustomerDTO> findAllPageable(Pageable page) {
+        return customerService.findAllPageable(page);
+    }
+
     @GetMapping("/{id}")
     public CustomerDTO findById(@PathVariable Long id) {
         return customerService.findById(id);
@@ -91,9 +96,9 @@ public class CustomerController {
         return customerService.update(id, customerDTO);
     }
 
-    @GetMapping("/pageable")
-    public Page<CustomerDTO> findAllPageable(Pageable page) {
-        return customerService.findAllPageable(page);
+    @PostMapping("/authenticated")
+    public CustomerDTO getCustomerAuthenticated(@RequestHeader("Authorization") String token) {
+        return customerService.getCustomerAuthenticated(token);
     }
 
     @PostMapping("/valid-key-auth")
@@ -120,7 +125,6 @@ public class CustomerController {
     public Map<CategoryDTO, List<CustomerDTO>> getCustomersGroupingByCategory() {
         return customerService.getCustomersGroupingByCategory();
     }
-
 
     @GetMapping("/health")
     public ResponseEntity<Object> healthcheck() {

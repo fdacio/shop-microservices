@@ -2,6 +2,8 @@ package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
+import br.com.daciosoftware.shop.models.dto.order.BrokerCredcardRequestDTO;
+import br.com.daciosoftware.shop.models.dto.order.BrokerCredcardResponseDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -20,30 +23,46 @@ public class KafkaReceiveMessageService {
 
     private final KafkaTemplate<String, OrderDTO> kafkaTemplate;
     private final OrderService orderService;
+    private final BrokerCredcardService brokerCredcardService;
 
     @KafkaListener(topics = ORDER_TOPIC_NAME, groupId = "order-group", containerFactory = "kafkaListenerContainerFactory")
     public void listenerOrderTopic(OrderDTO order) {
 
-        CustomerDTO customer = order.getCustomer();
-        CredcardDTO credcard = customer.getCredcardPrincipal();
+        log.info("Order Kafka receive: {}", order.getId());
 
+        CustomerDTO customer = order.getCustomer();
+        CredcardDTO credcard = order.getCredcardPrincipal();
         Float valorTotalOrder = order.getTotal();
 
-        try {
-            log.info("Order Kafka receive: {}", order);
-            if (valorTotalOrder < 1000) {
+
+        BrokerCredcardRequestDTO request = new BrokerCredcardRequestDTO();
+        request.setOrderId(order.getId());
+        request.setCpf(customer.getCpf());
+        request.setNumberCard(credcard.getNumberCard());
+        request.setCvv(credcard.getCvv());
+        request.setValue(valorTotalOrder);
+
+        log.info("Broker credcard request: {}", request);
+
+        Mono<BrokerCredcardResponseDTO> responseMono = brokerCredcardService.processPayment(request);
+
+        if (responseMono.blockOptional().isPresent()) {
+            BrokerCredcardResponseDTO response = responseMono.block();
+            log.info("Resposta do broker de cartão: {}", response);
+
+            if (response != null && response.getAuthorized()) {
                 orderService.updateStatus(order, OrderStatus.APPROVED);
                 log.info("Order processada com sucesso");
             } else {
                 orderService.updateStatus(order, OrderStatus.REJECTED);
-                log.info("Order processada com erro");
+                log.info("Order rejeitada pelo broker de cartão");
             }
-            kafkaTemplate.send(ORDER_TOPIC_EVENT_NAME, order);
-        } catch (Exception e) {
-            log.error("Erro ao processar Order Kafka: {}", order, e);
+        } else {
+            orderService.updateStatus(order, OrderStatus.REJECTED);
+            log.info("Order rejeitada: resposta do broker de cartão não recebida");
         }
-    }
 
+    }
 
 
 }

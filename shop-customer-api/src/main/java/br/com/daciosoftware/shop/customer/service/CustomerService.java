@@ -72,10 +72,6 @@ public class CustomerService {
     public CustomerDTO findByKeyAuth(String keyAuth) {
         return customerRepository.findByKeyAuth(keyAuth)
                 .map(CustomerDTO::convert)
-                .map(customerDTO -> {
-                    customerDTO.setCredcardPrincipal(getCredcardPrincipal(customerDTO.getId()).orElseThrow(CredcardPrincipalNotFoundException::new));
-                    return customerDTO;
-                })
                 .orElseThrow(CustomerInvalidKeyException::new);
     }
 
@@ -270,8 +266,15 @@ public class CustomerService {
         return credcardService.findShotByCustomerId(customerDTO.getId());
     }
 
-    public Optional<CredcardDTO> getCredcardPrincipal(Long customerId) {
-        return credcardService.findByCustomerId(customerId).stream().filter(CredcardDTO::getPrincipal).findFirst();
+    public CustomerDTO getCustomerAuthenticated(String token) {
+        AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
+        String customerKeyAuth = authUserDTO.getKeyToken();
+        return findByKeyAuth(customerKeyAuth);
+    }
+
+    public CredcardDTO getCredcardPrincipal(String token) {
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        return credcardService.findByCustomerId(customerDTO.getId()).stream().filter(CredcardDTO::getPrincipal).findFirst().orElseThrow(CredcardPrincipalNotFoundException::new);
     }
 
     public void deleteMyCredcard(Long credcardId, String token) {
@@ -327,9 +330,5 @@ public class CustomerService {
         return authService.createAuthUser(createAuthUserDTO);
     }
 
-    private CustomerDTO getCustomerAuthenticated(String token) {
-        AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
-        String customerKeyAuth = authUserDTO.getKeyToken();
-        return findByKeyAuth(customerKeyAuth);
-    }
+
 }

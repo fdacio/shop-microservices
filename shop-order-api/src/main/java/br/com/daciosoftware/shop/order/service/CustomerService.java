@@ -4,6 +4,7 @@ import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidK
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCustomerUnavailableException;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,22 +23,21 @@ public class CustomerService {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerService.class);
 
-    public CustomerDTO getCustomerByKeyAuth(String customerKeyAuth) {
-        try {
+    public CustomerDTO getCustomerAuthenticated(String token) {
 
+        try {
             WebClient webClient = WebClient.builder()
                     .baseUrl(customerApiURL)
                     .build();
 
             Mono<CustomerDTO> user = webClient
                     .post()
-                    .uri("/customer/valid-key-auth")
-                    .header("customerKeyAuth", customerKeyAuth)
+                    .uri("/customer/authenticated")
+                    .header("Authorization", token)
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> {
-                                log.info("Error valid-key-auth: {}", response.statusCode().value());
                                 switch (response.statusCode().value()) {
                                     case 409 -> Mono.error(new CustomerInvalidKeyException());
                                     case 401 -> Mono.error(new AuthUnauthorizedException());
@@ -50,6 +50,45 @@ public class CustomerService {
                     .bodyToMono(CustomerDTO.class);
 
             return user.block();
+
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            if (exception instanceof WebClientRequestException) {
+                throw new MicroserviceCustomerUnavailableException();
+            } else {
+                throw exception;
+            }
+        }
+
+    }
+
+    public CredcardDTO getCredcardPrincipalByToken(String token) {
+
+        try {
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(customerApiURL)
+                    .build();
+
+            Mono<CredcardDTO> credcard = webClient
+                    .post()
+                    .uri("/customer/my-principal-credcard")
+                    .header("Authorization", token)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> {
+                                switch (response.statusCode().value()) {
+                                    case 409 -> Mono.error(new CustomerInvalidKeyException());
+                                    case 401 -> Mono.error(new AuthUnauthorizedException());
+                                    case 403 -> Mono.error(new AuthForbiddenException());
+                                    default -> Mono.error(new RuntimeException());
+                                }
+                                return null;
+                            }
+                    )
+                    .bodyToMono(CredcardDTO.class);
+
+            return credcard.block();
 
         } catch (Exception exception) {
             log.error(exception.getMessage());

@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.models.dto.order;
 
+import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.order.Order;
 import br.com.daciosoftware.shop.models.enums.OrderStatus;
@@ -27,7 +28,8 @@ public class OrderDTO {
 	@NotNull(message="Informe os itens")
 	@NotEmpty(message="Informe pelo menos um item")
 	private List<ItemDTO> itens = new ArrayList<>();
-	
+	private CredcardDTO credcardPrincipal;
+
 	public static OrderDTO convert(Order order) {
 		OrderDTO orderDTO = new OrderDTO();
 		orderDTO.setId(order.getId());

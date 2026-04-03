@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.customer.controller;
 
 import br.com.daciosoftware.shop.customer.service.CustomerService;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import jakarta.validation.Valid;
@@ -26,6 +27,11 @@ public class CredcardController {
     @GetMapping("/my-credcards")
     public List<CredcardShotDTO> getMyCredcards(@RequestHeader("Authorization") String token) {
         return customerService.getMyCredcards(token);
+    }
+
+    @PostMapping("/my-principal-credcard")
+    public CredcardDTO getMyPrincipalCredcards(@RequestHeader("Authorization") String token) {
+        return customerService.getCredcardPrincipal(token);
     }
 
     @DeleteMapping("/{id}/my-credcard")

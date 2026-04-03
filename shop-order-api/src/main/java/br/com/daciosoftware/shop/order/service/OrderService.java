@@ -2,7 +2,7 @@ package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
-import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
@@ -36,8 +36,6 @@ public class OrderService {
     @Autowired
     private ProductService productService;
     @Autowired
-    private AuthService authService;
-    @Autowired
     private KafkaClientService kafkaClientService;
     @PersistenceContext
     private EntityManager entityManager;
@@ -66,7 +64,7 @@ public class OrderService {
 
         OrderDTO orderDTO = findById(id);
 
-        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
         if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
             throw new OrderNotFoundException();
         }
@@ -84,7 +82,8 @@ public class OrderService {
     @Transactional
     public OrderDTO save(OrderDTO orderDTO, String token) {
 
-        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
+
 
         List<ItemDTO> itensDTO = productService.findItens(orderDTO.getItens());
         Float total = itensDTO.stream().map(i -> (i.getPreco() * i.getQuantidade())).reduce((float) 0, Float::sum);
@@ -98,7 +97,9 @@ public class OrderService {
         Order order = orderRepository.save(Order.convert(orderDTO));
 
         orderDTO = OrderDTO.convert(order);
-
+        CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByToken(token);
+        log.info("Credcard Principal: {}", credcardPrincipal);
+        orderDTO.setCredcardPrincipal(credcardPrincipal);
         log.info("Order created for kafka: {}", orderDTO);
         kafkaClientService.sendMessage(orderDTO);
 
@@ -109,7 +110,7 @@ public class OrderService {
 
         OrderDTO orderUpdateDTO = findById(id);
 
-        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
         if (!orderUpdateDTO.getCustomer().getId().equals(customerDTO.getId())) {
             throw new CustomerInvalidKeyException();
         }
@@ -139,7 +140,7 @@ public class OrderService {
     public void delete(Long id, String token) {
 
         OrderDTO orderDeleteDTO = findById(id);
-        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
         if (!orderDeleteDTO.getCustomer().getId().equals(customerDTO.getId())) {
             throw new CustomerInvalidKeyException();
         }
@@ -191,13 +192,8 @@ public class OrderService {
     }
 
     public List<OrderDTO> findOrdersCustomerAuthenticated(String token) {
-        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
         return findByCustomerIndentifier(customerDTO.getId());
     }
 
-    private CustomerDTO getCustomerAuthenticated(String token) {
-        AuthUserKeyTokenDTO authUserDTO = authService.getUserAuthenticated(token);
-        String customerKeyAuth = authUserDTO.getKeyToken();
-        return customerService.getCustomerByKeyAuth(customerKeyAuth);
-    }
 }

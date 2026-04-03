@@ -44,7 +44,6 @@ public class CustomerDTO {
 	private LocalDateTime dataCadastro;
 	private Set<CategoryDTO> interesses;
 	private String keyAuth;
-	private CredcardDTO credcardPrincipal;
 
 	public static CustomerDTO convert(Customer customer) {
 		CustomerDTO customerDTO = new CustomerDTO();
