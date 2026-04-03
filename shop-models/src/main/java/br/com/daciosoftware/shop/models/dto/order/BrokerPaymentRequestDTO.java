@@ -6,8 +6,9 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BrokerCredcardRequestDTO {
+public class BrokerPaymentRequestDTO {
     private Long orderId;
+    private Long credcardId;
     private String cpf;
     private String numberCard;
     private Integer cvv;
@@ -17,6 +18,7 @@ public class BrokerCredcardRequestDTO {
     public String toString() {
         return "{" +
                 "\"orderId\":" + orderId +
+                "\"credcardId\":" + credcardId +
                 ",\"cpf\":\"" + cpf + "\"" +
                 ",\"numberCard\":\"" + numberCard + "\"" +
                 ",\"cvv\":" + cvv +

@@ -2,67 +2,56 @@ package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
-import br.com.daciosoftware.shop.models.dto.order.BrokerCredcardRequestDTO;
-import br.com.daciosoftware.shop.models.dto.order.BrokerCredcardResponseDTO;
+import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentRequestDTO;
+import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentResponseDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
+import br.com.daciosoftware.shop.models.dto.order.OrderPaymentDTO;
 import br.com.daciosoftware.shop.models.enums.OrderStatus;
+import br.com.daciosoftware.shop.order.config.KafkaConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class KafkaReceiveMessageService {
 
-    private static final String ORDER_TOPIC_NAME = "ORDER_TOPIC";
-    private static final String ORDER_TOPIC_EVENT_NAME = "ORDER_TOPIC_EVENT";
-
-    private final KafkaTemplate<String, OrderDTO> kafkaTemplate;
     private final OrderService orderService;
-    private final BrokerCredcardService brokerCredcardService;
+    private final BrokerPaymentService brokerCredcardService;
+    private final OrderPaymentService orderPaymentService;
 
-    @KafkaListener(topics = ORDER_TOPIC_NAME, groupId = "order-group", containerFactory = "kafkaListenerContainerFactory")
-    public void listenerOrderTopic(OrderDTO order) {
-
-        log.info("Order Kafka receive: {}", order.getId());
-
+    @KafkaListener(topics = KafkaConfig.ORDER_CREATE_TOPIC, groupId = "order-group", containerFactory = "kafkaListenerContainerFactoryOrderCreate")
+    public void listenerCreateOrder(OrderDTO order) {
+        log.info("Order Kafka order create listener: {}", order.getId());
         CustomerDTO customer = order.getCustomer();
         CredcardDTO credcard = order.getCredcardPrincipal();
         Float valorTotalOrder = order.getTotal();
-
-
-        BrokerCredcardRequestDTO request = new BrokerCredcardRequestDTO();
+        BrokerPaymentRequestDTO request = new BrokerPaymentRequestDTO();
         request.setOrderId(order.getId());
+        request.setCredcardId(credcard.getId());
         request.setCpf(customer.getCpf());
         request.setNumberCard(credcard.getNumberCard());
         request.setCvv(credcard.getCvv());
         request.setValue(valorTotalOrder);
-
-        log.info("Broker credcard request: {}", request);
-
-        Mono<BrokerCredcardResponseDTO> responseMono = brokerCredcardService.processPayment(request);
-
-        if (responseMono.blockOptional().isPresent()) {
-            BrokerCredcardResponseDTO response = responseMono.block();
-            log.info("Resposta do broker de cartão: {}", response);
-
-            if (response != null && response.getAuthorized()) {
-                orderService.updateStatus(order, OrderStatus.APPROVED);
-                log.info("Order processada com sucesso");
-            } else {
-                orderService.updateStatus(order, OrderStatus.REJECTED);
-                log.info("Order rejeitada pelo broker de cartão");
-            }
-        } else {
-            orderService.updateStatus(order, OrderStatus.REJECTED);
-            log.info("Order rejeitada: resposta do broker de cartão não recebida");
-        }
-
+        brokerCredcardService.processPayment(request);
     }
 
+    @KafkaListener(topics = KafkaConfig.BROKER_PAYMENT_RESPONSE_TOPIC, groupId = "order-group", containerFactory = "kafkaListenerContainerFactoryBrokerPaymentResponse")
+    public void listenerBrokerPayment(BrokerPaymentResponseDTO response) {
+        log.info("Broker payment response kafka listener: {}", response);
+        OrderStatus status = response.getAuthorized() ? OrderStatus.APPROVED : OrderStatus.REJECTED;
+        orderService.updateStatus(response.getOrderId(), status);
 
+        OrderPaymentDTO orderPaymentDTO = new OrderPaymentDTO();
+        orderPaymentDTO.setOrderId(response.getOrderId());
+        orderPaymentDTO.setCredcardId(response.getCredcardId());
+        orderPaymentDTO.setDatePayment(LocalDateTime.now());
+        orderPaymentDTO.setStatus(status);
+        orderPaymentDTO.setMessage(response.getMessage());
+        orderPaymentService.save(orderPaymentDTO);
+    }
 }

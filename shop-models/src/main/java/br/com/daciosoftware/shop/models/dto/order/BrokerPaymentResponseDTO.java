@@ -7,7 +7,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class BrokerCredcardResponseDTO {
+public class BrokerPaymentResponseDTO {
+    private Long orderId;
+    private Long credcardId;
     private Boolean authorized;
+    private int codeResponse;
     private String message;
 }

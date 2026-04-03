@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/order")
@@ -36,6 +37,12 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public List<OrderDTO> findOrdersCustomerAuthenticated(@RequestHeader("Authorization") String token) {
         return orderService.findOrdersCustomerAuthenticated(token);
+    }
+
+    @GetMapping("/last/my-order")
+    @ResponseStatus(HttpStatus.OK)
+    public Optional<OrderDTO> findLastOrdersCustomerAuthenticated(@RequestHeader("Authorization") String token) {
+        return orderService.findLastOrderCustomerAuthenticated(token);
     }
 
     @GetMapping("/{id}")

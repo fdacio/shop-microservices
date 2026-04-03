@@ -29,6 +29,7 @@ public class OrderDTO {
 	@NotEmpty(message="Informe pelo menos um item")
 	private List<ItemDTO> itens = new ArrayList<>();
 	private CredcardDTO credcardPrincipal;
+	private List<OrderPaymentDTO> payments = new ArrayList<>();
 
 	public static OrderDTO convert(Order order) {
 		OrderDTO orderDTO = new OrderDTO();
