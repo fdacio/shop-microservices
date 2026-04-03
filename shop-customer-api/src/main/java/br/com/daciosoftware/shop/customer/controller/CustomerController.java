@@ -121,22 +121,6 @@ public class CustomerController {
         return customerService.getCustomersGroupingByCategory();
     }
 
-    @PostMapping("/credcard")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CredcardDTO createCredcard(@RequestBody @Valid CredcardDTO credcard, @RequestHeader("Authorization") String token) {
-        return customerService.createCredcard(credcard, token);
-    }
-
-    @GetMapping("/my-credcards")
-    public List<CredcardShotDTO> getMyCredcards(@RequestHeader("Authorization") String token) {
-        return customerService.getMyCredcards(token);
-    }
-
-    @DeleteMapping("/{id}/my-credcard")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleMyCredcards(@PathVariable Long id,  @RequestHeader("Authorization") String token) {
-        customerService.deleteMyCredcard(id, token);
-    }
 
     @GetMapping("/health")
     public ResponseEntity<Object> healthcheck() {

@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+source config.sh
+
+PATH_APPS="/home/ubuntu/shop"
+APP="${1:-all}"
+
 # Função para compilar um módulo do repositório
 # Aceita nomes curtos: models, exceptions, auth-keys, auth, customer, order, product, gateway
 build_module() {
@@ -26,7 +31,7 @@ build_module() {
             dir="../shop-gateway-api" ;;
         *)
             # se foi fornecido um caminho/custom, usa direto
-            dir="$module" ;;
+            #dir="$module" ;;
     esac
 
     echo "🔧 Building módulo: $module (dir: $dir)"
@@ -38,18 +43,15 @@ build_module() {
 build_module models
 build_module exceptions
 build_module auth-keys
-build_module auth
-build_module customer
-build_module order
-build_module product
-build_module gateway
+if [ "$APP" = "all" ]; then
+  for m in auth customer product order gateway; do
+    build_module "$m"
+  done
+else
+  build_module "$APP"
+fi
 
 cd ../aws
-
-source config.sh
-
-PATH_APPS="/home/ubuntu/shop"
-APP="${1:-all}"
 
 # Cria estrutura de diretórios remota
 ssh -i "$SSH_KEY" "$USER"@"$HOST" "mkdir -p $PATH_APPS/{auth,gateway,order,product,customer}/target"

@@ -59,7 +59,6 @@ public class SecurityConfig {
                 .build();
     }
 
-
     @Order(1)
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler, ValidTokenFilter validTokenFilter) {
@@ -101,7 +100,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, "/order/*/my-order").hasAuthority(SCOPE_CUSTOMER)
                         .pathMatchers(HttpMethod.POST, "/customer/credcard").hasAuthority(SCOPE_CUSTOMER)
                         .pathMatchers(HttpMethod.GET, "/customer/my-credcards").hasAuthority(SCOPE_CUSTOMER)
-                        .pathMatchers(HttpMethod.DELETE, "/customer/my-credcard").hasAuthority(SCOPE_CUSTOMER)
+                        .pathMatchers(HttpMethod.DELETE, "/customer/*/my-credcard").hasAuthority(SCOPE_CUSTOMER)
 
                         .pathMatchers("/order/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .pathMatchers("/order/report/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
