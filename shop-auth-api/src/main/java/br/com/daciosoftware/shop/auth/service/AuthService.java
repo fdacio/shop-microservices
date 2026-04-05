@@ -1,6 +1,5 @@
 package br.com.daciosoftware.shop.auth.service;
 
-import br.com.daciosoftware.shop.auth.config.AdminUserConfig;
 import br.com.daciosoftware.shop.auth.repository.AuthRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.*;
 import br.com.daciosoftware.shop.models.dto.auth.*;
@@ -9,9 +8,7 @@ import br.com.daciosoftware.shop.models.entity.auth.AuthUser;
 import br.com.daciosoftware.shop.models.entity.auth.Rule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,25 +20,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
-
-    @Autowired
-    private AuthRepository authRepository;
-    @Autowired
-    private RuleService ruleService;
-    @Autowired
-    private TokenService tokenConfig;
-    @Autowired
-    private CustomerService customerService;
+    private final AuthRepository authRepository;
+    private final RuleService ruleService;
+    private final TokenService tokenService;
+    private final CustomerService customerService;
 
     public TokenDTO login(LoginDTO loginDTO) {
         AuthUser user = authRepository.findByUsername(loginDTO.getUsername()).orElseThrow(AuthInvalidLoginException::new);
         boolean loginValid = bCryptPasswordEncoder().matches(loginDTO.getPassword(), user.getPassword());
         if (!loginValid) throw new AuthInvalidLoginException();
         AuthUserDTO authUserDTO = AuthUserDTO.convert(user);
-        return tokenConfig.getToken(authUserDTO);
+        return tokenService.getToken(authUserDTO);
     }
 
     public AuthUserDTO findAuthenticatedUser(String token) {
@@ -53,7 +45,7 @@ public class AuthService {
     public TokenDTO refreshToken(TokenDTO tokenExpired) {
         String keyToken = getKeyTokenIdUserByTokenJWT(tokenExpired.getToken());
         AuthUser authUser = authRepository.findByKeyToken(keyToken).orElseThrow(AuthUserNotFoundException::new);
-        return tokenConfig.getToken(AuthUserDTO.convert(authUser));
+        return tokenService.getToken(AuthUserDTO.convert(authUser));
     }
 
     public AuthUserDTO createOperatorUser(CreateAuthUserDTO createAuthUserDTO) {
@@ -75,7 +67,7 @@ public class AuthService {
     @Transactional
     public CustomerDTO createCustomerFromAuthUser(Long userId, CustomerDTO customerDTO) {
         AuthUser authUser = authRepository.findById(userId).orElseThrow(AuthUserNotFoundException::new);
-        validKeyTokenExists(authUser.getKeyToken());
+        checkCustomerKeyAuthExists(authUser.getKeyToken());
         RuleDTO ruleCustomer = ruleService.findByNome(RuleEnum.CUSTOMER.getName());
         authUser.getRules().add(Rule.convert(ruleCustomer));
         authRepository.save(authUser);
@@ -91,7 +83,6 @@ public class AuthService {
         authUser.setKeyToken(geraKeyTokenForCreateUser(createAuthUserDTO.getUsername()));
         authUser.setRules(Set.of(Rule.convert(ruleDTO)));
         authUser.setDataCadastro(LocalDateTime.now());
-        log.info("Usuário {}", createAuthUserDTO);
         return AuthUserDTO.convert(authRepository.save(authUser));
     }
 
@@ -99,7 +90,6 @@ public class AuthService {
         return authRepository.findAll()
                 .stream()
                 .map(AuthUserDTO::convert)
-                .sorted(Comparator.comparing(AuthUserDTO::getNome))
                 .collect(Collectors.toList());
     }
 
@@ -131,7 +121,8 @@ public class AuthService {
 
     @Transactional
     public void delete(Long userId) {
-        authRepository.delete(AuthUser.convert(findById(userId)));
+        findById(userId);
+        authRepository.deleteById(userId);
     }
 
     @Transactional
@@ -171,13 +162,9 @@ public class AuthService {
         return AuthUserDTO.convert(authRepository.save(authUser));
     }
 
-    /* Private Methods */
+    //Private Methods
 
-    /**
-     * Método utilizado para obter o KeyToken (campo identificador do AuthUser),
-     * a partir do JWT Token
-     *
-     */
+    //Method utilizado para obter o KeyToken (campo identificador do AuthUser) a partir do JWT Token
     private String getKeyTokenIdUserByTokenJWT(String token) {
         try {
             String[] chunks = token.split("\\.");
@@ -191,19 +178,13 @@ public class AuthService {
         }
     }
 
-    /**
-     * Método utilizado para criptografar o password do AuthUser
-     */
+    //Method utilizado para criptografar o password do AuthUser
     private BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * Método utilizado para gerar o KeyToken(campo identificador do AuthUser)
-     * através da classe UUID a partir de uma String, que no caso é o username
-     * do AuthUser
-     *
-     */
+    //Method utilizado para gerar o KeyToken(campo identificador do AuthUser) através da classe UUID
+    //a partir de uma String, que no caso é o username do AuthUser
     private String geraKeyTokenForCreateUser(String username) {
         return UUID.nameUUIDFromBytes(username.getBytes()).toString();
     }
@@ -230,7 +211,7 @@ public class AuthService {
         }
     }
 
-    private void validKeyTokenExists(String keyToken) {
+    private void checkCustomerKeyAuthExists(String keyToken) {
         Optional<CustomerDTO> customerOptional = customerService.findByKeyAuth(keyToken);
         if (customerOptional.isPresent()) {
             throw new AuthUserCustomerConflictException();

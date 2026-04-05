@@ -14,6 +14,8 @@ import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Customer;
 import br.com.daciosoftware.shop.models.entity.product.Category;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +26,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
 
     @Autowired
@@ -73,6 +77,11 @@ public class CustomerService {
         return customerRepository.findByKeyAuth(keyAuth)
                 .map(CustomerDTO::convert)
                 .orElseThrow(CustomerInvalidKeyException::new);
+    }
+
+    public Optional<CustomerDTO> findOptionalByKeyAuth(String keyAuth) {
+        return customerRepository.findByKeyAuth(keyAuth)
+                .map(CustomerDTO::convert);
     }
 
     public List<CustomerDTO> findHasKeyAuth() {
@@ -183,24 +192,20 @@ public class CustomerService {
         customerRepository.delete(Customer.convert(customerDTO));
     }
 
+    @Transactional
     public void deleteCustomerAndAuthUser(Long customerId) {
-
         CustomerDTO customerDTO = findById(customerId);
+        customerRepository.deleteById(customerId);
+
+        //Delete Customer
         Optional<String> keyAuthOptional = Optional.ofNullable(customerDTO.getKeyAuth());
+        //Try delete AuthUser from Customer
+        keyAuthOptional.ifPresent((keyAuth) -> {
+            Optional<AuthUserDTO> authUserDTOOptional = authService.findAuthUserByKeyToken(keyAuth);
+            authUserDTOOptional.ifPresent((authUserDTO -> authService.deleteAuthUser(authUserDTO)));
+        });
 
-        try {
-            //Delete Customer
-            customerRepository.delete(Customer.convert(customerDTO));
 
-            //Try delete AuthUser from Customer
-            keyAuthOptional.ifPresent((keyAuth) -> {
-                Optional<AuthUserDTO> authUserDTOOptional = authService.findAuthUserByKeyToken(keyAuth);
-                authUserDTOOptional.ifPresent((authUserDTO -> authService.deleteAuthUser(authUserDTO)));
-            });
-
-        } catch (RuntimeException exception) {
-            throw new CustomerIntegrityViolationException();
-        }
     }
 
     public Page<CustomerDTO> findAllPageable(Pageable page) {

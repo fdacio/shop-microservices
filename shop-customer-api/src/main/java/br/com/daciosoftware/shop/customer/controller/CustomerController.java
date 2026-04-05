@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/customer")
@@ -72,6 +73,11 @@ public class CustomerController {
     @GetMapping("/{keyAuth}/key-auth")
     public CustomerDTO findByKeyAuth(@PathVariable String keyAuth) {
         return customerService.findByKeyAuth(keyAuth);
+    }
+
+    @GetMapping("/optional/{keyAuth}/key-auth")
+    public Optional<CustomerDTO> findOptionalByKeyAuth(@PathVariable String keyAuth) {
+        return customerService.findOptionalByKeyAuth(keyAuth);
     }
 
     @DeleteMapping("/{id}")

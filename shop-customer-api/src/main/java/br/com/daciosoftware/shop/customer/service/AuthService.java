@@ -1,5 +1,6 @@
 package br.com.daciosoftware.shop.customer.service;
 
+import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthEmailExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
@@ -8,8 +9,6 @@ import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceAuthU
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,6 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Value("${auth.api.url}")
     private String authApiURL;
@@ -45,7 +42,7 @@ public class AuthService {
                                 case 404 -> Mono.error(new AuthUserNotFoundException());
                                 case 401 -> Mono.error(new AuthUnauthorizedException());
                                 case 403 -> Mono.error(new AuthForbiddenException());
-                                default -> Mono.error(new RuntimeException());
+                                default -> Mono.empty();
                             })
                     .bodyToMono(AuthUserDTO.class)
                     .block();
@@ -77,64 +74,63 @@ public class AuthService {
                             HttpStatusCode::isError,
                             response -> {
                                 int status = response.statusCode().value();
-                                String message = "Erro ao criar usuário no Auth API - status: " + status;
-                                return response.bodyToMono(String.class)
-                                        .doOnNext(body -> log.error(message))
-                                        .then(Mono.error(
-                                                switch (status) {
-                                                    case 409 -> new AuthUserUsernameExistsException();
-                                                    case 401 -> new AuthUnauthorizedException();
-                                                    case 403 -> new AuthForbiddenException();
-                                                    default -> new IllegalArgumentException();
-                                                }
-                                        ));
+                                String messageError = response.bodyToMono(String.class).block();
+                                if (messageError != null) {
+                                    if (messageError.toLowerCase().contains("username")) {
+                                        return Mono.error(new AuthUserUsernameExistsException());
+                                    }
+                                    if (messageError.toLowerCase().contains("email")) {
+                                        return Mono.error(new AuthEmailExistsException());
+                                    }
+                                    if (status == 401) {
+                                        return Mono.error(new AuthUnauthorizedException());
+                                    }
+                                    if (status == 403) {
+                                        return Mono.error(new AuthForbiddenException());
+                                    }
+                                    return Mono.error(new RuntimeException(messageError));
+                                }
+                                return Mono.empty();
                             }
                     )
                     .bodyToMono(AuthUserDTO.class)
-                    .block(); //aguarda a resposta
+                    .block();
 
         } catch (Exception exception) {
-
             if (exception instanceof WebClientRequestException) {
                 throw new MicroserviceAuthUnavailableException();
             } else {
-                throw new RuntimeException();
+                throw exception;
             }
         }
 
     }
 
     public void deleteAuthUser(AuthUserDTO authUserDTO) {
+
         try {
-            Long id = authUserDTO.getId();
+
             WebClient webClient = WebClient.builder()
                     .baseUrl(authApiURL)
                     .build();
 
             webClient
                     .delete()
-                    .uri("/auth/user/" + id)
+                    .uri("/auth/user/" + authUserDTO.getId())
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,
                             response -> {
                                 int status = response.statusCode().value();
-                                return response.bodyToMono(String.class)
-                                        .doOnNext(body -> log.error("Erro delete user {}: {}", status, body))
-                                        .then(Mono.error(
-                                                switch (status) {
-                                                    case 409 -> new AuthUserUsernameExistsException();
-                                                    case 401 -> new AuthUnauthorizedException();
-                                                    case 403 -> new AuthForbiddenException();
-                                                    default ->
-                                                            new RuntimeException("Erro inesperado do Auth API (status " + status + ")");
-                                                }
-                                        ));
+                                if (status == 401) {
+                                    return Mono.error(new AuthUnauthorizedException());
+                                }
+                                if (status == 403) {
+                                    return Mono.error(new AuthForbiddenException());
+                                }
+                                return Mono.empty();
                             }
                     )
-                    .onStatus(
-                            HttpStatusCode::is2xxSuccessful,
-                            response -> Mono.empty())
                     .bodyToMono(Void.class)
                     .block();
 
@@ -165,7 +161,7 @@ public class AuthService {
                                 case 404 -> Mono.error(new AuthUserNotFoundException());
                                 case 401 -> Mono.error(new AuthUnauthorizedException());
                                 case 403 -> Mono.error(new AuthForbiddenException());
-                                default -> Mono.error(new RuntimeException());
+                                default ->  Mono.empty();
                             })
                     .bodyToMono(AuthUserKeyTokenDTO.class);
 

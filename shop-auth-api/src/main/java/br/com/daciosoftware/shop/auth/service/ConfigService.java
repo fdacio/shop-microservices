@@ -4,17 +4,18 @@ import br.com.daciosoftware.shop.auth.repository.ConfigRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthConfigNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.ConfigDTO;
 import br.com.daciosoftware.shop.models.entity.auth.Config;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ConfigService {
 
-    @Autowired
-    private ConfigRepository configRepository;
+    private final ConfigRepository configRepository;
 
     public List<ConfigDTO> findAll() {
         return configRepository.findAll().stream().map(ConfigDTO::convert).collect(Collectors.toList());
@@ -22,6 +23,10 @@ public class ConfigService {
 
     public ConfigDTO findByChave(String chave) {
         return configRepository.findByChave(chave).map(ConfigDTO::convert).orElseThrow(AuthConfigNotFoundException::new);
+    }
+
+    public Optional<ConfigDTO> findOptionalByChave(String chave) {
+        return configRepository.findByChave(chave).map(ConfigDTO::convert);
     }
 
     public ConfigDTO save(ConfigDTO configDTO) {

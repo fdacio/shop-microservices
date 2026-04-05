@@ -6,49 +6,42 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.jwt.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TokenService {
 
-    @Autowired
-    private ConfigService configService;
+    private final ConfigService configService;
 
-    public JwtEncoder jwtEncoder() {
-        try {
-            RsaKey rsaKey = new RsaKey();
-            JWK jwk = new RSAKey.Builder(rsaKey.getRsaPublicKey()).privateKey(rsaKey.getRsaPrivateKey()).build();
-            var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-            return new NimbusJwtEncoder(jwks);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public JwtEncoder jwtEncoder() throws Exception {
+        RsaKey rsaKey = new RsaKey();
+        JWK jwk = new RSAKey.Builder(rsaKey.getRsaPublicKey()).privateKey(rsaKey.getRsaPrivateKey()).build();
+        var immutableJwk = new ImmutableJWKSet<>(new JWKSet(jwk));
+        return new NimbusJwtEncoder(immutableJwk);
     }
-
 
     public TokenDTO getToken(AuthUserDTO authUserDTO) {
 
-        var now = Instant.now();
-        long expire;
-
-        try {
-            ConfigDTO configDTO = configService.findByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
-            expire = Long.parseLong(configDTO.getValor());
-        } catch (Exception e){
-            expire = 300L;
-        }
+        Instant now = Instant.now();
+        Optional<ConfigDTO> optionalConfigDTO = configService.findOptionalByChave(ConfigEnum.EXPIRE_TOKEN.getChave());
+        long expire = optionalConfigDTO.map(configDTO -> Long.parseLong(configDTO.getValor())).orElse(300L);
 
         String scopes = authUserDTO.getRules()
                 .stream()
                 .map(RuleDTO::getNome)
                 .collect(Collectors.joining(" "));
 
-        var claims = JwtClaimsSet.builder()
+        JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("shop-api")
                 .subject(authUserDTO.getKeyToken())
                 .issuedAt(now)

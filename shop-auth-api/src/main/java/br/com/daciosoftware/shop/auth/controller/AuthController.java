@@ -50,12 +50,6 @@ public class AuthController {
         return authService.createOperatorUser(createAuthUserDTO);
     }
 
-    @PostMapping("/user/customer")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AuthUserDTO createUserFromCustomer(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
-        return authService.createCustomerUser(createAuthUserDTO);
-    }
-
     @GetMapping("/user")
     public List<AuthUserDTO> findAll() {
         return authService.findAll();
@@ -108,6 +102,12 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public AuthUserDTO update(@PathVariable Long id, @RequestBody UpdateAuthUserDTO updateAuthUserDTO) {
         return authService.update(id, updateAuthUserDTO);
+    }
+
+    @PostMapping("/user/customer")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthUserDTO createUserFromCustomer(@RequestBody @Valid CreateAuthUserDTO createAuthUserDTO) {
+        return authService.createCustomerUser(createAuthUserDTO);
     }
 
     @PostMapping("/user/{id}/customer")
