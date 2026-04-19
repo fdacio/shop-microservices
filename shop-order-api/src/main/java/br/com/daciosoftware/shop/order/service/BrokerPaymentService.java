@@ -38,13 +38,6 @@ public class BrokerPaymentService {
                         status -> status.isError() || status.is2xxSuccessful(),
                         clientResponse -> {
                             log.info("Broke Payment response status: {}", clientResponse.statusCode().value());
-                            if (clientResponse.statusCode().value() == 404) {
-                                response.setAuthorized(false);
-                                response.setCodeResponse(clientResponse.statusCode().value());
-                                response.setMessage("Broker de pagamento não encontrado");
-                                kafkaClientService.sendResponseBrokerPayment(response);
-                                return Mono.empty();
-                            }
                             return clientResponse
                                     .bodyToMono(BrokerPaymentResponseDTO.class)
                                     .flatMap(brokerPaymentResponseDTO -> {

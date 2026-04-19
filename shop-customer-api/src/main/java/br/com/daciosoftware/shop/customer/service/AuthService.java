@@ -131,8 +131,7 @@ public class AuthService {
                                 return Mono.empty();
                             }
                     )
-                    .bodyToMono(Void.class)
-                    .block();
+                    .bodyToMono(Void.class);
 
         } catch (Exception exception) {
             if (exception instanceof WebClientRequestException) {

@@ -3,6 +3,8 @@ package br.com.daciosoftware.shop.models.dto.customer;
 import br.com.daciosoftware.shop.models.entity.customer.Credcard;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,15 +13,17 @@ import lombok.*;
 public class CredcardShotDTO {
     private Long id;
     private String numberCard;
+    private LocalDate valid;
+    private Integer cvv;
     private Boolean principal;
-    private CustomerShotDTO customer;
 
-    public static CredcardShotDTO convert(Credcard credcard) {
-        return new CredcardShotDTO(
-                credcard.getId(),
-                credcard.getNumberCard(),
-                credcard.getPrincipal(),
-                CustomerShotDTO.convert(credcard.getCustomer())
-        );
+    public static CredcardShotDTO convert(CredcardDTO dto) {
+        CredcardShotDTO credcardShotDTO =    new CredcardShotDTO();
+        credcardShotDTO.setId(dto.getId());
+        credcardShotDTO.setNumberCard(dto.getNumberCard());
+        credcardShotDTO.setValid(dto.getValid());
+        credcardShotDTO.setCvv(dto.getCvv());
+        credcardShotDTO.setPrincipal(dto.getPrincipal());
+        return credcardShotDTO;
     }
 }

@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentRequestDTO;
 import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentResponseDTO;
@@ -28,7 +29,7 @@ public class KafkaReceiveMessageService {
     public void listenerCreateOrder(OrderDTO order) {
         log.info("Order Kafka order create listener: {}", order.getId());
         CustomerDTO customer = order.getCustomer();
-        CredcardDTO credcard = order.getCredcardPrincipal();
+        CredcardShotDTO credcard = order.getCredcardPrincipal();
         Float valorTotalOrder = order.getTotal();
         BrokerPaymentRequestDTO request = new BrokerPaymentRequestDTO();
         request.setOrderId(order.getId());

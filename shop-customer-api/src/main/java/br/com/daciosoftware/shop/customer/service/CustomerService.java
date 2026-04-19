@@ -279,9 +279,21 @@ public class CustomerService {
 
     public CredcardDTO getCredcardPrincipal(String token) {
         CustomerDTO customerDTO = getCustomerAuthenticated(token);
-        return credcardService.findByCustomerId(customerDTO.getId()).stream().filter(CredcardDTO::getPrincipal).findFirst().orElseThrow(CredcardPrincipalNotFoundException::new);
+        return credcardService.findByCustomerId(customerDTO.getId())
+                .stream()
+                .filter(CredcardDTO::getPrincipal)
+                .findFirst().orElseThrow(CredcardPrincipalNotFoundException::new);
     }
 
+    public CredcardDTO updatePrincipalCredcard(Long credcardId, String token) {
+        CredcardDTO credcardDTO = credcardService.findById(credcardId);
+        CustomerDTO customerDTO = getCustomerAuthenticated(token);
+        if (!credcardDTO.getCustomer().getId().equals(customerDTO.getId())) {
+            throw new CredcardNotFoundException();
+        }
+        credcardDTO.setPrincipal(true);
+        return credcardService.updateMyPrincipal(credcardDTO, customerDTO);
+    }
     public void deleteMyCredcard(Long credcardId, String token) {
         CredcardDTO credcardDTO = credcardService.findById(credcardId);
         CustomerDTO customerDTO = getCustomerAuthenticated(token);

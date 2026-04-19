@@ -1,6 +1,7 @@
 package br.com.daciosoftware.shop.models.entity.customer;
 
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerShotDTO;
 import br.com.daciosoftware.shop.models.entity.product.Category;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,5 +51,4 @@ public class Customer {
             customer.setInteresses(customerDTO.getInteresses().stream().map(Category::convert).collect(Collectors.toSet()));
         return customer;
     }
-
 }

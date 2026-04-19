@@ -1,6 +1,8 @@
 package br.com.daciosoftware.shop.order.service;
 
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthUnauthorizedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.MicroserviceCustomerUnavailableException;
@@ -30,26 +32,24 @@ public class CustomerService {
                     .baseUrl(customerApiURL)
                     .build();
 
-            Mono<CustomerDTO> user = webClient
+            Mono<CustomerDTO> customer = webClient
                     .post()
                     .uri("/customer/authenticated")
                     .header("Authorization", token)
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,
-                            response -> {
-                                switch (response.statusCode().value()) {
-                                    case 409 -> Mono.error(new CustomerInvalidKeyException());
-                                    case 401 -> Mono.error(new AuthUnauthorizedException());
-                                    case 403 -> Mono.error(new AuthForbiddenException());
-                                    default -> Mono.error(new RuntimeException());
-                                }
-                                return null;
-                                }
-                            )
+                            response -> switch (response.statusCode().value()) {
+                                case 409 -> Mono.error(new CustomerInvalidKeyException());
+                                case 401 -> Mono.error(new AuthUnauthorizedException());
+                                case 403 -> Mono.error(new AuthForbiddenException());
+                                case 404 -> Mono.error(new CustomerNotFoundException());
+                                default -> Mono.error(new RuntimeException());
+                            }
+                    )
                     .bodyToMono(CustomerDTO.class);
 
-            return user.block();
+            return customer.block();
 
         } catch (Exception exception) {
             log.error(exception.getMessage());
@@ -76,14 +76,12 @@ public class CustomerService {
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,
-                            response -> {
-                                switch (response.statusCode().value()) {
-                                    case 409 -> Mono.error(new CustomerInvalidKeyException());
-                                    case 401 -> Mono.error(new AuthUnauthorizedException());
-                                    case 403 -> Mono.error(new AuthForbiddenException());
-                                    default -> Mono.error(new RuntimeException());
-                                }
-                                return null;
+                            response -> switch (response.statusCode().value()) {
+                                case 409 -> Mono.error(new CustomerInvalidKeyException());
+                                case 401 -> Mono.error(new AuthUnauthorizedException());
+                                case 403 -> Mono.error(new AuthForbiddenException());
+                                case 404 -> Mono.error(new CredcardPrincipalNotFoundException());
+                                default -> Mono.error(new RuntimeException());
                             }
                     )
                     .bodyToMono(CredcardDTO.class);

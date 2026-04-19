@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.order.service;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.order.ItemDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
@@ -95,7 +96,7 @@ public class OrderService {
 
         orderDTO = OrderDTO.convert(order);
         CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByToken(token);
-        orderDTO.setCredcardPrincipal(credcardPrincipal);
+        orderDTO.setCredcardPrincipal(CredcardShotDTO.convert(credcardPrincipal));
         kafkaClientService.sendOrder(orderDTO);
 
         return orderDTO;
@@ -195,11 +196,18 @@ public class OrderService {
         return orderDTO;
     }
 
+    public OrderDTO getOrderWithPrincipalCredcard(OrderDTO orderDTO, String token) {
+        CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByToken(token);
+        orderDTO.setCredcardPrincipal(CredcardShotDTO.convert(credcardPrincipal));
+        return orderDTO;
+    }
+
     public Optional<OrderDTO> findLastOrderCustomerAuthenticated(String token) {
         CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
         return findByCustomerIndentifier(customerDTO.getId())
                 .stream()
                 .map(this::getOrderWithPayments)
+                .map((order) -> getOrderWithPrincipalCredcard(order, token))
                 .max(Comparator.comparing(OrderDTO::getDateOrder));
     }
 

@@ -67,6 +67,11 @@ public class KafkaConfig {
         // garantir group id e comportamento de offset para consistência
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-group");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        // Configurações para retry
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 300000); // 5 minutos
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 30000); // 30 segundos
+        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, 3000); // 3 segundos
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); // Controle manual do commit
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
@@ -82,6 +87,11 @@ public class KafkaConfig {
         // garantir group id e comportamento de offset para consistência
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-group");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        // Configurações para retry
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 300000); // 5 minutos
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 30000); // 30 segundos
+        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, 3000); // 3 segundos
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); // Controle manual do commit
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
@@ -115,5 +125,4 @@ public class KafkaConfig {
                 .replicas(1)
                 .build();
     }
-
 }

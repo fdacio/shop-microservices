@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/customer")
@@ -32,6 +33,11 @@ public class CredcardController {
     @PostMapping("/my-principal-credcard")
     public CredcardDTO getMyPrincipalCredcards(@RequestHeader("Authorization") String token) {
         return customerService.getCredcardPrincipal(token);
+    }
+
+    @PutMapping("/{id}/update-principal-credcard")
+    public CredcardDTO updateLikePrincipalCredcard(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        return customerService.updatePrincipalCredcard(id, token);
     }
 
     @DeleteMapping("/{id}/my-credcard")

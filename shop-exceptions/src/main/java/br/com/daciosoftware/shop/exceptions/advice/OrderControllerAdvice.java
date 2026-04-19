@@ -2,6 +2,7 @@ package br.com.daciosoftware.shop.exceptions.advice;
 
 import br.com.daciosoftware.shop.exceptions.dto.ErrorDTO;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
@@ -51,6 +52,14 @@ public class OrderControllerAdvice {
     public ErrorDTO handleAuthUserNotFound(HttpServletRequest request, AuthUserNotFoundException exception) {
         log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Cliente não identificado", request);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CredcardPrincipalNotFoundException.class)
+    public ErrorDTO handleCredcardPrincipalNotFoundException(HttpServletRequest request, CredcardPrincipalNotFoundException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
+        return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cliente não tem um cartão de crédito principal", request);
     }
 
 }
