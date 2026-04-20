@@ -4,8 +4,6 @@ import br.com.daciosoftware.shop.customer.service.CustomerService;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.PasswordDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CreateCustomerAndAuthUserDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import jakarta.validation.Valid;

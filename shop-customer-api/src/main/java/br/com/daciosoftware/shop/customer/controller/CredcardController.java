@@ -1,7 +1,6 @@
 package br.com.daciosoftware.shop.customer.controller;
 
 import br.com.daciosoftware.shop.customer.service.CustomerService;
-import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import jakarta.validation.Valid;
@@ -10,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/customer")
@@ -33,6 +31,11 @@ public class CredcardController {
     @PostMapping("/my-principal-credcard")
     public CredcardDTO getMyPrincipalCredcards(@RequestHeader("Authorization") String token) {
         return customerService.getCredcardPrincipal(token);
+    }
+
+    @GetMapping("/{id}/my-principal-credcard")
+    public CredcardDTO getMyPrincipalCredcardsById(@PathVariable Long id) {
+        return customerService.getCredcardPrincipalById(id);
     }
 
     @PutMapping("/{id}/update-principal-credcard")

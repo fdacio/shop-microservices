@@ -2,6 +2,7 @@ package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotRejectedException;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
@@ -39,6 +40,7 @@ public class OrderService {
     private final KafkaClientService kafkaClientService;
     private final EntityManager entityManager;
     private final OrderPaymentService orderPaymentService;
+    private final BrokerPaymentService brokerPaymentService;
 
     public List<OrderDTO> findAllComplete() {
         List<Order> orders = orderRepository.findAll();
@@ -60,10 +62,22 @@ public class OrderService {
         return orderRepository.findById(id).map(OrderDTO::convert).orElseThrow(OrderNotFoundException::new);
     }
 
-    public OrderDTO findByIdAndToken(Long id, String token) {
-
+    public OrderDTO findByIdWithCredcardPrincipal(Long id) {
         OrderDTO orderDTO = findById(id);
+        CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByCustomerId(orderDTO.getCustomer().getId());
+        orderDTO.setCredcardPrincipal(CredcardShotDTO.convert(credcardPrincipal));
+        return orderDTO;
+    }
 
+    public OrderDTO findByIdWithCredcardPrincipalByCustomerToken(Long id, String token) {
+        OrderDTO orderDTO = findById(id);
+        CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByToken(token);
+        orderDTO.setCredcardPrincipal(CredcardShotDTO.convert(credcardPrincipal));
+        return orderDTO;
+    }
+
+    public OrderDTO findByIdAndToken(Long id, String token) {
+        OrderDTO orderDTO = findById(id);
         CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
         if (!orderDTO.getCustomer().getId().equals(customerDTO.getId())) {
             throw new OrderNotFoundException();
@@ -94,37 +108,36 @@ public class OrderService {
 
         Order order = orderRepository.save(Order.convert(orderDTO));
 
-        orderDTO = OrderDTO.convert(order);
-        CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByToken(token);
-        orderDTO.setCredcardPrincipal(CredcardShotDTO.convert(credcardPrincipal));
-        kafkaClientService.sendOrder(orderDTO);
+        OrderDTO orderDTOWithCredcardPrincipal = findByIdWithCredcardPrincipalByCustomerToken(order.getId(), token);
+        kafkaClientService.sendOrder(orderDTOWithCredcardPrincipal);
 
-        return orderDTO;
+        return OrderDTO.convert(order);
+    }
+
+    public void retryOrderPayment(Long orderID) {
+        OrderDTO orderDTO = findByIdWithCredcardPrincipal(orderID);
+        if (orderDTO.getStatus() != OrderStatus.REJECTED) {
+            throw new OrderNotRejectedException();
+        }
+        brokerPaymentService.processPayment(orderDTO);
     }
 
     public OrderDTO update(Long id, OrderDTO orderDTO, String token) {
-
         OrderDTO orderUpdateDTO = findById(id);
-
         CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
         if (!orderUpdateDTO.getCustomer().getId().equals(customerDTO.getId())) {
             throw new CustomerInvalidKeyException();
         }
-
         return update(id, orderDTO);
     }
 
     public OrderDTO update(Long id, OrderDTO orderDTO) {
-
         OrderDTO orderUpdateDTO = findById(id);
-
         List<ItemDTO> itensDTO = productService.findItens(orderDTO.getItens());
         Float total = itensDTO.stream().map(i -> (i.getPreco() * i.getQuantidade())).reduce((float) 0, Float::sum);
         orderUpdateDTO.setTotal(total);
         orderUpdateDTO.setItens(itensDTO);
-
         orderRepository.save(Order.convert(orderUpdateDTO));
-
         return findById(id);
     }
 
@@ -152,37 +165,26 @@ public class OrderService {
     }
 
     public List<OrderDTO> findOrdersByFilters(LocalDate dataInicio, LocalDate dataFim, Float valorMinimo) {
-
         StringBuilder sbSql = new StringBuilder();
         sbSql.append("select o from orders o \n");
         sbSql.append("where o.data >= :dataInicio \n");
-
         if (dataFim != null) {
             sbSql.append("and o.data <= :dataFim \n");
         }
-
         if (valorMinimo != null) {
             sbSql.append("and o.total <= :valorMinimo \n");
         }
-
         sbSql.append("order by o.data");
-
         TypedQuery<Order> query = entityManager.createQuery(sbSql.toString(), Order.class);
-
         query.setParameter("dataInicio", dataInicio.atTime(0, 0));
-
         if (dataFim != null) {
             query.setParameter("dataFim", dataFim.atTime(23, 59));
         }
-
         if (valorMinimo != null) {
             query.setParameter("valorMinimo", valorMinimo);
         }
-
         List<Order> vendas = query.getResultList();
-
         return vendas.stream().map(OrderDTO::convert).toList();
-
     }
 
     public List<OrderDTO> findOrdersCustomerAuthenticated(String token) {

@@ -5,6 +5,7 @@ import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserNotFoundExce
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.order.OrderNotRejectedException;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.ProductNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class OrderControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(OrderNotFoundException.class)
     public ErrorDTO handleUserNotFound(HttpServletRequest request, OrderNotFoundException exception) {
-        log.error("Shop Error: {}", exception.getMessage(), exception);
+        log.error("Order Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Ordem não encontrado", request);
 
     }
@@ -33,7 +34,7 @@ public class OrderControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ProductNotFoundException.class)
     public ErrorDTO handleProductNotFound(HttpServletRequest request, ProductNotFoundException exception) {
-        log.error("Shop Error: {}", exception.getMessage(), exception);
+        log.error("Order Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Produto não encontrado", request);
     }
 
@@ -41,7 +42,7 @@ public class OrderControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(CustomerInvalidKeyException.class)
     public ErrorDTO handleInvalidKeyCustomer(HttpServletRequest request, CustomerInvalidKeyException exception) {
-        log.error("Shop Error: {}", exception.getMessage(), exception);
+        log.error("Order Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.UNAUTHORIZED.value(), "Order - Chave de autenticação inválida", request);
 
     }
@@ -50,7 +51,7 @@ public class OrderControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(AuthUserNotFoundException.class)
     public ErrorDTO handleAuthUserNotFound(HttpServletRequest request, AuthUserNotFoundException exception) {
-        log.error("Shop Error: {}", exception.getMessage(), exception);
+        log.error("Order Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Order - Cliente não identificado", request);
     }
 
@@ -58,8 +59,17 @@ public class OrderControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CredcardPrincipalNotFoundException.class)
     public ErrorDTO handleCredcardPrincipalNotFoundException(HttpServletRequest request, CredcardPrincipalNotFoundException exception) {
-        log.error("Shop Error: {}", exception.getMessage(), exception);
+        log.error("Order Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cliente não tem um cartão de crédito principal", request);
     }
 
+
+    //OrderNotRejectedException
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(OrderNotRejectedException.class)
+    public ErrorDTO handleCredcardPrincipalNotFoundException(HttpServletRequest request, OrderNotRejectedException exception) {
+        log.error("Order Error: {}", exception.getMessage(), exception);
+        return new ErrorDTO(HttpStatus.BAD_REQUEST.value(), "Order - Ordem com status não Rejeitada", request);
+    }
 }

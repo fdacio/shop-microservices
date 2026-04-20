@@ -82,8 +82,6 @@ public class SecurityConfig {
                         .pathMatchers("/auth/user/*").hasAuthority(SCOPE_ADMIN)
                         .pathMatchers("/auth/config/*").hasAuthority(SCOPE_ADMIN)
 
-
-
                         //Route for resources product
                         .pathMatchers("/product").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)
                         .pathMatchers("/product/*").hasAnyAuthority(SCOPE_ADMIN, SCOPE_OPERATOR)

@@ -4,7 +4,7 @@ import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderShotDTO;
 import br.com.daciosoftware.shop.order.service.OrderService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,10 +18,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/order")
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
     @GetMapping(("/all"))
     public List<OrderDTO> findAllOrders() {
@@ -88,6 +88,12 @@ public class OrderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         orderService.delete(id, token);
+    }
+
+    @GetMapping("/{id}/retry-payment")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void retryOrderPayment(@PathVariable Long id) {
+        orderService.retryOrderPayment(id);
     }
 
     @GetMapping("/customer/{customerId}")

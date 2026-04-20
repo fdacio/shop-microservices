@@ -285,6 +285,14 @@ public class CustomerService {
                 .findFirst().orElseThrow(CredcardPrincipalNotFoundException::new);
     }
 
+    public CredcardDTO getCredcardPrincipalById(Long customerId) {
+        CustomerDTO customerDTO = findById(customerId);
+        return credcardService.findByCustomerId(customerDTO.getId())
+                .stream()
+                .filter(CredcardDTO::getPrincipal)
+                .findFirst().orElseThrow(CredcardPrincipalNotFoundException::new);
+    }
+
     public CredcardDTO updatePrincipalCredcard(Long credcardId, String token) {
         CredcardDTO credcardDTO = credcardService.findById(credcardId);
         CustomerDTO customerDTO = getCustomerAuthenticated(token);

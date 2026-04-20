@@ -25,7 +25,7 @@ PATH_APPS="/home/ubuntu/shop"
 
 APP="${1:-all}"
 DELAY="${2:-60}"
-OPTIONS="${3:-}"
+OPTIONS="${3:-"--with-dependencies"}"
 
 #if [ "$OPTIONS" = "--dependencies" ]; then
 #  OPTIONS="--dependencies"
@@ -41,6 +41,7 @@ OPTIONS="${3:-}"
 validate_input() {
     local valid_apps=("all" "auth" "customer" "product" "order" "gateway" "models" "exceptions" "auth-keys")
 
+    # shellcheck disable=SC2076
     if [[ ! " ${valid_apps[*]} " =~ " $APP " ]]; then
         echo "❌ Aplicação inválida: $APP"
         echo "📋 Aplicações válidas: ${valid_apps[*]}"
