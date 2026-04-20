@@ -1,9 +1,5 @@
 package br.com.daciosoftware.shop.order.service;
 
-import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
-import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentRequestDTO;
 import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentResponseDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderPaymentDTO;
@@ -12,6 +8,8 @@ import br.com.daciosoftware.shop.order.config.KafkaConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,19 +24,15 @@ public class KafkaReceiveMessageService {
     private final OrderPaymentService orderPaymentService;
 
     @KafkaListener(topics = KafkaConfig.ORDER_CREATE_TOPIC, groupId = "order-group", containerFactory = "kafkaListenerContainerFactoryOrderCreate")
+    @RetryableTopic(
+            attempts = "5",
+            backoff = @Backoff(delay = 5000, multiplier = 2),
+            kafkaTemplate = "kafkaTemplateCreateOrder",
+            dltTopicSuffix = ".DLT"
+    )
     public void listenerCreateOrder(OrderDTO order) {
         log.info("Order Kafka order create listener: {}", order.getId());
-        CustomerDTO customer = order.getCustomer();
-        CredcardShotDTO credcard = order.getCredcardPrincipal();
-        Float valorTotalOrder = order.getTotal();
-        BrokerPaymentRequestDTO request = new BrokerPaymentRequestDTO();
-        request.setOrderId(order.getId());
-        request.setCredcardId(credcard.getId());
-        request.setCpf(customer.getCpf());
-        request.setNumberCard(credcard.getNumberCard());
-        request.setCvv(credcard.getCvv());
-        request.setValue(valorTotalOrder);
-        brokerCredcardService.processPayment(request);
+        brokerCredcardService.processPayment(order);
     }
 
     @KafkaListener(topics = KafkaConfig.BROKER_PAYMENT_RESPONSE_TOPIC, groupId = "order-group", containerFactory = "kafkaListenerContainerFactoryBrokerPaymentResponse")
@@ -55,4 +49,6 @@ public class KafkaReceiveMessageService {
         orderPaymentDTO.setMessage(response.getMessage());
         orderPaymentService.save(orderPaymentDTO);
     }
+
+
 }

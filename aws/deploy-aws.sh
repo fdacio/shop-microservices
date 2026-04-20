@@ -25,7 +25,7 @@ PATH_APPS="/home/ubuntu/shop"
 
 APP="${1:-all}"
 DELAY="${2:-60}"
-OPTIONS="${3:-"--dependencies"}"
+OPTIONS="${3:-}"
 
 #if [ "$OPTIONS" = "--dependencies" ]; then
 #  OPTIONS="--dependencies"
@@ -47,9 +47,9 @@ validate_input() {
         exit 1
     fi
 
-    if [[ "$OPTIONS" != "--dependencies" && "$OPTIONS" != "" ]]; then
+    if [[ "$OPTIONS" != "--with-dependencies" && "$OPTIONS" != "" ]]; then
         echo "❌ Opção inválida: $OPTIONS"
-        echo "📋 Opções válidas: --dependencies ou vazio"
+        echo "📋 Opções válidas: --with-dependencies ou vazio"
         exit 1
     fi
 
@@ -115,7 +115,7 @@ build_module() {
 }
 
 # Build os módulos necessários
-if [ "$OPTIONS" = "--dependencies" ]; then
+if [ "$OPTIONS" = "--with-dependencies" ]; then
   build_module models
   build_module exceptions
   build_module auth-keys
@@ -221,4 +221,3 @@ echo "   ⚙️  Opções: ${OPTIONS:-nenhuma}"
 echo "   ⏱️  Delay: ${DELAY}s"
 echo ""
 echo "✅ Script executado com sucesso!"
-

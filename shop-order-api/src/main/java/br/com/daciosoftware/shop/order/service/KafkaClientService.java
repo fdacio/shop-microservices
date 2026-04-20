@@ -22,4 +22,7 @@ public class KafkaClientService {
         kafkaTemplateBrokerPaymentResponse.send(KafkaConfig.BROKER_PAYMENT_RESPONSE_TOPIC, response);
     }
 
+    public void sendProcessPayment(OrderDTO orderDTO) {
+        kafkaTemplateOrder.send(KafkaConfig.REPROCESS_PAYMENT_TOPIC, orderDTO);
+    }
 }
