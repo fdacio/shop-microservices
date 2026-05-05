@@ -67,6 +67,7 @@ validate_input
 # Função para compilar um módulo do repositório
 # Aceita nomes curtos: models, exceptions, auth-keys, auth, customer, order, product, gateway
 build_module() {
+
     local module="$1"
     local dir
 
@@ -124,7 +125,7 @@ fi
 
 if [ "$APP" = "all" ]; then
   for m in auth customer product order gateway; do
-    build_module "$m"
+     build_module "$m"
   done
 else
   build_module "$APP"
