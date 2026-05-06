@@ -1,5 +1,5 @@
 FROM eclipse-temurin:17-jdk-alpine
-RUN apk add curl
+RUN apk add --no-cache curl
 VOLUME /tmp
 RUN mkdir -p /app/photos
 ENV PRODUCT_API_DIR_PHOTO=/app/photos
