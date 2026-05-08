@@ -2,11 +2,11 @@
 set -euo pipefail
 
 OPTIONS="${1:-""}"
-SLEEP=10
+SLEEP=30
 
 if [ "$OPTIONS" = "--down" ]; then
   docker-compose down --remove-orphans
-  SLEEP=40
+  SLEEP=60
 fi
 echo "✅ UP containers"
 docker-compose up -d

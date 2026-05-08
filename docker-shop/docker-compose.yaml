@@ -61,7 +61,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 150s
+      start_period: 180s
 
   product:
     image: daciosoftware/shop-product-api:latest
@@ -81,7 +81,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 150s
+      start_period: 180s
 
   customer:
     image: daciosoftware/shop-customer-api:latest
@@ -98,10 +98,10 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://customer:8083/customer/health" ]
-      interval: 15s
+      interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 150s
+      start_period: 180s
 
   order:
     image: daciosoftware/shop-order-api:latest
@@ -114,6 +114,8 @@ services:
       AUTH_API_URL: http://auth:8081
       PRODUCT_API_URL: http://product:8082
       CUSTOMER_API_URL: http://customer:8083
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      BROKER_CARDCARD_URL: https://brokercredcard.daciosoftware.com.br/api
     depends_on:
       postgres:
         condition: service_healthy
@@ -130,7 +132,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 150s
+      start_period: 180s
 
   gateway:
     image: daciosoftware/shop-gateway-api:latest
@@ -155,4 +157,4 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 150s
+      start_period: 60s
