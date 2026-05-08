@@ -13,94 +13,6 @@ services:
     healthcheck:
       test: [ "CMD", "psql", "--username=postgres",  "--command=SELECT 1 FROM pg_database WHERE datname='shop';"]
 
-  auth:
-    #image: loja/shop-auth-api
-    build: "./auth"
-    ports:
-      - "8881:8081"
-    environment:
-      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: dacio@04
-      CUSTOMER_API_URL: http://customer:8083
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://auth:8081/auth/health" ]
-
-  product:
-    #image: loja/shop-product-api
-    build: "./product"
-    ports:
-      - "8882:8082"
-    volumes:
-      - ./produtos/photos:/app/photos
-    environment:
-      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: dacio@04
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://product:8082/product/health" ]
-
-  customer:
-    #image: loja/shop-customer-api
-    build: "./customer"
-    ports:
-      - "8883:8083"
-    environment:
-      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: dacio@04
-      PRODUCT_API_URL: http://product:8082
-      AUTH_API_URL: http://auth:8081
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://customer:8083/customer/health" ]
-
-  order:
-    #image: loja/shop-order-api
-    build: "./order"
-    ports:
-      - "8884:8084"
-    environment:
-      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: dacio@04
-      AUTH_API_URL: http://auth:8081
-      PRODUCT_API_URL: http://product:8082
-      CUSTOMER_API_URL: http://customer:8083
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      BROKER_CARDCARD_URL: https://brokercredcard.daciosoftware.com.br/api
-    depends_on:
-      postgres:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://order:8084/order/health" ]
-
-  gateway:
-    #image: loja/shop-gateway-api
-    build: "./gateway"
-    ports:
-      - "8880:8080"
-    environment:
-      AUTH_API_URL: http://auth:8081
-      PRODUCT_API_URL: http://product:8082
-      CUSTOMER_API_URL: http://customer:8083
-      ORDER_API_URL: http://order:8084
-    depends_on:
-      auth:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://gateway:8080/gateway/health" ]
-
   kafka:
     image: apache/kafka:4.2.0
     ports:
@@ -124,3 +36,86 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+
+  auth:
+    image: daciosoftware/shop-auth-api:latest
+    ports:
+      - "8881:8081"
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: dacio@04
+      CUSTOMER_API_URL: http://customer:8083
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://auth:8081/auth/health" ]
+
+  product:
+    image: daciosoftware/shop-product-api:latest
+    ports:
+      - "8882:8082"
+    volumes:
+      - ./produtos/photos:/app/photos
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: dacio@04
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://product:8082/product/health" ]
+
+  customer:
+    image: daciosoftware/shop-customer-api:latest
+    ports:
+      - "8883:8083"
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: dacio@04
+      PRODUCT_API_URL: http://product:8082
+      AUTH_API_URL: http://auth:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://customer:8083/customer/health" ]
+
+  order:
+    image: daciosoftware/shop-order-api:latest
+    ports:
+      - "8884:8084"
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/shop
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: dacio@04
+      AUTH_API_URL: http://auth:8081
+      PRODUCT_API_URL: http://product:8082
+      CUSTOMER_API_URL: http://customer:8083
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      BROKER_CARDCARD_URL: https://brokercredcard.daciosoftware.com.br/api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://order:8084/order/health" ]
+
+  gateway:
+    image: daciosoftware/shop-gateway-api:latest
+    ports:
+      - "8880:8080"
+    environment:
+      AUTH_API_URL: http://auth:8081
+      PRODUCT_API_URL: http://product:8082
+      CUSTOMER_API_URL: http://customer:8083
+      ORDER_API_URL: http://order:8084
+    depends_on:
+      auth:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://gateway:8080/gateway/health" ]

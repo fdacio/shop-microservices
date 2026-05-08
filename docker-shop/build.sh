@@ -31,6 +31,7 @@ validate_input
 build_module() {
     local module="$1"
     local dir
+    local image_name
 
     case "$module" in
         models)   dir="../shop-models";  image_name= ;;

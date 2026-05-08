@@ -25,7 +25,7 @@ PATH_APPS="/home/ubuntu/shop"
 
 APP="${1:-all}"
 DELAY="${2:-60}"
-OPTIONS="${3:-"--with-dependencies"}"
+OPTIONS="${3:-"--without-dependencies"}"
 
 #if [ "$OPTIONS" = "--dependencies" ]; then
 #  OPTIONS="--dependencies"
@@ -39,7 +39,8 @@ OPTIONS="${3:-"--with-dependencies"}"
 
 # Validação dos parâmetros de entrada
 validate_input() {
-    local valid_apps=("all" "auth" "customer" "product" "order" "gateway" "models" "exceptions" "auth-keys")
+    local valid_apps=("all" "auth" "customer" "product" "order" "gateway")
+    local valid_options=("with-dependencies" "--without-dependencies")
 
     # shellcheck disable=SC2076
     if [[ ! " ${valid_apps[*]} " =~ " $APP " ]]; then
@@ -47,10 +48,10 @@ validate_input() {
         echo "📋 Aplicações válidas: ${valid_apps[*]}"
         exit 1
     fi
-
-    if [[ "$OPTIONS" != "--with-dependencies" && "$OPTIONS" != "" ]]; then
+    # shellcheck disable=SC2076
+    if [[ ! " ${valid_options[*]} " =~ " $OPTIONS " ]]; then
         echo "❌ Opção inválida: $OPTIONS"
-        echo "📋 Opções válidas: --with-dependencies ou vazio"
+        echo "📋 Opções válidas: - ${valid_options[*]}"
         exit 1
     fi
 
@@ -72,25 +73,14 @@ build_module() {
     local dir
 
     case "$module" in
-        models)
-            dir="../shop-models" ;;
-        exceptions)
-            dir="../shop-exceptions" ;;
-        auth-keys)
-            dir="../shop-auth-keys" ;;
-        auth)
-            dir="../shop-auth-api" ;;
-        customer)
-            dir="../shop-customer-api" ;;
-        order)
-            dir="../shop-order-api" ;;
-        product)
-            dir="../shop-product-api" ;;
-        gateway)
-            dir="../shop-gateway-api" ;;
-        *)
-            echo "❌ Módulo inválido: $module"
-            return 1 ;;
+        models)     dir="../shop-models";;
+        exceptions) dir="../shop-exceptions";;
+        auth-keys)  dir="../shop-auth-keys";;
+        auth)       dir="../shop-auth-api";;
+        customer)   dir="../shop-customer-api";;
+        order)      dir="../shop-order-api";;
+        product)    dir="../shop-product-api";;
+        gateway)    dir="../shop-gateway-api";;
     esac
 
     # Verifica se o diretório existe
@@ -108,7 +98,7 @@ build_module() {
     echo "🔧 Compilando módulo: $module (dir: $dir)"
 
     # Executa Maven com melhor tratamento de erro
-    if ! (cd "$dir" && mvn --batch-mode --offline -DskipTests=true clean install); then
+    if ! (cd "$dir" && mvn --batch-mode -DskipTests=true clean install); then
         echo "❌ Falha ao compilar módulo: $module"
         return 1
     fi
@@ -118,6 +108,7 @@ build_module() {
 
 # Build os módulos necessários
 if [ "$OPTIONS" = "--with-dependencies" ]; then
+  echo "⚙️ Build dependencies"
   build_module models
   build_module exceptions
   build_module auth-keys
@@ -125,9 +116,11 @@ fi
 
 if [ "$APP" = "all" ]; then
   for m in auth customer product order gateway; do
+    echo "⚙️ Build all apps"
      build_module "$m"
   done
 else
+  echo "⚙️ Build $APP"
   build_module "$APP"
 fi
 
@@ -187,9 +180,11 @@ deploy_module() {
 # Faz deploy dos módulos na ordem correta
 if [ "$APP" = "all" ]; then
   for m in auth customer product order gateway; do
+    echo "-"
     deploy_module "$m"
   done
 else
+  echo "-"
   deploy_module "$APP"
 fi
 
