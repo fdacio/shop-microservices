@@ -40,7 +40,7 @@ OPTIONS="${3:-"--without-dependencies"}"
 # Validação dos parâmetros de entrada
 validate_input() {
     local valid_apps=("all" "auth" "customer" "product" "order" "gateway")
-    local valid_options=("with-dependencies" "--without-dependencies")
+    local valid_options=("--with-dependencies" "--without-dependencies")
 
     # shellcheck disable=SC2076
     if [[ ! " ${valid_apps[*]} " =~ " $APP " ]]; then
