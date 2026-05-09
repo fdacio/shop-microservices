@@ -12,6 +12,7 @@ services:
       POSTGRES_PASSWORD: dacio@04
     healthcheck:
       test: [ "CMD", "psql", "--username=postgres",  "--command=SELECT 1 FROM pg_database WHERE datname='shop';"]
+    restart: unless-stopped
 
   kafka:
     image: apache/kafka:4.2.0
@@ -36,6 +37,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+    restart: unless-stopped
 
   auth:
     image: daciosoftware/shop-auth-api:latest
@@ -51,6 +53,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://auth:8081/auth/health" ]
+    restart: unless-stopped
 
   product:
     image: daciosoftware/shop-product-api:latest
@@ -67,6 +70,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://product:8082/product/health" ]
+    restart: unless-stopped
 
   customer:
     image: daciosoftware/shop-customer-api:latest
@@ -83,6 +87,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://customer:8083/customer/health" ]
+    restart: unless-stopped
 
   order:
     image: daciosoftware/shop-order-api:latest
@@ -104,6 +109,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://order:8084/order/health" ]
+    restart: unless-stopped
 
   gateway:
     image: daciosoftware/shop-gateway-api:latest
@@ -119,3 +125,4 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://gateway:8080/gateway/health" ]
+    restart: unless-stopped
