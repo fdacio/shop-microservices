@@ -1,6 +1,6 @@
 package br.com.daciosoftware.shop.order.service;
 
-import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardPrincipalNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.order.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerInvalidKeyException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.CustomerNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.gateway.AuthForbiddenException;

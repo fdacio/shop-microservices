@@ -3,6 +3,8 @@ package br.com.daciosoftware.shop.customer.service;
 import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.order.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
 import br.com.daciosoftware.shop.models.dto.auth.CreateAuthUserDTO;
@@ -199,7 +201,7 @@ public class CustomerService {
 
         //Delete Customer
         Optional<String> keyAuthOptional = Optional.ofNullable(customerDTO.getKeyAuth());
-        //Try delete AuthUser from Customer
+        //Try of delete AuthUser from Customer
         keyAuthOptional.ifPresent((keyAuth) -> {
             Optional<AuthUserDTO> authUserDTOOptional = authService.findAuthUserByKeyToken(keyAuth);
             authUserDTOOptional.ifPresent((authUserDTO -> authService.deleteAuthUser(authUserDTO)));
@@ -261,6 +263,7 @@ public class CustomerService {
     }
 
     public CredcardDTO createCredcard(CredcardDTO credcard, String token) {
+        valiNumeroCredcardUnique(credcard.getNumberCard());
         CustomerDTO customerDTO = getCustomerAuthenticated(token);
         credcard.setCustomer(customerDTO);
         return credcardService.save(credcard);
@@ -302,6 +305,7 @@ public class CustomerService {
         credcardDTO.setPrincipal(true);
         return credcardService.updateMyPrincipal(credcardDTO, customerDTO);
     }
+
     public void deleteMyCredcard(Long credcardId, String token) {
         CredcardDTO credcardDTO = credcardService.findById(credcardId);
         CustomerDTO customerDTO = getCustomerAuthenticated(token);
@@ -314,18 +318,18 @@ public class CustomerService {
     /*** Private Methods */
 
     private void validCpfUnique(String cpf) {
-        Optional<CustomerDTO> userDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);
-        if (userDTO.isPresent()) {
+        Optional<CustomerDTO> optionalCustomerDTO = customerRepository.findByCpf(cpf).map(CustomerDTO::convert);
+        if (optionalCustomerDTO.isPresent()) {
             throw new CustomerCpfExistsException();
         }
     }
 
     private void validEmailUnique(String email, Long id) {
-        Optional<CustomerDTO> userDTO = customerRepository.findByEmail(email).map(CustomerDTO::convert);
-        if (userDTO.isPresent()) {
+        Optional<CustomerDTO> optionalCustomerDTO = customerRepository.findByEmail(email).map(CustomerDTO::convert);
+        if (optionalCustomerDTO.isPresent()) {
             if (id == null) {
                 throw new CustomerEmailExistsException();
-            } else if (!id.equals(userDTO.get().getId())) {
+            } else if (!id.equals(optionalCustomerDTO.get().getId())) {
                 throw new CustomerEmailExistsException();
             }
         }
@@ -353,6 +357,13 @@ public class CustomerService {
         createAuthUserDTO.setEmail(customerDTO.getEmail());
         createAuthUserDTO.setPassword(password);
         return authService.createAuthUser(createAuthUserDTO);
+    }
+
+    private void valiNumeroCredcardUnique(String numberCard) {
+        Optional<CredcardDTO> optionalCredcardDTO = credcardService.findByNumberCard(numberCard);
+        if (optionalCredcardDTO.isPresent()) {
+            throw new CredcardNumberExistsException();
+        }
     }
 
 

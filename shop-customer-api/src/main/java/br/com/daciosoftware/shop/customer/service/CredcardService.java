@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CredcardService {
@@ -19,6 +20,10 @@ public class CredcardService {
 
     public CredcardDTO findById(Long id) {
         return credcardRepository.findById(id).map(CredcardDTO::convert).orElseThrow(CredcardNotFoundException::new);
+    }
+
+    public Optional<CredcardDTO> findByNumberCard(String numberCard) {
+        return credcardRepository.findByNumberCard(numberCard).map(CredcardDTO::convert);
     }
 
     public List<CredcardShotDTO> findShotByCustomerId(Long customerId) {

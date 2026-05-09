@@ -5,6 +5,8 @@ import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthEmailExistsExcep
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthUserUsernameExistsException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
+import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardNotFoundException;
+import br.com.daciosoftware.shop.exceptions.exceptions.order.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.product.CategoryNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -108,5 +110,13 @@ public class CustomerControllerAdvice {
     public ErrorDTO handleCredcardNotFoundException(HttpServletRequest request, CredcardNotFoundException exception) {
         log.error("Shop Error: {}", exception.getMessage(), exception);
         return new ErrorDTO(HttpStatus.NOT_FOUND.value(), "Cartão de crédito não encontrado", request);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CredcardNumberExistsException.class)
+    public ErrorDTO handleCredcardNumberExistsException(HttpServletRequest request, CredcardNumberExistsException exception) {
+        log.error("Shop Error: {}", exception.getMessage(), exception);
+        return new ErrorDTO(HttpStatus.CONFLICT.value(), "Cartão de crédito com o número informado já cadastrado", request);
     }
 }
