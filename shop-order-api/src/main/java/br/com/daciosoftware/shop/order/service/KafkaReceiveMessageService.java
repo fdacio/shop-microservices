@@ -3,6 +3,7 @@ package br.com.daciosoftware.shop.order.service;
 import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentResponseDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
 import br.com.daciosoftware.shop.models.dto.order.OrderPaymentDTO;
+import br.com.daciosoftware.shop.models.dto.order.OrderShotDTO;
 import br.com.daciosoftware.shop.models.enums.OrderStatus;
 import br.com.daciosoftware.shop.order.config.KafkaConfig;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,9 @@ public class KafkaReceiveMessageService {
             kafkaTemplate = "kafkaTemplateCreateOrder",
             dltTopicSuffix = ".DLT"
     )
-    public void listenerCreateOrder(OrderDTO order) {
-        log.info("Order Kafka order create listener: {}", order.getId());
-        brokerCredcardService.processPayment(order);
+    public void listenerCreateOrder(OrderShotDTO orderShotDTO) {
+        log.info("Order Kafka order create listener: {}", orderShotDTO.getId());
+        brokerCredcardService.processPayment(orderShotDTO);
     }
 
     @KafkaListener(topics = KafkaConfig.BROKER_PAYMENT_RESPONSE_TOPIC, groupId = "order-group", containerFactory = "kafkaListenerContainerFactoryBrokerPaymentResponse")

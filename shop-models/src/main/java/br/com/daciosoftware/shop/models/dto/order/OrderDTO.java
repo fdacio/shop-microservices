@@ -1,6 +1,5 @@
 package br.com.daciosoftware.shop.models.dto.order;
 
-import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.order.Order;
@@ -21,29 +20,27 @@ import java.util.stream.Collectors;
 @ToString
 public class OrderDTO {
 
-	private Long id;
-	private LocalDateTime dateOrder;
-	private Float total;
-	private OrderStatus status;
-	private CustomerDTO customer;
-	@NotNull(message="Informe os itens")
-	@NotEmpty(message="Informe pelo menos um item")
-	private List<ItemDTO> itens = new ArrayList<>();
-	private CredcardShotDTO credcardPrincipal;
-	private List<OrderPaymentDTO> payments = new ArrayList<>();
+    private Long id;
+    private LocalDateTime dateOrder;
+    private Float total;
+    private OrderStatus status;
+    private CustomerDTO customer;
+    @NotNull(message = "Informe os itens")
+    @NotEmpty(message = "Informe pelo menos um item")
+    private List<ItemDTO> itens = new ArrayList<>();
 
-	public static OrderDTO convert(Order order) {
-		OrderDTO orderDTO = new OrderDTO();
-		orderDTO.setId(order.getId());
-		orderDTO.setDateOrder(order.getDateOrder());
-		orderDTO.setTotal(order.getTotal());
-		orderDTO.setStatus(order.getStatus());
-		orderDTO.setCustomer(CustomerDTO.convert(order.getCustomer()));
-		List<ItemDTO> itensDTO = order.getItens()
-				.stream()
-				.map(ItemDTO::convert)
-				.collect(Collectors.toList());
-		orderDTO.setItens(itensDTO);
-		return orderDTO;
-	}
+    public static OrderDTO convert(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setId(order.getId());
+        orderDTO.setDateOrder(order.getDateOrder());
+        orderDTO.setTotal(order.getTotal());
+        orderDTO.setStatus(order.getStatus());
+        orderDTO.setCustomer(CustomerDTO.convert(order.getCustomer()));
+        List<ItemDTO> itensDTO = order.getItens()
+                .stream()
+                .map(ItemDTO::convert)
+                .collect(Collectors.toList());
+        orderDTO.setItens(itensDTO);
+        return orderDTO;
+    }
 }

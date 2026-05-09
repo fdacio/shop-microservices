@@ -1,10 +1,10 @@
 package br.com.daciosoftware.shop.order.service;
 
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
-import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
+import br.com.daciosoftware.shop.models.dto.customer.CustomerShotDTO;
 import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentRequestDTO;
 import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentResponseDTO;
-import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
+import br.com.daciosoftware.shop.models.dto.order.OrderShotDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +23,9 @@ public class BrokerPaymentService {
     private String brokerCredcardApiURL;
     private final KafkaClientService kafkaClientService;
 
-    public void processPayment(OrderDTO order) {
+    public void processPayment(OrderShotDTO orderShotDTO) {
 
-        BrokerPaymentRequestDTO requestDTO = getBrokerPaymentRequestDTO(order);
+        BrokerPaymentRequestDTO requestDTO = getBrokerPaymentRequestDTO(orderShotDTO);
 
         WebClient.builder()
                 .baseUrl(brokerCredcardApiURL)
@@ -35,25 +35,25 @@ public class BrokerPaymentService {
                 .bodyValue(requestDTO)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-                    log.warn("Erro de validação do broker para ordem {}: status {}", order.getId(), clientResponse.statusCode().value());
+                    log.warn("Erro de validação do broker para ordem {}: status {}", orderShotDTO.getId(), clientResponse.statusCode().value());
                     return clientResponse
                             .bodyToMono(BrokerPaymentResponseDTO.class)
                             .flatMap(errorResponse -> {
-                                BrokerPaymentResponseDTO response = getBrokerPaymentResponseDTO(order, errorResponse);
+                                BrokerPaymentResponseDTO response = getBrokerPaymentResponseDTO(orderShotDTO, errorResponse);
                                 kafkaClientService.sendResponseBrokerPayment(response);
                                 return Mono.empty();
                             });
                 })
                 .bodyToMono(BrokerPaymentResponseDTO.class)
                 .flatMap(brokerResponse -> {
-                    log.info("Processando o pagamento da Ordem: {}", order.getId());
-                    BrokerPaymentResponseDTO response = getBrokerPaymentResponseDTO(order, brokerResponse);
+                    log.info("Processando o pagamento da Ordem: {}", orderShotDTO.getId());
+                    BrokerPaymentResponseDTO response = getBrokerPaymentResponseDTO(orderShotDTO, brokerResponse);
                     kafkaClientService.sendResponseBrokerPayment(response);
                     return Mono.empty();
                 })
                 .onErrorResume(error -> {
-                    log.error("Erro no processamento do pagamento para ordem: {} - {}", order.getId(), error.getMessage());
-                    BrokerPaymentResponseDTO errorResponse = createErrorResponse(order, error);
+                    log.error("Erro no processamento do pagamento para ordem: {} - {}", orderShotDTO.getId(), error.getMessage());
+                    BrokerPaymentResponseDTO errorResponse = createErrorResponse(orderShotDTO, error);
                     kafkaClientService.sendResponseBrokerPayment(errorResponse);
                     // Lança a exception após enviar para Kafka, para que o Kafka faça retry
                     return Mono.error(error);
@@ -62,8 +62,8 @@ public class BrokerPaymentService {
 
     }
 
-    private BrokerPaymentRequestDTO getBrokerPaymentRequestDTO(OrderDTO order) {
-        CustomerDTO customer = order.getCustomer();
+    private BrokerPaymentRequestDTO getBrokerPaymentRequestDTO(OrderShotDTO order) {
+        CustomerShotDTO customer = order.getCustomer();
         CredcardShotDTO credcardPrincipal = order.getCredcardPrincipal();
         Long orderId = order.getId();
         Long credcardId = credcardPrincipal.getId();
@@ -82,7 +82,7 @@ public class BrokerPaymentService {
         return request;
     }
 
-    private BrokerPaymentResponseDTO getBrokerPaymentResponseDTO(OrderDTO orderDTO, BrokerPaymentResponseDTO brokerPaymentResponseDTO) {
+    private BrokerPaymentResponseDTO getBrokerPaymentResponseDTO(OrderShotDTO orderDTO, BrokerPaymentResponseDTO brokerPaymentResponseDTO) {
         BrokerPaymentResponseDTO response = new BrokerPaymentResponseDTO();
         response.setOrderId(orderDTO.getId());
         response.setCredcardId(orderDTO.getCredcardPrincipal().getId());
@@ -92,7 +92,7 @@ public class BrokerPaymentService {
         return response;
     }
 
-    private BrokerPaymentResponseDTO createErrorResponse(OrderDTO order, Throwable error) {
+    private BrokerPaymentResponseDTO createErrorResponse(OrderShotDTO order, Throwable error) {
         BrokerPaymentResponseDTO response = new BrokerPaymentResponseDTO();
         response.setOrderId(order.getId());
         response.setCredcardId(order.getCredcardPrincipal().getId());

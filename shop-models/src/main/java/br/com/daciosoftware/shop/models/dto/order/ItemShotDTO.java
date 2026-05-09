@@ -29,4 +29,13 @@ public class ItemShotDTO {
 		itemDTO.setPreco(item.getPreco());
 		return itemDTO;
 	}
+
+	public static ItemShotDTO convert(ItemDTO item) {
+		ItemShotDTO itemDTO = new ItemShotDTO();
+		itemDTO.setId(item.getId());
+		itemDTO.setProduct(ProductShotDTO.convert(item.getProduct()));
+		itemDTO.setQuantidade(item.getQuantidade());
+		itemDTO.setPreco(item.getPreco());
+		return itemDTO;
+	}
 }

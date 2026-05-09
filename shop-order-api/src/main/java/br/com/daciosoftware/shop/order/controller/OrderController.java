@@ -23,13 +23,8 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping(("/all"))
-    public List<OrderDTO> findAllOrders() {
-        return orderService.findAllComplete();
-    }
-
     @GetMapping
-    public List<OrderShotDTO> findAll() {
+    public List<OrderDTO> findAll() {
         return orderService.findAll();
     }
 
@@ -41,7 +36,7 @@ public class OrderController {
 
     @GetMapping("/last/my-order")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<OrderDTO> findLastOrdersCustomerAuthenticated(@RequestHeader("Authorization") String token) {
+    public Optional<OrderShotDTO> findLastOrdersCustomerAuthenticated(@RequestHeader("Authorization") String token) {
         return orderService.findLastOrderCustomerAuthenticated(token);
     }
 

@@ -1,7 +1,8 @@
 package br.com.daciosoftware.shop.order.config;
 
 import br.com.daciosoftware.shop.models.dto.order.BrokerPaymentResponseDTO;
-import br.com.daciosoftware.shop.models.dto.order.OrderDTO;
+import br.com.daciosoftware.shop.models.dto.order.OrderShotDTO;
+import br.com.daciosoftware.shop.models.dto.order.OrderShotDTO;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -29,7 +30,7 @@ public class KafkaConfig {
     public static final String BROKER_PAYMENT_RESPONSE_TOPIC = "BROKER_PAYMENT_RESPONSE_TOPIC";
     public static final String REPROCESS_PAYMENT_TOPIC = "REPROCESS_PAYMENT_TOPIC";
 
-    public ProducerFactory<String, OrderDTO> producerFactoryOrderCreate() {
+    public ProducerFactory<String, OrderShotDTO> producerFactoryOrderCreate() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddressServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -48,7 +49,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, OrderDTO> kafkaTemplateCreateOrder() {
+    public KafkaTemplate<String, OrderShotDTO> kafkaTemplateCreateOrder() {
         return new KafkaTemplate<>(producerFactoryOrderCreate());
     }
 
@@ -57,9 +58,9 @@ public class KafkaConfig {
         return new KafkaTemplate<>(producerFactoryBrokerPaymentResponse());
     }
 
-    public ConsumerFactory<String, OrderDTO> consumerFactoryOrderCreate() {
+    public ConsumerFactory<String, OrderShotDTO> consumerFactoryOrderCreate() {
         // JSON deserializer que conhece a classe alvo
-        JsonDeserializer<OrderDTO> deserializer = new JsonDeserializer<>(OrderDTO.class);
+        JsonDeserializer<OrderShotDTO> deserializer = new JsonDeserializer<>(OrderShotDTO.class);
         // Permitir desserializar classes do pacote do projeto (evita erro de "trusted packages")
         deserializer.addTrustedPackages("*");
 
@@ -72,9 +73,9 @@ public class KafkaConfig {
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
 
-    public ConsumerFactory<String, OrderDTO> consumerFactoryProcessPayment() {
+    public ConsumerFactory<String, OrderShotDTO> consumerFactoryProcessPayment() {
         // JSON deserializer que conhece a classe alvo
-        JsonDeserializer<OrderDTO> deserializer = new JsonDeserializer<>(OrderDTO.class);
+        JsonDeserializer<OrderShotDTO> deserializer = new JsonDeserializer<>(OrderShotDTO.class);
         // Permitir desserializar classes do pacote do projeto (evita erro de "trusted packages")
         deserializer.addTrustedPackages("*");
 
@@ -102,8 +103,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, OrderDTO> kafkaListenerContainerFactoryOrderCreate() {
-        ConcurrentKafkaListenerContainerFactory<String, OrderDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, OrderShotDTO> kafkaListenerContainerFactoryOrderCreate() {
+        ConcurrentKafkaListenerContainerFactory<String, OrderShotDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryOrderCreate());
         return factory;
     }
@@ -116,8 +117,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, OrderDTO> kafkaListenerContainerFactoryProcessPayment() {
-        ConcurrentKafkaListenerContainerFactory<String, OrderDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, OrderShotDTO> kafkaListenerContainerFactoryProcessPayment() {
+        ConcurrentKafkaListenerContainerFactory<String, OrderShotDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryProcessPayment());
         return factory;
     }

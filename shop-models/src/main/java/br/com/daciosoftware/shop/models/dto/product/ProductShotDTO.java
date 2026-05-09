@@ -30,4 +30,13 @@ public class ProductShotDTO {
 		return dto;
 	}
 
+	public static ProductShotDTO convert(ProductDTO product) {
+		ProductShotDTO dto = new ProductShotDTO();
+		dto.setId(product.getId());
+		dto.setNome(product.getNome());
+		dto.setPreco(product.getPreco());
+		dto.setFoto(product.getFoto());
+		return dto;
+	}
+
 }
