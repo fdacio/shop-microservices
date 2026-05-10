@@ -2,7 +2,6 @@ package br.com.daciosoftware.shop.models.dto.order;
 
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerShotDTO;
-import br.com.daciosoftware.shop.models.entity.order.Order;
 import br.com.daciosoftware.shop.models.enums.OrderStatus;
 import lombok.*;
 
@@ -26,21 +25,6 @@ public class OrderShotDTO {
     private List<ItemShotDTO> itens = new ArrayList<>();
     private CredcardShotDTO credcardPrincipal;
     private List<OrderPaymentDTO> payments = new ArrayList<>();
-
-    public static OrderShotDTO convert(Order order) {
-        OrderShotDTO dto = new OrderShotDTO();
-        dto.setId(order.getId());
-        dto.setDateOrder(order.getDateOrder());
-        dto.setTotal(order.getTotal());
-        dto.setStatus(order.getStatus());
-        dto.setCustomer(CustomerShotDTO.convert(order.getCustomer()));
-        List<ItemShotDTO> itensDTO = order.getItens()
-                .stream()
-                .map(ItemShotDTO::convert)
-                .collect(Collectors.toList());
-        dto.setItens(itensDTO);
-        return dto;
-    }
 
     public static OrderShotDTO convert(OrderDTO order) {
         OrderShotDTO dto = new OrderShotDTO();

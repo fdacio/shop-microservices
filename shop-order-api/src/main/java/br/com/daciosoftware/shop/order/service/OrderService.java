@@ -54,12 +54,7 @@ public class OrderService {
         return orderRepository.findById(id).map(OrderDTO::convert).orElseThrow(OrderNotFoundException::new);
     }
 
-    public OrderShotDTO findByIdWithCredcardPrincipal(Long id) {
-        OrderShotDTO orderShotDTO = OrderShotDTO.convert(findById(id));
-        CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByCustomerId(orderShotDTO.getCustomer().getId());
-        orderShotDTO.setCredcardPrincipal(CredcardShotDTO.convert(credcardPrincipal));
-        return orderShotDTO;
-    }
+
 
     /**
      *
@@ -74,6 +69,12 @@ public class OrderService {
         return orderShotDTO;
     }
 
+    /**
+     *
+     * @param id order
+     * @param token customer
+     * @return OrderDTO
+     */
     public OrderDTO findByIdAndToken(Long id, String token) {
         OrderDTO orderDTO = findById(id);
         CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
@@ -83,6 +84,11 @@ public class OrderService {
         return orderDTO;
     }
 
+    /**
+     *
+     * @param userId - Id do usuário
+     * @return List<OrderDTO>
+     */
     public List<OrderDTO> findByCustomerIndentifier(Long userId) {
         List<Order> orders = orderRepository.findByCustomerIdentifier(userId);
         return orders
@@ -192,6 +198,16 @@ public class OrderService {
         return findByCustomerIndentifier(customerDTO.getId());
     }
 
+    public Optional<OrderShotDTO> findLastOrderCustomerAuthenticated(String token) {
+        CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
+        return findByCustomerIndentifier(customerDTO.getId())
+                .stream()
+                .map(OrderShotDTO::convert)
+                .map(this::getOrderWithPayments)
+                .map((order) -> getOrderWithPrincipalCredcard(order, token))
+                .max(Comparator.comparing(OrderShotDTO::getDateOrder));
+    }
+
     private OrderShotDTO getOrderWithPayments(OrderShotDTO orderShotDTO) {
         List<OrderPaymentDTO> payments = orderPaymentService.findByOrderId(orderShotDTO.getId());
         orderShotDTO.setPayments(payments);
@@ -204,14 +220,12 @@ public class OrderService {
         return orderShotDTO;
     }
 
-    public Optional<OrderShotDTO> findLastOrderCustomerAuthenticated(String token) {
-        CustomerDTO customerDTO = customerService.getCustomerAuthenticated(token);
-        return findByCustomerIndentifier(customerDTO.getId())
-                .stream()
-                .map(OrderShotDTO::convert)
-                .map(this::getOrderWithPayments)
-                .map((order) -> getOrderWithPrincipalCredcard(order, token))
-                .max(Comparator.comparing(OrderShotDTO::getDateOrder));
+    private OrderShotDTO findByIdWithCredcardPrincipal(Long id) {
+        OrderShotDTO orderShotDTO = OrderShotDTO.convert(findById(id));
+        CredcardDTO credcardPrincipal = customerService.getCredcardPrincipalByCustomerId(orderShotDTO.getCustomer().getId());
+        orderShotDTO.setCredcardPrincipal(CredcardShotDTO.convert(credcardPrincipal));
+        return orderShotDTO;
     }
+
 
 }
