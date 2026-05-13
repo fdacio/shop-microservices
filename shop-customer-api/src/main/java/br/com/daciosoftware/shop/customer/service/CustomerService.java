@@ -176,7 +176,7 @@ public class CustomerService {
         }
 
         if ((customerDTO.getInteresses() != null)) {
-            Set<CategoryDTO> interesses = categoryService.validCategorys(customerDTO.getInteresses());
+            Set<CategoryDTO> interesses = categoryService.validCategories(customerDTO.getInteresses());
             customer.setInteresses(interesses
                     .stream()
                     .map(Category::convert)
@@ -336,7 +336,7 @@ public class CustomerService {
     }
 
     private void validInteresses(Set<CategoryDTO> interesses) {
-        categoryService.validCategorys(interesses);
+        categoryService.validCategories(interesses);
     }
 
     private void validPassword(PasswordDTO password) {
