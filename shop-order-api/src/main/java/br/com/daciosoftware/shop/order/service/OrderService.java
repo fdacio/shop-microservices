@@ -54,8 +54,6 @@ public class OrderService {
         return orderRepository.findById(id).map(OrderDTO::convert).orElseThrow(OrderNotFoundException::new);
     }
 
-
-
     /**
      *
      * @param id order

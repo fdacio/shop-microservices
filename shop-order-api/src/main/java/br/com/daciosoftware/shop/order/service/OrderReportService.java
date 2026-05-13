@@ -10,7 +10,7 @@ import com.itextpdf.text.Font.FontStyle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -20,17 +20,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class OrderReportService {
 
     private static final int SCALE_PERC_LOGO = 50;
 
-    @Autowired
-    private OrderReportRepositoryImpl orderReportRepository;
+    private final OrderReportRepositoryImpl orderReportRepository;
+    private final OrderService orderService;
 
-    @Autowired
-    private OrderService orderService;
-
-    public ByteArrayOutputStream getReportDemoVenda(Long shopId)  throws DocumentException {
+    public ByteArrayOutputStream getReportDemoVenda(Long shopId) throws DocumentException {
         Document document = new Document();
         document.setMargins(20, 20, 30, 30);
 
@@ -201,26 +199,26 @@ public class OrderReportService {
         tableItens.addCell(cell9);
 
         int n = 1;
-        for (ItemDTO item: shopDTO.getItens()) {
+        for (ItemDTO item : shopDTO.getItens()) {
 
-            String num =  String.valueOf(n);
+            String num = String.valueOf(n);
             String nome = item.getProduct().getNome();
             String quantidade = String.valueOf(item.getQuantidade());
             String vrUnit = String.format("R$ %,.2f", item.getPreco());
             String vrTotal = String.format("R$ %,.2f", item.getQuantidade() * item.getPreco());
 
 
-            PdfPCell cell10 = new PdfPCell(new Phrase( num, fontNormal));
+            PdfPCell cell10 = new PdfPCell(new Phrase(num, fontNormal));
             cell10.setPadding(PADDING);
-            PdfPCell cell11 = new PdfPCell(new Phrase( nome, fontNormal));
+            PdfPCell cell11 = new PdfPCell(new Phrase(nome, fontNormal));
             cell11.setPadding(PADDING);
-            PdfPCell cell12 = new PdfPCell(new Phrase( quantidade, fontNormal));
+            PdfPCell cell12 = new PdfPCell(new Phrase(quantidade, fontNormal));
             cell12.setPadding(PADDING);
             cell12.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            PdfPCell cell13 = new PdfPCell(new Phrase( vrUnit, fontNormal));
+            PdfPCell cell13 = new PdfPCell(new Phrase(vrUnit, fontNormal));
             cell13.setPadding(PADDING);
             cell13.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            PdfPCell cell14 = new PdfPCell(new Phrase( vrTotal, fontNormal));
+            PdfPCell cell14 = new PdfPCell(new Phrase(vrTotal, fontNormal));
             cell14.setPadding(PADDING);
             cell14.setHorizontalAlignment(Element.ALIGN_RIGHT);
 
@@ -244,7 +242,7 @@ public class OrderReportService {
         float[] widths = {15, 70, 15};
         tableHeader.setWidths(widths);
 
-        PdfPCell pdfPCellImg =  getLogo().isPresent() ? new PdfPCell(getLogo().get()) : new PdfPCell();
+        PdfPCell pdfPCellImg = getLogo().isPresent() ? new PdfPCell(getLogo().get()) : new PdfPCell();
         pdfPCellImg.setBorderWidth(0);
         tableHeader.addCell(pdfPCellImg);
 
