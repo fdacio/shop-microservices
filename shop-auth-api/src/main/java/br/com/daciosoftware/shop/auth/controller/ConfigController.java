@@ -3,7 +3,7 @@ package br.com.daciosoftware.shop.auth.controller;
 import br.com.daciosoftware.shop.auth.service.ConfigService;
 import br.com.daciosoftware.shop.models.dto.auth.ConfigDTO;
 import br.com.daciosoftware.shop.models.dto.auth.ConfigEnum;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +11,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class ConfigController {
 
-    @Autowired
-    private ConfigService configService;
+    private final ConfigService configService;
 
     @GetMapping("/config")
     @ResponseStatus(HttpStatus.OK)
