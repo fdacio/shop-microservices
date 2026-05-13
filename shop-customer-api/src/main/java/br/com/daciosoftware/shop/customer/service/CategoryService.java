@@ -21,14 +21,14 @@ public class CategoryService {
     @Value("${product.api.url}")
     private String productApiURL;
 
-    public Set<CategoryDTO> validCategorys(Set<CategoryDTO> categorysDTO) {
+    public Set<CategoryDTO> validCategories(Set<CategoryDTO> categoriesDTO) {
 
-        if (categorysDTO != null) {
+        if (categoriesDTO != null) {
 
             try {
                 WebClient webClient = WebClient.builder().baseUrl(productApiURL).build();
 
-                for (CategoryDTO c : categorysDTO) {
+                for (CategoryDTO c : categoriesDTO) {
                     Long categoryId = c.getId();
                     CategoryDTO category = webClient
                             .get()
@@ -45,7 +45,7 @@ public class CategoryService {
                             .bodyToMono(CategoryDTO.class)
                             .block();
 
-                    categorysDTO.add(category);
+                    categoriesDTO.add(category);
 
                 }
 
@@ -59,7 +59,7 @@ public class CategoryService {
 
         }
 
-        return categorysDTO;
+        return categoriesDTO;
     }
 
     public Flux<CategoryDTO> findAll() {
