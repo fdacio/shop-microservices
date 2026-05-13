@@ -33,6 +33,7 @@ import java.util.List;
 @Configuration
 @EnableWebFluxSecurity //reactive stack - Non Blocking Code
 @EnableReactiveMethodSecurity()
+
 public class SecurityConfig {
 
     public static final String[] PUBLIC_END_POINTS = {

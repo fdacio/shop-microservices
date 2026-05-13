@@ -3,7 +3,7 @@ package br.com.daciosoftware.shop.product.controller;
 import br.com.daciosoftware.shop.models.dto.product.CategoryDTO;
 import br.com.daciosoftware.shop.product.service.CategoryService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,35 +11,35 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/category")
+@RequiredArgsConstructor
 public class CategoryController {
 
-	@Autowired
-	private CategoryService categoryService;
-	
-	@GetMapping
-	public List<CategoryDTO> getAll() {		
-		return categoryService.findAll();		
-	}
-	
-	@GetMapping("/{id}")
-	public CategoryDTO findById(@PathVariable Long id) {
-		return categoryService.findById(id);
-	}
+    private final CategoryService categoryService;
 
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public CategoryDTO save(@Valid @RequestBody CategoryDTO categoryDTO) {
-		return categoryService.save(categoryDTO);
-	}
+    @GetMapping
+    public List<CategoryDTO> getAll() {
+        return categoryService.findAll();
+    }
 
-	@PatchMapping("/{id}")
-	public CategoryDTO update(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
-		return categoryService.update(id, categoryDTO);
-	}
+    @GetMapping("/{id}")
+    public CategoryDTO findById(@PathVariable Long id) {
+        return categoryService.findById(id);
+    }
 
-	@DeleteMapping("/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable Long id) {
-		categoryService.delete(id);
-	}
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryDTO save(@Valid @RequestBody CategoryDTO categoryDTO) {
+        return categoryService.save(categoryDTO);
+    }
+
+    @PatchMapping("/{id}")
+    public CategoryDTO update(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
+        return categoryService.update(id, categoryDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        categoryService.delete(id);
+    }
 }

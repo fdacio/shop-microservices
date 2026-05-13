@@ -6,17 +6,17 @@ import br.com.daciosoftware.shop.models.dto.customer.CredcardDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CredcardShotDTO;
 import br.com.daciosoftware.shop.models.dto.customer.CustomerDTO;
 import br.com.daciosoftware.shop.models.entity.customer.Credcard;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CredcardService {
 
-    @Autowired
-    private CredcardRepository credcardRepository;
+    private final CredcardRepository credcardRepository;
 
     public CredcardDTO findById(Long id) {
         return credcardRepository.findById(id).map(CredcardDTO::convert).orElseThrow(CredcardNotFoundException::new);

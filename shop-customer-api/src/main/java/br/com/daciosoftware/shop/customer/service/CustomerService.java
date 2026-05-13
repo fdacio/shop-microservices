@@ -3,7 +3,6 @@ package br.com.daciosoftware.shop.customer.service;
 import br.com.daciosoftware.shop.customer.repository.CustomerRepository;
 import br.com.daciosoftware.shop.exceptions.exceptions.auth.AuthPasswordNotMatchException;
 import br.com.daciosoftware.shop.exceptions.exceptions.customer.*;
-import br.com.daciosoftware.shop.exceptions.exceptions.customer.CredcardNotFoundException;
 import br.com.daciosoftware.shop.exceptions.exceptions.order.CredcardPrincipalNotFoundException;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserDTO;
 import br.com.daciosoftware.shop.models.dto.auth.AuthUserKeyTokenDTO;
@@ -18,7 +17,6 @@ import br.com.daciosoftware.shop.models.entity.customer.Customer;
 import br.com.daciosoftware.shop.models.entity.product.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,14 +31,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomerService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private AuthService authService;
-    @Autowired
-    private CredcardService credcardService;
+    private final CustomerRepository customerRepository;
+    private final CategoryService categoryService;
+    private final AuthService authService;
+    private final CredcardService credcardService;
 
     public List<CustomerDTO> findAll() {
         return customerRepository.findAll()
@@ -204,7 +198,7 @@ public class CustomerService {
         //Try of delete AuthUser from Customer
         keyAuthOptional.ifPresent((keyAuth) -> {
             Optional<AuthUserDTO> authUserDTOOptional = authService.findAuthUserByKeyToken(keyAuth);
-            authUserDTOOptional.ifPresent((authUserDTO -> authService.deleteAuthUser(authUserDTO)));
+            authUserDTOOptional.ifPresent((authService::deleteAuthUser));
         });
 
 
